@@ -1,0 +1,117 @@
+package com.ngxqt.mdm.ui.fragments
+
+import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.addCallback
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ngxqt.mdm.R
+import com.ngxqt.mdm.data.model.LoginPost
+import com.ngxqt.mdm.data.model.LoginResponse
+import com.ngxqt.mdm.databinding.FragmentHomeBinding
+import com.ngxqt.mdm.databinding.FragmentLoginBinding
+import com.ngxqt.mdm.ui.viewmodels.LoginViewModel
+import com.ngxqt.mdm.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+
+@AndroidEntryPoint
+class LoginFragment : Fragment() {
+    private val viewModel: LoginViewModel by viewModels()
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
+    private var backPressedCount = 0
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        val view = binding.root
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.GONE
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setBackPressed()
+        binding.buttonLogin.setOnClickListener {
+            onLogin()
+            binding.paginationProgressBar.visibility = View.VISIBLE
+        }
+        viewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                binding.paginationProgressBar.visibility = View.INVISIBLE
+                when (it) {
+                    is Resource.Success -> {
+                        binding.tvError.visibility = View.GONE
+                        onLoginSuccess(it.data)
+                    }
+                    is Resource.Error -> {
+                        binding.tvError.visibility = View.VISIBLE
+                        binding.tvError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        Toast.makeText(requireContext(), "Đăng Nhập Thất Bại", Toast.LENGTH_SHORT).show()
+                        Log.e("LOGIN_OBSERVER_ERROR", it.message.toString())
+                    }
+                }
+            }
+
+        })
+    }
+
+    private fun onLoginSuccess(data: LoginResponse?) {
+        val token = data?.accessToken ?: ""
+        val tokenType = data?.tokenType ?: ""
+        val userInfo = data?.user
+        Log.d("LOGIN_OBSERVER", token.substringAfter("|"))
+        if (token != ""){
+            lifecycleScope.launch {
+                viewModel.saveToken(tokenType+" "+ token.substringAfter("|"))
+                userInfo?.let { viewModel.saveUserInfo(it) }
+                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+            }
+        } else {
+            Toast.makeText(requireContext(), "Đăng Nhập Thất Bại", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onLogin() {
+        val email = binding.editTextPhone.text.toString().trim()
+        val password = binding.editTextPassword.text.toString().trim()
+        if (email.isNotEmpty() && password.isNotEmpty() && isEmailValid(email)) {
+            val userLoginPost = LoginPost(email, password)
+            viewModel.login(userLoginPost)
+        } else {
+            Toast.makeText(requireContext(), "Hãy Điền Chính Xác Thông Tin", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    fun isEmailValid(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun setBackPressed(){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (backPressedCount == 1){
+                requireActivity().finishAffinity()
+            } else {
+                backPressedCount++
+                Toast.makeText(requireContext(), "Nhấn hai lần để thoát ứng dụng", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
