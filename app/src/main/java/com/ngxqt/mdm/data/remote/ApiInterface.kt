@@ -12,7 +12,7 @@ interface ApiInterface {
     suspend fun getAllUsers(@Header("Authorization") authorization: String): Response<GetAllUsersResponse>
 
     @GET("api/v1/users")
-    suspend fun searchUsers(@Header("Authorization") authorization: String, @Query("keyword") keyword: String): Response<GetAllUsersResponse>
+    suspend fun searchUsers(@Header("Authorization") authorization: String, @Query("keyword") keyword: String?): Response<GetAllUsersResponse>
 
     @GET("api/v1/equipments")
     suspend fun getAllEquipments(@Header("Authorization") authorization: String): Response<GetAllEquipmentsResponse>

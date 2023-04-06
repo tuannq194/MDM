@@ -24,7 +24,7 @@ class MDMRepository @Inject constructor(
         return mdmApi.getAllUsers(authorization)
     }
 
-    suspend fun searchUsers(authorization: String, keyword: String): Response<GetAllUsersResponse> {
+    suspend fun searchUsers(authorization: String, keyword: String?): Response<GetAllUsersResponse> {
         return mdmApi.searchUsers(authorization, keyword)
     }
 

@@ -8,13 +8,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.ngxqt.mdm.R
+import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.ItemStaffBinding
 
-class StaffAdapter: ListAdapter<User,StaffAdapter.StaffVewHolder>(STAFF_COMPARATOR) {
+class StaffAdapter(private val listener: OnItemClickListener): ListAdapter<User,StaffAdapter.StaffVewHolder>(STAFF_COMPARATOR) {
 
     inner class StaffVewHolder(private val binding: ItemStaffBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.apply {
+                staffMail.setOnClickListener {
+                    listener.onEmailClick(getItem(bindingAdapterPosition))
+                }
+                staffPhone.setOnClickListener {
+                    listener.onPhoneClick(getItem(bindingAdapterPosition))
+                }
+            }
+        }
 
         fun bind(staff: User) {
             binding.apply {
@@ -34,6 +46,11 @@ class StaffAdapter: ListAdapter<User,StaffAdapter.StaffVewHolder>(STAFF_COMPARAT
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StaffVewHolder {
         val binding = ItemStaffBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return StaffVewHolder(binding)
+    }
+
+    interface OnItemClickListener {
+        fun onEmailClick(user: User)
+        fun onPhoneClick(user: User)
     }
 
     override fun onBindViewHolder(holder: StaffVewHolder, position: Int) {

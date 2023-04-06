@@ -1,5 +1,9 @@
 package com.ngxqt.mdm.ui.fragments
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -17,19 +22,24 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
+import com.ngxqt.mdm.data.model.Department
+import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.FragmentStaffBinding
 import com.ngxqt.mdm.ui.adapters.StaffAdapter
 import com.ngxqt.mdm.ui.viewmodels.StaffViewModel
 import com.ngxqt.mdm.util.Resource
+import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class StaffFragment : Fragment() {
+class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
     private val viewModel: StaffViewModel by viewModels()
     private var _binding: FragmentStaffBinding? = null
     private val binding get() = _binding!!
-    private val staffAdapter = StaffAdapter()
+    private val staffAdapter = StaffAdapter(this)
+    private var disposable: Disposable? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +53,10 @@ class StaffFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupRecyclerView()
-        getAllUsers()
+        searchUser(null)
+
         binding.btnStaffSearch.setOnClickListener {
             val keyword = binding.editTextStaffSearch.text.toString().trim()
             if (keyword.isNotEmpty()){
@@ -68,33 +80,7 @@ class StaffFragment : Fragment() {
         }
     }
 
-    private fun getAllUsers(){
-        // Call API Get All User
-        val userPreferences = UserPreferences(requireContext())
-        lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.getAllUsers(it) }
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        }
-        //Get LiveData
-        viewModel.getAllUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
-                when(it) {
-                    is Resource.Success -> {
-                        staffAdapter.submitList(it.data?.data)
-                        binding.tvStaffError.visibility = View.GONE
-                    }
-                    is Resource.Error -> {
-                        binding.tvStaffError.visibility = View.VISIBLE
-                        binding.tvStaffError.setText("ERROR\n${it.message}")
-                        Log.e("GETALLUSERS_OBSERVER_ERROR", it.data.toString())
-                    }
-                }
-            }
-        })
-    }
-
-    private fun searchUser(keyword: String) {
+    private fun searchUser(keyword: String?) {
         // Call API
         val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
@@ -125,4 +111,67 @@ class StaffFragment : Fragment() {
             }
         })
     }
+
+    override fun onEmailClick(user: User) {
+        val intent= Intent(Intent.ACTION_SENDTO)
+        intent.setData(Uri.parse("mailto:${user.email}"))
+        intent.putExtra(Intent.EXTRA_SUBJECT, "[Hệ thống quản lý thiết bị y tế]")
+        intent.putExtra(Intent.EXTRA_TEXT, "Kính gửi ${user.name}")
+        val chooser = Intent.createChooser(intent, "Chọn ứng dụng để thực hiện gửi mail:")
+        startActivity(chooser)
+    }
+
+    override fun onPhoneClick(user: User) {
+        val rxPermissions = RxPermissions(this)
+
+        disposable = rxPermissions
+            .request(
+                Manifest.permission.CALL_PHONE
+            )
+            .subscribe { granted ->
+                if (granted) {
+                    callPhone(user.phone)
+                } else {
+                    Toast.makeText(requireContext(),"Hãy Chấp Thuận Quyền Quản Lý Cuộc Gọi",Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+
+    private fun callPhone(phoneNumber: String?) {
+        val intent= Intent(Intent.ACTION_DIAL)
+        intent.setData(Uri.parse("tel:$phoneNumber"))
+        val chooser = Intent.createChooser(intent, "Chọn ứng dụng để thực hiện cuộc gọi:")
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(requireContext(),"Permission denied",Toast.LENGTH_LONG).show()
+            return
+        }
+        startActivity(chooser)
+    }
+
+    /*private fun getAllUsers(){
+        // Call API Get All User
+        val userPreferences = UserPreferences(requireContext())
+        lifecycleScope.launch {
+            userPreferences.accessTokenString()?.let { viewModel.getAllUsers(it) }
+            binding.paginationProgressBar.visibility = View.VISIBLE
+        }
+        //Get LiveData
+        viewModel.getAllUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                binding.paginationProgressBar.visibility = View.INVISIBLE
+                when(it) {
+                    is Resource.Success -> {
+                        staffAdapter.submitList(it.data?.data)
+                        binding.tvStaffError.visibility = View.GONE
+                    }
+                    is Resource.Error -> {
+                        binding.tvStaffError.visibility = View.VISIBLE
+                        binding.tvStaffError.setText("ERROR\n${it.message}")
+                        Log.e("GETALLUSERS_OBSERVER_ERROR", it.data.toString())
+                    }
+                }
+            }
+        })
+    }*/
 }

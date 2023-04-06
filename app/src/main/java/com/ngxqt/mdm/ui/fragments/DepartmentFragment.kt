@@ -1,5 +1,9 @@
 package com.ngxqt.mdm.ui.fragments
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +27,9 @@ import com.ngxqt.mdm.databinding.FragmentDepartmentBinding
 import com.ngxqt.mdm.ui.adapters.DepartmentAdapter
 import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
 import com.ngxqt.mdm.util.Resource
+import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -31,6 +38,7 @@ class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
     private var _binding: FragmentDepartmentBinding? = null
     private val binding get() = _binding!!
     private val departmentAdapter = DepartmentAdapter(this)
+    private var disposable: Disposable? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -88,11 +96,39 @@ class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
     }
 
     override fun onEmailClick(department: Department) {
-        Toast.makeText(requireContext(),"Email", Toast.LENGTH_SHORT).show()
+        val intent= Intent(Intent.ACTION_SENDTO)
+        intent.setData(Uri.parse("mailto:${department.email}"))
+        intent.putExtra(Intent.EXTRA_SUBJECT, "[Hệ thống quản lý thiết bị y tế]")
+        intent.putExtra(Intent.EXTRA_TEXT, "Kính gửi ${department.title}")
+        val chooser = Intent.createChooser(intent, "Chọn ứng dụng để thực hiện gửi mail:")
+        startActivity(chooser)
     }
 
     override fun onPhoneClick(department: Department) {
-        Toast.makeText(requireContext(),"Phone", Toast.LENGTH_SHORT).show()
+        val rxPermissions = RxPermissions(this)
+
+        disposable = rxPermissions
+            .request(
+                Manifest.permission.CALL_PHONE
+            )
+            .subscribe { granted ->
+                if (granted) {
+                    callPhone(department.phone)
+                } else {
+                    Toast.makeText(requireContext(),"Hãy Chấp Thuận Quyền Quản Lý Cuộc Gọi",Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun callPhone(phoneNumber: String?) {
+        val intent= Intent(Intent.ACTION_DIAL)
+        intent.setData(Uri.parse("tel:$phoneNumber"))
+        val chooser = Intent.createChooser(intent, "Chọn ứng dụng để thực hiện cuộc gọi:")
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(requireContext(),"Permission denied",Toast.LENGTH_LONG).show()
+            return
+        }
+        startActivity(chooser)
     }
 
     override fun onListEquipClick(department: Department) {

@@ -23,6 +23,46 @@ import javax.inject.Inject
 class StaffViewModel @Inject constructor(
     private val mdmRepository: MDMRepository, @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    /**SEARCH USERS*/
+    private val _searchUsersResponseLiveData: MutableLiveData<Event<Resource<GetAllUsersResponse>>> = MutableLiveData()
+    val searchUsersResponseLiveData: LiveData<Event<Resource<GetAllUsersResponse>>>
+        get() = _searchUsersResponseLiveData
+
+    private var searchUsersResponse: GetAllUsersResponse? = null
+
+    fun searchUsers(authorization: String, keyword: String?) = viewModelScope.launch(Dispatchers.IO) {
+        safeSearchUsers(authorization,keyword)
+    }
+
+    private suspend fun safeSearchUsers(authorization: String, keyword: String?) {
+        try {
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.searchUsers(authorization, keyword)
+                _searchUsersResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
+            } else {
+                _searchUsersResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
+
+        } catch (e: Exception) {
+            Log.e("SEARCHUSER_API_ERROR", e.toString())
+            _searchUsersResponseLiveData.postValue(Event(Resource.Error(e.toString())))
+        }
+    }
+
+    private fun handleSearchUsersResponse(response: Response<GetAllUsersResponse>): Resource<GetAllUsersResponse> {
+        if (response.isSuccessful) {
+            Log.d("SEARCHUSER_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
+            response.body()?.let { resultResponse ->
+                return Resource.Success(searchUsersResponse ?: resultResponse)
+            }
+        } else {
+            Log.e("SEARCHUSER_RETROFIT_ERROR", response.toString())
+        }
+        return Resource.Error((searchUsersResponse ?: response.message()).toString())
+    }
+
+    /**GET ALL USERS*/
     private val _getAllUsersResponseLiveData: MutableLiveData<Event<Resource<GetAllUsersResponse>>> = MutableLiveData()
     val getAllUsersResponseLiveData: LiveData<Event<Resource<GetAllUsersResponse>>>
         get() = _getAllUsersResponseLiveData
@@ -57,43 +97,5 @@ class StaffViewModel @Inject constructor(
             Log.e("GETALLUSERS_RETROFIT_ERROR", response.toString())
         }
         return Resource.Error((getAllUsersResponse ?: response.message()).toString())
-    }
-
-
-    private val _searchUsersResponseLiveData: MutableLiveData<Event<Resource<GetAllUsersResponse>>> = MutableLiveData()
-    val searchUsersResponseLiveData: LiveData<Event<Resource<GetAllUsersResponse>>>
-        get() = _searchUsersResponseLiveData
-
-    private var searchUsersResponse: GetAllUsersResponse? = null
-
-    fun searchUsers(authorization: String, keyword: String) = viewModelScope.launch(Dispatchers.IO) {
-        safeSearchUsers(authorization,keyword)
-    }
-
-    private suspend fun safeSearchUsers(authorization: String, keyword: String) {
-        try {
-            if(hasInternetConnection(context)){
-                val response = mdmRepository.searchUsers(authorization, keyword)
-                _searchUsersResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
-            } else {
-                _searchUsersResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
-            }
-
-        } catch (e: Exception) {
-            Log.e("SEARCHUSER_API_ERROR", e.toString())
-            _searchUsersResponseLiveData.postValue(Event(Resource.Error(e.toString())))
-        }
-    }
-
-    private fun handleSearchUsersResponse(response: Response<GetAllUsersResponse>): Resource<GetAllUsersResponse> {
-        if (response.isSuccessful) {
-            Log.d("SEARCHUSER_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
-            response.body()?.let { resultResponse ->
-                return Resource.Success(searchUsersResponse ?: resultResponse)
-            }
-        } else {
-            Log.e("SEARCHUSER_RETROFIT_ERROR", response.toString())
-        }
-        return Resource.Error((searchUsersResponse ?: response.message()).toString())
     }
 }
