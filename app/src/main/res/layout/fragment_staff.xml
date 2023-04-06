@@ -15,62 +15,61 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/dialog_bottom">
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/image_cardView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="13dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginRight="13dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="23dp"
+            android:layout_marginRight="23dp"
+            android:backgroundTint="@color/edit_text_color"
+            app:cardCornerRadius="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/image_cardView"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_margin="10dp"
-                android:backgroundTint="@color/edit_text_color"
-                app:cardCornerRadius="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <EditText
+                    android:id="@+id/editTextStaffSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:drawableLeft="@drawable/ic_search"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="Tên nhân viên,..."
+                    android:textColor="@color/black50"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_staff_search"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
-                    <Button
-                        android:id="@+id/btn_staff_search"
-                        android:layout_width="50dp"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent"
-                        android:drawableLeft="@drawable/ic_search"
-                        android:paddingLeft="16dp" />
-
-                    <EditText
-                        android:id="@+id/editTextStaffSearch"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginRight="10dp"
-                        android:ems="10"
-                        android:hint="Tên nhân viên, phòng khoa,..."
-                        android:textColor="@color/black50"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+                <Button
+                    android:id="@+id/btn_staff_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:text="Tìm kiếm"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView_staff"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:clipToPadding="false"
+            android:layout_marginTop="10dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingBottom="16dp"
@@ -78,7 +77,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/image_cardView" />
 
         <TextView
             android:id="@+id/tv_staff_error"

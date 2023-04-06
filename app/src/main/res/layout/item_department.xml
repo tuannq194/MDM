@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:clipToPadding="false"
-    android:background="@drawable/background_white_border"
+    android:background="@drawable/background_white_border_20"
     android:layout_margin="5dp">
 
     <TextView
@@ -14,12 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:fontFamily="@font/averta_std_cy_semibold_1"
+        android:textStyle="bold"
         android:maxLines="2"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:gravity="center"
-        android:background="@drawable/header_blue_border_10"
+        android:background="@drawable/header_blue_border_20"
         tools:text="Phòng Vật tư" />
 
     <LinearLayout
@@ -49,7 +49,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:fontFamily="@font/averta_std_cy_semibold_1"
                 android:maxLines="2"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -95,7 +94,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:fontFamily="@font/averta_std_cy_semibold_1"
                 android:maxLines="2"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -141,7 +139,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:fontFamily="@font/averta_std_cy_semibold_1"
                 android:maxLines="2"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -186,7 +183,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:fontFamily="@font/averta_std_cy_semibold_1"
                 android:maxLines="2"
                 android:text="Danh sách thiết bị"
                 android:textColor="@color/black"

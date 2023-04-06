@@ -86,7 +86,7 @@ class StaffFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         binding.tvStaffError.visibility = View.VISIBLE
-                        binding.tvStaffError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvStaffError.setText("ERROR\n${it.message}")
                         Log.e("GETALLUSERS_OBSERVER_ERROR", it.data.toString())
                     }
                 }
@@ -118,7 +118,7 @@ class StaffFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         binding.tvStaffError.visibility = View.VISIBLE
-                        binding.tvStaffError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvStaffError.setText("ERROR\n${it.message}")
                         Log.e("GETALLEQUIP_OBSERVER_ERROR", it.data.toString())
                     }
                 }

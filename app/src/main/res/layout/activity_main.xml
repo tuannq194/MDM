@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:visibility="visible"
-        android:background="@color/white"
+        android:background="@drawable/dialog_bottom"
         app:itemTextColor="@drawable/nav_selector"
         app:itemIconTint="@drawable/nav_selector"
         app:menu="@menu/bottom_navigation_menu"

@@ -12,6 +12,7 @@ import com.ngxqt.mdm.data.model.RequestEquipmentBrokenPost
 import com.ngxqt.mdm.data.model.RequestEquipmentBrokenResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,8 +37,12 @@ class BrokenReportViewModel @Inject constructor(
 
     private suspend fun safeBrokenReport(authorization: String, equipmentId: Int, post: RequestEquipmentBrokenPost) {
         try {
-            val response = mdmRepository.requestEquipmentBroken(authorization, equipmentId, post)
-            _brokenReportResponseLiveData.postValue(Event(handleLoginResponse(response)))
+            if(NetworkUtil.hasInternetConnection(context)){
+                val response = mdmRepository.requestEquipmentBroken(authorization, equipmentId, post)
+                _brokenReportResponseLiveData.postValue(Event(handleLoginResponse(response)))
+            } else {
+                _brokenReportResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception){
             Log.e("LOGIN_API_ERROR", e.toString())
             _brokenReportResponseLiveData.postValue(Event(Resource.Error(e.toString())))

@@ -58,6 +58,10 @@ class MDMRepository @Inject constructor(
         return mdmApi.getAllDepartments(authorization)
     }
 
+    suspend fun getDepartmentById(authorization: String, departmentId: Int?): Response<GetDepartmentByIdResponse> {
+        return mdmApi.getDepartmentById(authorization,departmentId)
+    }
+
     suspend fun getListEquipmentsByDepartmenId(authorization: String, departmentId: Int): Response<GetListEquipmentsByDepartmentIdResponse> {
         return mdmApi.getListEquipmentsByDepartmenId(authorization, departmentId)
     }

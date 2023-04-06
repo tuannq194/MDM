@@ -90,7 +90,12 @@ class ScanFragment : Fragment() {
             // Callbacks
             decodeCallback = DecodeCallback {
                 getActivity()?.runOnUiThread {
-                    searchEquipmentsById(it.toString().toInt())
+                    val intValue = it.toString().toIntOrNull()
+                    if (intValue != null) {
+                        searchEquipmentsById(intValue)
+                    } else {
+                        Toast.makeText(requireContext(), "Mã QR Không Chính Xác", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
@@ -131,7 +136,7 @@ class ScanFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         binding.tvScanError.visibility = View.VISIBLE
-                        binding.tvScanError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvScanError.setText("ERROR\n${it.message}")
                         Log.e("SEARCHEQUIPBYID_OBSERVER_ERROR", it.data.toString())
                     }
                 }

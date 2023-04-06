@@ -10,6 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#EC0D3A</color>
     <color name="green">#33BD39</color>
+    <color name="gray">#DCDCDC</color>
     <color name="edit_text_color">#f5f6f8</color>
     <color name="blue_app">#0096c7</color>
     <color name="blue_app_50">#b0dfef</color>

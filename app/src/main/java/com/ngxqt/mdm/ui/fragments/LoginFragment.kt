@@ -45,7 +45,7 @@ class LoginFragment : Fragment() {
         setBackPressed()
         binding.buttonLogin.setOnClickListener {
             onLogin()
-            binding.paginationProgressBar.visibility = View.VISIBLE
+
         }
         viewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
@@ -56,10 +56,12 @@ class LoginFragment : Fragment() {
                         onLoginSuccess(it.data)
                     }
                     is Resource.Error -> {
-                        binding.tvError.visibility = View.VISIBLE
-                        binding.tvError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
-                        Toast.makeText(requireContext(), "Đăng Nhập Thất Bại", Toast.LENGTH_SHORT).show()
+                        binding.tvError.visibility = View.GONE
+                        Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("LOGIN_OBSERVER_ERROR", it.message.toString())
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }

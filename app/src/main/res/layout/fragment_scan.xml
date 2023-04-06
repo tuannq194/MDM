@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/dialog_bottom"
             android:orientation="vertical"
-            android:padding="30dp"
+            android:padding="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -57,8 +57,9 @@
                 android:layout_height="wrap_content"
                 android:gravity="left"
                 android:text="Đưa mã QR Code vào trong khung. Ứng dụng sẽ tự động quét để nhận thông tin thiết bị."
-                android:textColor="@color/black"
-                android:textSize="16dp"/>
+                android:textColor="@color/black50"
+                android:textSize="14dp"
+                android:textStyle="italic"/>
         </LinearLayout>
         <TextView
             android:id="@+id/tv_scan_error"

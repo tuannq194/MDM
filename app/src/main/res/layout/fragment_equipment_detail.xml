@@ -19,8 +19,7 @@
         android:paddingTop="10dp">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false">
+            android:layout_height="match_parent">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView2"
@@ -451,6 +450,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="20dp"
                     android:text="Thiết bị chưa được kiểm kê"
+                    android:visibility="gone"
                     android:textColor="@color/black"
                     android:textSize="14dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -523,7 +523,7 @@
                 android:layout_margin="10dp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:background="@drawable/background_white_border"
+                android:background="@drawable/background_white_border_10"
                 android:padding="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

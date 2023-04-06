@@ -11,6 +11,8 @@ import androidx.paging.cachedIn
 import com.ngxqt.mdm.data.model.*
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.NetworkUtil
+import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -86,8 +88,12 @@ class EquipmentsViewModel @Inject constructor(
 
     private suspend fun safeSearchEquipments(authorization: String, keyword: String) {
         try {
-            val response = mdmRepository.searchEquipments(authorization, keyword)
-            _searchEquipmentsResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.searchEquipments(authorization, keyword)
+                _searchEquipmentsResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
+            } else {
+                _searchEquipmentsResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception) {
             Log.e("SEARCHEQUIP_API_ERROR", e.toString())
             _searchEquipmentsResponseLiveData.postValue(Event(Resource.Error(e.toString())))
@@ -119,8 +125,12 @@ class EquipmentsViewModel @Inject constructor(
 
     private suspend fun safeSearchEquipmentsById(authorization: String, equipmentId: Int) {
         try {
-            val response = mdmRepository.searchEquipmentsById(authorization, equipmentId)
-            _searchEquipmentsByIdResponseLiveData.postValue(Event(handleSearchEquipByIdResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.searchEquipmentsById(authorization, equipmentId)
+                _searchEquipmentsByIdResponseLiveData.postValue(Event(handleSearchEquipByIdResponse(response)))
+            } else {
+                _searchEquipmentsByIdResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception) {
             Log.e("SEARCHEQUIPBYID_API_ERROR", e.toString())
             _searchEquipmentsByIdResponseLiveData.postValue(Event(Resource.Error(e.toString())))
@@ -152,8 +162,12 @@ class EquipmentsViewModel @Inject constructor(
 
     private suspend fun safeStatisticalEquipments(authorization: String, status: String) {
         try {
-            val response = mdmRepository.statisticalEquipments(authorization, status)
-            _statisticalEquipmentsResponseLiveData.postValue(Event(handleStatisticalResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.statisticalEquipments(authorization, status)
+                _statisticalEquipmentsResponseLiveData.postValue(Event(handleStatisticalResponse(response)))
+            }else{
+                _statisticalEquipmentsResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception) {
             Log.e("STATISTICAL_API_ERROR", e.toString())
             _statisticalEquipmentsResponseLiveData.postValue(Event(Resource.Error(e.toString())))
@@ -170,6 +184,43 @@ class EquipmentsViewModel @Inject constructor(
             Log.e("STATISTICAL_RETROFIT_ERROR", response.toString())
         }
         return Resource.Error((statisticalEquipmentsResponse ?: response.message()).toString())
+    }
+
+    /**GET ALL DEPARTMENT*/
+    private val _getAllDepartmentsResponseLiveData: MutableLiveData<Event<Resource<GetAllDepartmentsResponse>>> = MutableLiveData()
+    val getAllDepartmentsResponseLiveData: LiveData<Event<Resource<GetAllDepartmentsResponse>>>
+        get() = _getAllDepartmentsResponseLiveData
+
+    private var getAllDepartmentsResponse: GetAllDepartmentsResponse? = null
+
+    fun getAllDepartments(authorization: String) = viewModelScope.launch(Dispatchers.IO) {
+        safeGetAllDepartments(authorization)
+    }
+
+    private suspend fun safeGetAllDepartments(authorization: String) {
+        try {
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.getAllDepartments(authorization)
+                _getAllDepartmentsResponseLiveData.postValue(Event(handleGetAllDepartmentsResponse(response)))
+            } else {
+                _getAllDepartmentsResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
+        } catch (e: Exception) {
+            Log.e("GETALLDEPARTMENT_API_ERROR", e.toString())
+            _getAllDepartmentsResponseLiveData.postValue(Event(Resource.Error(e.toString())))
+        }
+    }
+
+    private fun handleGetAllDepartmentsResponse(response: Response<GetAllDepartmentsResponse>): Resource<GetAllDepartmentsResponse> {
+        if (response.isSuccessful) {
+            Log.d("GETALLDEPARTMENT_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
+            response.body()?.let { resultResponse ->
+                return Resource.Success(getAllDepartmentsResponse ?: resultResponse)
+            }
+        } else {
+            Log.e("GETALLDEPARTMENT_RETROFIT_ERROR", response.toString())
+        }
+        return Resource.Error((getAllDepartmentsResponse ?: response.message()).toString())
     }
 
 

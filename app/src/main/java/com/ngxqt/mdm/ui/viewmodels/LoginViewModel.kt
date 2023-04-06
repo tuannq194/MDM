@@ -11,12 +11,14 @@ import com.ngxqt.mdm.data.model.LoginResponse
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,14 +36,21 @@ class LoginViewModel @Inject constructor(
     }
 
     private suspend fun safeLogin(post: LoginPost) {
+        _loginResponseLiveData.postValue(Event(Resource.Loading()))
         try {
-            val response = mdmRepository.login(post)
-            _loginResponseLiveData.postValue(Event(handleLoginResponse(response)))
-        } catch (e: Exception){
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.login(post)
+                _loginResponseLiveData.postValue(Event(handleLoginResponse(response)))
+            }else{
+                _loginResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
+        } catch (e: Exception) {
             Log.e("LOGIN_API_ERROR", e.toString())
-            _loginResponseLiveData.postValue(Event(Resource.Error(e.toString())))
+            when (e) {
+                is IOException -> _loginResponseLiveData.postValue(Event(Resource.Error("Lỗi Mạng")))
+                else ->_loginResponseLiveData.postValue(Event(Resource.Error("Lỗi")))
+            }
         }
-
     }
 
     private fun handleLoginResponse(response: Response<LoginResponse>): Resource<LoginResponse> {
@@ -52,6 +61,9 @@ class LoginViewModel @Inject constructor(
             }
         } else {
             Log.e("LOGIN_RETROFIT_ERROR", response.toString())
+            if (response.code()==400){
+                return Resource.Error("Tài Khoản Hoặc Mật Khẩu Không Đúng")
+            }
         }
         return Resource.Error((loginResponse ?: response.message()).toString())
     }

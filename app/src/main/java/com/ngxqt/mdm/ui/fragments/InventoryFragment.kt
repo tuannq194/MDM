@@ -6,8 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -18,9 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
-import com.ngxqt.mdm.databinding.FragmentHomeBinding
 import com.ngxqt.mdm.databinding.FragmentInventoryBinding
-import com.ngxqt.mdm.ui.adapters.EquipmentsAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +49,7 @@ class InventoryFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
         setupRecyclerView()
 
         binding.btnInventorySearch.setOnClickListener {
-            val keyword = binding.editTextSearch.text.toString().trim()
+            val keyword = binding.editTextEquipmentsSearch.text.toString().trim()
             if (keyword.isNotEmpty()){
                 searchEquipments(keyword)
             } else{
@@ -100,7 +97,7 @@ class InventoryFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
                     }
                     is Resource.Error -> {
                         binding.tvInventoryError.visibility = View.VISIBLE
-                        binding.tvInventoryError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvInventoryError.setText("ERROR\n${it.message}")
                         Log.e("GETALLEQUIP_OBSERVER_ERROR", it.data.toString())
                     }
                 }

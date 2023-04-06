@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -69,12 +70,12 @@ class HomeFragment : Fragment() {
 
     private fun setUpGridView(){
         val itemModelArrayList: ArrayList<HomeItemModel?> = ArrayList()
-        itemModelArrayList.add(HomeItemModel("Thiết bị", R.drawable.ic_equipment))
-        itemModelArrayList.add(HomeItemModel("Báo hỏng", R.drawable.ic_noti_ring))
-        itemModelArrayList.add(HomeItemModel("Khoa phòng", R.drawable.ic_department))
-        itemModelArrayList.add(HomeItemModel("Nhân viên", R.drawable.ic_staff))
-        itemModelArrayList.add(HomeItemModel("Thống kê", R.drawable.ic_statistical))
-        itemModelArrayList.add(HomeItemModel("Kiểm kê", R.drawable.ic_inventory))
+        itemModelArrayList.add(HomeItemModel("Thiết Bị", R.drawable.ic_equipment_fill))
+        itemModelArrayList.add(HomeItemModel("Báo Hỏng", R.drawable.ic_noti_ring_fill))
+        itemModelArrayList.add(HomeItemModel("Khoa Phòng", R.drawable.ic_department_fill))
+        itemModelArrayList.add(HomeItemModel("Nhân Viên", R.drawable.ic_staff_fill))
+        itemModelArrayList.add(HomeItemModel("Thống Kê", R.drawable.ic_statistical))
+        itemModelArrayList.add(HomeItemModel("Kiểm Kê", R.drawable.ic_inventory_fill))
 
         binding.homeGridview.adapter = HomeGridAdapter(requireContext(),itemModelArrayList)
 

@@ -135,7 +135,7 @@ class BrokenReportFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         binding.tvBrokenReportError.visibility = View.VISIBLE
-                        binding.tvBrokenReportError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvBrokenReportError.setText("ERROR\n${it.message}")
                         Log.e("BROKENREPORT_OBSERVER_ERROR", it.data.toString())
                     }
                 }

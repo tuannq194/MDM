@@ -1,9 +1,9 @@
-package com.ngxqt.mdm.ui.adapters
+package com.ngxqt.mdm.ui.adapters.equipment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -12,20 +12,38 @@ import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.ItemEquipmentBinding
 import com.ngxqt.mdm.util.BASE_URL_KA
 
-class EquipmentsAdapter(private val listener: OnItemClickListener): ListAdapter<Equipment,EquipmentsAdapter.EquipmentVewHolder>(COMPARATOR) {
+class EquipmentsPagingAdapter(private val listener: OnItemClickListener) :
+    PagingDataAdapter<Equipment, EquipmentsPagingAdapter.EquipmentViewHolder>(EQUIPMENT_COMPARATOR) {
 
-    inner class EquipmentVewHolder(private val binding: ItemEquipmentBinding) :
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EquipmentViewHolder {
+        val binding = ItemEquipmentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return EquipmentViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: EquipmentViewHolder, position: Int) {
+        val currentItem = getItem(position)
+        if (currentItem != null) {
+            holder.bind(currentItem)
+        }
+    }
+
+    inner class EquipmentViewHolder(private val binding: ItemEquipmentBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         init {
             binding.root.setOnClickListener {
-                listener.onItemClick(getItem(bindingAdapterPosition))
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val equipment = getItem(position)
+                    if (equipment!=null)
+                        listener.onItemClick(equipment)
+                }
             }
         }
+
         fun bind(equipment: Equipment) {
             binding.apply {
                 Glide.with(itemView)
-                    .load(BASE_URL_KA+"/public/uploads/"+equipment.path)
+                    .load(BASE_URL_KA +"/public/uploads/"+equipment.path)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
@@ -47,24 +65,12 @@ class EquipmentsAdapter(private val listener: OnItemClickListener): ListAdapter<
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EquipmentVewHolder {
-        val binding = ItemEquipmentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return EquipmentVewHolder(binding)
-    }
-
     interface OnItemClickListener {
         fun onItemClick(equipment: Equipment)
     }
 
-    override fun onBindViewHolder(holder: EquipmentVewHolder, position: Int) {
-        val currentItem = getItem(position)
-        if (currentItem != null) {
-            holder.bind(currentItem)
-        }
-    }
-
-    companion object {
-        private val COMPARATOR = object : DiffUtil.ItemCallback<Equipment>() {
+    companion object{
+        private val EQUIPMENT_COMPARATOR = object : DiffUtil.ItemCallback<Equipment>() {
             override fun areItemsTheSame(oldItem: Equipment, newItem: Equipment): Boolean {
                 return oldItem.id == newItem.id
             }
@@ -72,7 +78,6 @@ class EquipmentsAdapter(private val listener: OnItemClickListener): ListAdapter<
             override fun areContentsTheSame(oldItem: Equipment, newItem: Equipment): Boolean {
                 return oldItem == newItem
             }
-
         }
     }
 }

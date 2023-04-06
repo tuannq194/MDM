@@ -79,7 +79,7 @@ class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
                     }
                     is Resource.Error -> {
                         binding.tvDepartmentError.visibility = View.VISIBLE
-                        binding.tvDepartmentError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvDepartmentError.setText("ERROR\n${it.message}")
                         Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data.toString())
                     }
                 }

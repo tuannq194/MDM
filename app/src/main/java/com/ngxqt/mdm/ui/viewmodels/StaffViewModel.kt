@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.data.model.GetAllUsersResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.NetworkUtil
+import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,8 +35,12 @@ class StaffViewModel @Inject constructor(
 
     private suspend fun safeGetAllUsers(authorization: String) {
         try {
-            val response = mdmRepository.getAllUsers(authorization)
-            _getAllUsersResponseLiveData.postValue(Event(handleGetAllUsersResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.getAllUsers(authorization)
+                _getAllUsersResponseLiveData.postValue(Event(handleGetAllUsersResponse(response)))
+            } else {
+                _getAllUsersResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception) {
             Log.e("GETALLUSERS_API_ERROR", e.toString())
             _getAllUsersResponseLiveData.postValue(Event(Resource.Error(e.toString())))
@@ -66,8 +72,13 @@ class StaffViewModel @Inject constructor(
 
     private suspend fun safeSearchUsers(authorization: String, keyword: String) {
         try {
-            val response = mdmRepository.searchUsers(authorization, keyword)
-            _searchUsersResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.searchUsers(authorization, keyword)
+                _searchUsersResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
+            } else {
+                _searchUsersResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
+
         } catch (e: Exception) {
             Log.e("SEARCHUSER_API_ERROR", e.toString())
             _searchUsersResponseLiveData.postValue(Event(Resource.Error(e.toString())))

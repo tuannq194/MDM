@@ -12,6 +12,8 @@ import com.ngxqt.mdm.data.model.RequestEquipmentInventoryPost
 import com.ngxqt.mdm.data.model.RequestEquipmentInventoryResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.NetworkUtil
+import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,8 +38,12 @@ class InventoryNoteViewModel @Inject constructor(
 
     private suspend fun safeInventoryNote(authorization: String, equipmentId: Int, post: RequestEquipmentInventoryPost) {
         try {
-            val response = mdmRepository.requestEquipmentInventory(authorization, equipmentId, post)
-            _inventoryNoteResponseLiveData.postValue(Event(handleInventoryNoteResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.requestEquipmentInventory(authorization, equipmentId, post)
+                _inventoryNoteResponseLiveData.postValue(Event(handleInventoryNoteResponse(response)))
+            } else {
+                _inventoryNoteResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception){
             Log.e("INVENTORY_API_ERROR", e.toString())
             _inventoryNoteResponseLiveData.postValue(Event(Resource.Error(e.toString())))

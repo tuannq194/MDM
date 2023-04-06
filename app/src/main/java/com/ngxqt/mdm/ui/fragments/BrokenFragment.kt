@@ -6,8 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,8 +17,7 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentBrokenBinding
-import com.ngxqt.mdm.databinding.FragmentInventoryBinding
-import com.ngxqt.mdm.ui.adapters.EquipmentsAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +49,7 @@ class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
         setupRecyclerView()
 
         binding.btnBrokenSearch.setOnClickListener {
-            val keyword = binding.editTextSearchBroken.text.toString().trim()
+            val keyword = binding.editTextEquipmentsSearch.text.toString().trim()
             if (keyword.isNotEmpty()){
                 searchEquipments(keyword)
             } else{
@@ -94,7 +91,7 @@ class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
                     }
                     is Resource.Error -> {
                         binding.tvBrokenError.visibility = View.VISIBLE
-                        binding.tvBrokenError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvBrokenError.setText("ERROR\n${it.message}")
                         Log.e("GETALLEQUIP_OBSERVER_ERROR", it.data.toString())
                     }
                 }

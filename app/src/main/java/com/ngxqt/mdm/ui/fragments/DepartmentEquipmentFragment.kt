@@ -1,15 +1,11 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -19,16 +15,13 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentDepartmentEquipmentBinding
-import com.ngxqt.mdm.ui.adapters.EquipmentsAdapter
-import com.ngxqt.mdm.ui.adapters.EquipmentsPagingAdapter
-import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
-import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DepartmentEquipmentFragment : Fragment(),EquipmentsPagingAdapter.OnItemClickListener {
+class DepartmentEquipmentFragment : Fragment(), EquipmentsPagingAdapter.OnItemClickListener {
     private val viewModel: EquipmentsViewModel by viewModels()
     private var _binding: FragmentDepartmentEquipmentBinding? = null
     private val binding get() = _binding!!

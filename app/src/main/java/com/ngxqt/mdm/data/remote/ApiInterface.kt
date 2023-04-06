@@ -39,6 +39,9 @@ interface ApiInterface {
     @GET("api/v1/departments")
     suspend fun getAllDepartments(@Header("Authorization") authorization: String): Response<GetAllDepartmentsResponse>
 
+    @GET("api/v1/departments/{id}")
+    suspend fun getDepartmentById(@Header("Authorization") authorization: String, @Path("id") departmentId: Int?): Response<GetDepartmentByIdResponse>
+
     @GET("api/v1/listEquipmentInventory/{id}")
     suspend fun getListEquipmentsByDepartmenId(@Header("Authorization") authorization: String, @Path("id") departmentId: Int): Response<GetListEquipmentsByDepartmentIdResponse>
 

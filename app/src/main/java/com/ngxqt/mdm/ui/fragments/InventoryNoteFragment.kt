@@ -131,7 +131,7 @@ class InventoryNoteFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         binding.tvInventoryNoteError.visibility = View.VISIBLE
-                        binding.tvInventoryNoteError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvInventoryNoteError.setText("ERROR\n${it.message}")
                         Log.e("INVENTORYNOTE_OBSERVER_ERROR", it.data.toString())
                     }
                 }

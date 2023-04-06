@@ -145,7 +145,7 @@ class EquipmentDetailFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         binding.tvEquipmentDetailError.visibility = View.VISIBLE
-                        binding.tvEquipmentDetailError.setText("ERROR ${it.message}\nHÃY THỬ KIỂM TRA KẾT NỐI INTERNET")
+                        binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
                         Log.e("GETALLEQUIP_OBSERVER_ERROR", it.data.toString())
                     }
                 }

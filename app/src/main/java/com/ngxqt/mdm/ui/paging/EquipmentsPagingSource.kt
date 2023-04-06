@@ -26,13 +26,20 @@ class EquipmentsPagingSource(
 
         return try {
             val response = mdmApi.getEquipments(authorization, page, PER_PAGE, status, keyword, departmenId)
-            val data = response.body()!!.data.data
-
-            LoadResult.Page(
-                data = data,
-                prevKey = if (page == STARTING_INDEX) null else page - 1,
-                nextKey = if (data.isEmpty()) null else page + 1
-            )
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    val data = body.data.data
+                    LoadResult.Page(
+                        data = data,
+                        prevKey = if (page == STARTING_INDEX) null else page - 1,
+                        nextKey = if (data.isEmpty()) null else page + 1
+                    )
+                } ?: run {
+                    LoadResult.Error(NullPointerException("Response body is null"))
+                }
+            } else {
+                LoadResult.Error(HttpException(response))
+            }
         } catch (exception: IOException) {
             LoadResult.Error(exception)
         } catch (exception: HttpException) {

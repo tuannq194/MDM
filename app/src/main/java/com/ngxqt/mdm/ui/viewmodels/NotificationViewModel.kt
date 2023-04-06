@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.data.model.*
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.NetworkUtil
+import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,8 +35,12 @@ class NotificationViewModel @Inject constructor(
 
     private suspend fun safeGetNotification(authorization: String) {
         try {
-            val response = mdmRepository.getNotification(authorization)
-            _getNotificationResponseLiveData.postValue(Event(handleGetNotificationResponse(response)))
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.getNotification(authorization)
+                _getNotificationResponseLiveData.postValue(Event(handleGetNotificationResponse(response)))
+            } else {
+                _getNotificationResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
         } catch (e: Exception) {
             Log.e("GETNOTIFICATION_API_ERROR", e.message.toString())
             _getNotificationResponseLiveData.postValue(Event(Resource.Error(e.message.toString())))
