@@ -58,16 +58,16 @@ class EquipmentsFragment : Fragment(),
 
         setupRecyclerView()
         getAllDepartment()
-        getEquipments(filterStatus, filterKeyword, filterDepartment)
+
+        if (filterKeyword == null && filterStatus == null && filterDepartment == null){
+            getEquipments(filterStatus, filterKeyword, filterDepartment)
+        }
+
         setButtonClearFilter()
 
         binding.btnEquipmentsSearch.setOnClickListener {
             filterKeyword = binding.editTextEquipmentsSearch.text.toString().trim()
             if (filterKeyword!!.isNotEmpty()){
-                //binding.btnEquipmentsFilterStatus.setText("Tất cả")
-                //binding.btnEquipmentsFilterDepartment.setText("Tất cả")
-                //filterStatus = null
-                //filterDepartment = null
                 getEquipments(filterStatus, filterKeyword, filterDepartment)
                 setButtonClearFilter()
             } else{
@@ -132,13 +132,17 @@ class EquipmentsFragment : Fragment(),
                 recyclerViewEquipments.isVisible = loadState.source.refresh is LoadState.NotLoading
                 buttonRetry.isVisible = loadState.source.refresh is LoadState.Error
                 textViewError.isVisible = loadState.source.refresh is LoadState.Error
+                imageError.isVisible = loadState.source.refresh is LoadState.Error
 
                 //Empty View
                 if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && equipmentsPagingAdapter.itemCount <= 0){
                     recyclerViewEquipments.isVisible = false
+                    imageEmpty.isVisible = true
                     textViewEmpty.isVisible = true
+                } else {
+                    imageEmpty.isVisible = false
+                    textViewEmpty.isVisible = false
                 }
-                else textViewEmpty.isVisible = false
             }
         }
 
@@ -226,7 +230,6 @@ class EquipmentsFragment : Fragment(),
         // Call API
         lifecycleScope.launch {
             UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
-                //binding.recyclerViewEquipments.adapter = equipmentsPagingAdapter
                 equipmentsPagingAdapter.submitData(lifecycle,it)
             }}
         }

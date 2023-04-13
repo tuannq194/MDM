@@ -7,28 +7,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentInventoryBinding
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class InventoryFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
+class InventoryFragment : Fragment(),
+    EquipmentsPagingAdapter.OnItemClickListener {
     private val viewModel: EquipmentsViewModel by viewModels()
     private var _binding: FragmentInventoryBinding? = null
     private val binding get() = _binding!!
-    private val equipmentsAdapter = EquipmentsAdapter(this)
+    private val equipmentsPagingAdapter = EquipmentsPagingAdapter(this)
+    private var filterKeyword: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,15 +49,17 @@ class InventoryFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupRecyclerView()
+
         binding.btnInventoryScan.setOnClickListener {
             findNavController().navigate(R.id.action_inventoryFragment_to_scanFragment)
         }
-        setupRecyclerView()
+
 
         binding.btnInventorySearch.setOnClickListener {
-            val keyword = binding.editTextEquipmentsSearch.text.toString().trim()
-            if (keyword.isNotEmpty()){
-                searchEquipments(keyword)
+            filterKeyword = binding.editTextEquipmentsSearch.text.toString().trim()
+            if (filterKeyword!!.isNotEmpty()){
+                getEquipments(null,filterKeyword, null)
             } else{
                 Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
             }
@@ -69,11 +77,55 @@ class InventoryFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
         binding.recyclerViewInventory.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
-            adapter = equipmentsAdapter
+            adapter = equipmentsPagingAdapter.withLoadStateHeaderAndFooter(
+                header = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() },
+                footer = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() }
+            )
+        }
+        binding.buttonRetry.setOnClickListener {
+            equipmentsPagingAdapter.retry()
+            getEquipments(null,filterKeyword, null)
+        }
+        equipmentsPagingAdapter.addLoadStateListener { loadState ->
+            binding.apply {
+                imageFind.isVisible = false
+                textViewFind.isVisible = false
+                paginationProgressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                recyclerViewInventory.isVisible = loadState.source.refresh is LoadState.NotLoading
+                cardViewRetry.isVisible = loadState.source.refresh is LoadState.Error
+                textViewError.isVisible = loadState.source.refresh is LoadState.Error
+                imageError.isVisible = loadState.source.refresh is LoadState.Error
+
+                //Empty View
+                if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && equipmentsPagingAdapter.itemCount <= 0){
+                    recyclerViewInventory.isVisible = false
+                    imageEmpty.isVisible = true
+                    textViewEmpty.isVisible = true
+                    imageFind.isVisible = false
+                    textViewFind.isVisible = false
+                } else {
+                    imageEmpty.isVisible = false
+                    textViewEmpty.isVisible = false
+                }
+            }
         }
     }
 
-    private fun searchEquipments(keyword: String) {
+    private fun getEquipments(status: String?, keyword: String?, departmentId: Int?){
+        // Call API
+        lifecycleScope.launch {
+            UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
+                equipmentsPagingAdapter.submitData(lifecycle,it)
+            }}
+        }
+    }
+
+    override fun onItemClick(equipment: Equipment) {
+        val action = InventoryFragmentDirections.actionInventoryFragmentToInventoryNoteFragment(equipment)
+        findNavController().navigate(action)
+    }
+
+    /*private fun searchEquipments(keyword: String) {
         // Call API
         val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
@@ -103,10 +155,5 @@ class InventoryFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
                 }
             }
         })
-    }
-
-    override fun onItemClick(equipment: Equipment) {
-        val action = InventoryFragmentDirections.actionInventoryFragmentToInventoryNoteFragment(equipment)
-        findNavController().navigate(action)
-    }
+    }*/
 }

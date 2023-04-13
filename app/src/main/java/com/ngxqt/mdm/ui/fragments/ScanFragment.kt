@@ -107,6 +107,7 @@ class ScanFragment : Fragment() {
         codeScanner.startPreview()
         binding.scannerView.setOnClickListener {
             codeScanner.startPreview()
+            binding.tvScanError.visibility = View.INVISIBLE
         }
     }
 

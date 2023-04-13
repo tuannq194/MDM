@@ -7,28 +7,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentBrokenBinding
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
+class BrokenFragment : Fragment(),
+    EquipmentsPagingAdapter.OnItemClickListener {
     private val viewModel: EquipmentsViewModel by viewModels()
     private var _binding: FragmentBrokenBinding? = null
     private val binding get() = _binding!!
-    private val equipmentsAdapter = EquipmentsAdapter(this)
+    private val equipmentsPagingAdapter = EquipmentsPagingAdapter(this)
+    private var filterKeyword: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,15 +49,16 @@ class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupRecyclerView()
+
         binding.btnBrokenScan.setOnClickListener {
             findNavController().navigate(R.id.action_brokenFragment_to_scanFragment)
         }
-        setupRecyclerView()
 
         binding.btnBrokenSearch.setOnClickListener {
-            val keyword = binding.editTextEquipmentsSearch.text.toString().trim()
-            if (keyword.isNotEmpty()){
-                searchEquipments(keyword)
+            filterKeyword = binding.editTextEquipmentsSearch.text.toString().trim()
+            if (filterKeyword!!.isNotEmpty()){
+                getEquipments("active",filterKeyword, null)
             } else{
                 Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
             }
@@ -69,11 +76,57 @@ class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
         binding.recyclerViewBroken.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
-            adapter = equipmentsAdapter
+            adapter = equipmentsPagingAdapter.withLoadStateHeaderAndFooter(
+                header = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() },
+                footer = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() }
+            )
+        }
+        binding.buttonRetry.setOnClickListener {
+            equipmentsPagingAdapter.retry()
+            getEquipments("active",filterKeyword, null)
+        }
+        equipmentsPagingAdapter.addLoadStateListener { loadState ->
+            binding.apply {
+                imageFind.isVisible = false
+                textViewFind.isVisible = false
+                paginationProgressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                recyclerViewBroken.isVisible = loadState.source.refresh is LoadState.NotLoading
+                cardViewRetry.isVisible = loadState.source.refresh is LoadState.Error
+                textViewError.isVisible = loadState.source.refresh is LoadState.Error
+                imageError.isVisible = loadState.source.refresh is LoadState.Error
+
+                //Empty View
+                if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && equipmentsPagingAdapter.itemCount <= 0){
+                    recyclerViewBroken.isVisible = false
+                    imageEmpty.isVisible = true
+                    textViewEmpty.isVisible = true
+                    imageFind.isVisible = false
+                    textViewFind.isVisible = false
+                } else {
+                    imageEmpty.isVisible = false
+                    textViewEmpty.isVisible = false
+                }
+            }
         }
     }
 
-    private fun searchEquipments(keyword: String) {
+
+
+    private fun getEquipments(status: String?, keyword: String?, departmentId: Int?){
+        // Call API
+        lifecycleScope.launch {
+            UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
+                equipmentsPagingAdapter.submitData(lifecycle,it)
+            }}
+        }
+    }
+
+    override fun onItemClick(equipment: Equipment) {
+        val action = BrokenFragmentDirections.actionBrokenFragmentToBrokenReportFragment(equipment)
+        findNavController().navigate(action)
+    }
+
+    /*private fun searchEquipments(keyword: String) {
         // Call API
         val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
@@ -97,9 +150,9 @@ class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
                 }
             }
         })
-    }
+    }*/
 
-    private fun onResponseSuccess(data: MutableList<Equipment>?) {
+    /*private fun onResponseSuccess(data: MutableList<Equipment>?) {
         if (data?.isNotEmpty() == true){
             val equipments: MutableList<Equipment>? = mutableListOf()
             for (item in data){
@@ -117,10 +170,5 @@ class BrokenFragment : Fragment(), EquipmentsAdapter.OnItemClickListener {
         }else{
             Toast.makeText(requireContext(), "Không Tìm Thấy Thiết Bị Chứa Từ Khóa", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onItemClick(equipment: Equipment) {
-        val action = BrokenFragmentDirections.actionBrokenFragmentToBrokenReportFragment(equipment)
-        findNavController().navigate(action)
-    }
+    }*/
 }

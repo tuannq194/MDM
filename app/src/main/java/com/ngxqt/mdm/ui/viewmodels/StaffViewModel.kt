@@ -36,6 +36,7 @@ class StaffViewModel @Inject constructor(
     }
 
     private suspend fun safeSearchUsers(authorization: String, keyword: String?) {
+        _searchUsersResponseLiveData.postValue(Event(Resource.Loading()))
         try {
             if(hasInternetConnection(context)){
                 val response = mdmRepository.searchUsers(authorization, keyword)

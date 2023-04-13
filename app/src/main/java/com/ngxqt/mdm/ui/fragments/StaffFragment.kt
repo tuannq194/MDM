@@ -85,14 +85,15 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
         val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
             userPreferences.accessTokenString()?.let { viewModel.searchUsers(it,keyword) }
-            binding.paginationProgressBar.visibility = View.VISIBLE
+
         }
         //Get LiveData
         viewModel.searchUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
+
                 when(it) {
                     is Resource.Success -> {
+                        binding.paginationProgressBar.visibility = View.INVISIBLE
                         binding.tvStaffError.visibility = View.GONE
                         val data = it.data?.data
                         if (data?.isNotEmpty() == true){
@@ -103,9 +104,13 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
                         }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.INVISIBLE
                         binding.tvStaffError.visibility = View.VISIBLE
                         binding.tvStaffError.setText("ERROR\n${it.message}")
-                        Log.e("GETALLEQUIP_OBSERVER_ERROR", it.data.toString())
+                        Log.e("SEARCHSTAFF_OBSERVER_ERROR", it.data.toString())
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }

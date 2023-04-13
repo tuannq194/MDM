@@ -17,6 +17,8 @@
         app:layout_constraintBottom_toTopOf="@+id/editTextPhone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/logo" />
 
     <EditText
@@ -66,7 +68,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:layout_marginLeft="21dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
@@ -119,17 +122,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:background="@drawable/button_login"
-        android:text="ĐĂNG NHẬP"
         android:fontFamily="@font/averta_std_cy_semibold_1"
         android:letterSpacing="0.001"
+        android:text="ĐĂNG NHẬP"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.0" />
+
     <TextView
         android:id="@+id/tv_error"
         android:layout_width="match_parent"
