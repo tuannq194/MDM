@@ -2,13 +2,11 @@ package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -78,8 +76,6 @@ class NotiFragment : Fragment() {
                         binding.tvNotiError.visibility = View.GONE
                     }
                     is Resource.Error -> {
-                        //binding.tvNotiError.visibility = View.VISIBLE
-                        //binding.tvNotiError.setText("ERROR\n${it.message}")
                         Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("GETNOTI_OBSERVER_ERROR", it.data.toString())
                     }

@@ -9,12 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.data.model.GetAllUsersResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -31,7 +29,7 @@ class StaffViewModel @Inject constructor(
 
     private var searchUsersResponse: GetAllUsersResponse? = null
 
-    fun searchUsers(authorization: String, keyword: String?) = viewModelScope.launch(Dispatchers.IO) {
+    fun searchUsers(authorization: String, keyword: String?) = viewModelScope.launch() {
         safeSearchUsers(authorization,keyword)
     }
 
@@ -70,7 +68,7 @@ class StaffViewModel @Inject constructor(
 
     private var getAllUsersResponse: GetAllUsersResponse? = null
 
-    fun getAllUsers(authorization: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getAllUsers(authorization: String) = viewModelScope.launch() {
         safeGetAllUsers(authorization)
     }
 

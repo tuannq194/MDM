@@ -14,17 +14,17 @@ import com.ngxqt.mdm.databinding.DialogBottomBinding
 import com.ngxqt.mdm.ui.adapters.DialogRecyclerViewAdapter
 
 class MyDialog () : DialogFragment(){
-    private lateinit var listener: onPickerItemSelectedListener
+    private lateinit var listener: OnPickerItemSelectedListener
     private var dialogRecyclerViewAdapter: DialogRecyclerViewAdapter? = null
     private var title: String? = null
     private var items: MutableList<String>? = null
 
-    constructor(adapter: DialogRecyclerViewAdapter, title: String, listener: onPickerItemSelectedListener) : this() {
+    constructor(adapter: DialogRecyclerViewAdapter, title: String, listener: OnPickerItemSelectedListener) : this() {
         this.dialogRecyclerViewAdapter = adapter
         this.title = title
         this.listener = listener
     }
-    constructor(items: MutableList<String>, title: String, listener: onPickerItemSelectedListener) : this() {
+    constructor(items: MutableList<String>, title: String, listener: OnPickerItemSelectedListener) : this() {
         this.items = items
         this.title = title
         this.listener = listener
@@ -64,7 +64,6 @@ class MyDialog () : DialogFragment(){
             dialogPicker.displayedValues = items?.toTypedArray()
             dialogPicker.wrapSelectorWheel = false
             dialogOk.setOnClickListener {
-                //listener?.onPickerItemSelected(items?.get(bindingDialog.dialogPicker.value).toString())
                 listener?.onPickerItemSelected(bindingDialog.dialogPicker.value)
                 dialog?.dismiss()
             }
@@ -73,7 +72,7 @@ class MyDialog () : DialogFragment(){
         return builder.create()
     }
 
-    interface onPickerItemSelectedListener{
+    interface OnPickerItemSelectedListener{
         //fun onPickerItemSelected(status: String?)
         fun onPickerItemSelected(position: Int)
     }

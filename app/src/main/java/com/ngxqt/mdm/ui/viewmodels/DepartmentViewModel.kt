@@ -16,7 +16,6 @@ import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -32,7 +31,7 @@ class DepartmentViewModel @Inject constructor(
 
     private var getAllDepartmentsResponse: GetAllDepartmentsResponse? = null
 
-    fun getAllDepartments(authorization: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getAllDepartments(authorization: String) = viewModelScope.launch() {
         safeGetAllDepartments(authorization)
     }
 
@@ -69,7 +68,7 @@ class DepartmentViewModel @Inject constructor(
 
     private var getDepartmentByIdResponse: GetDepartmentByIdResponse? = null
 
-    fun getDepartmentById(authorization: String, departmentId: Int?) = viewModelScope.launch(Dispatchers.IO) {
+    fun getDepartmentById(authorization: String, departmentId: Int?) = viewModelScope.launch() {
         safeGetDepartmentById(authorization, departmentId)
     }
 
@@ -106,7 +105,7 @@ class DepartmentViewModel @Inject constructor(
 
     private var getListEquipByDepartmentResponse: GetListEquipmentsByDepartmentIdResponse? = null
 
-    fun getListEquipmentByDepartmentId(authorization: String, departmentId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun getListEquipmentByDepartmentId(authorization: String, departmentId: Int) = viewModelScope.launch() {
         safeGetListEquipByDepartment(authorization, departmentId)
     }
 
@@ -133,7 +132,9 @@ class DepartmentViewModel @Inject constructor(
         return Resource.Error((getListEquipByDepartmentResponse ?: response.message()).toString())
     }
 
-    suspend fun clearData() {
-        mdmRepository.clearData()
+    fun clearData() {
+        viewModelScope.launch {
+            mdmRepository.clearData()
+        }
     }
 }

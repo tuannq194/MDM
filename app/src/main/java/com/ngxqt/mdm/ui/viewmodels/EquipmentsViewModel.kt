@@ -8,16 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.model.*
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -26,7 +24,7 @@ import javax.inject.Inject
 class EquipmentsViewModel @Inject constructor(
     private val mdmRepository: MDMRepository, @ApplicationContext private val context: Context
 ) : ViewModel() {
-    //GET EQUIPMENTS V2\
+    //GET EQUIPMENTS V2
     fun getEquipments(authorization: String, status: String?, keyword: String?, departmentId: Int?): LiveData<PagingData<Equipment>>{
         return mdmRepository.getEquipments(authorization, status, keyword, departmentId).cachedIn(viewModelScope)
     }
@@ -38,7 +36,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private var getAllEquipmentsResponse: GetAllEquipmentsResponse? = null
 
-    /*fun getAllEquipments(authorization: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getAllEquipments(authorization: String) = viewModelScope.launch() {
         safeGetAllEquipments(authorization)
     }
 
@@ -50,17 +48,6 @@ class EquipmentsViewModel @Inject constructor(
             Log.e("GETALLEQUIP_API_ERROR", e.message.toString())
             _getAllEquipmentsResponseLiveData.postValue(Event(Resource.Error(e.message.toString())))
         }
-    }*/
-    private val exceptionHandler = CoroutineExceptionHandler {_,throwable ->
-        Log.e("GETALLEQUIP_API_ERROR","exception handler ${throwable.message}")
-        _getAllEquipmentsResponseLiveData.postValue(Event(Resource.Error(throwable.message.toString())))
-    }
-    fun getAllEquipments(authorization: String) = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-        safeGetAllEquipments(authorization)
-    }
-    private suspend fun safeGetAllEquipments(authorization: String) {
-        val response = mdmRepository.getAllEquipments(authorization)
-        _getAllEquipmentsResponseLiveData.postValue(Event(handleGetAllUsersResponse(response)))
     }
 
     private fun handleGetAllUsersResponse(response: Response<GetAllEquipmentsResponse>): Resource<GetAllEquipmentsResponse> {
@@ -82,7 +69,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private var searchEquipmentsResponse: GetAllEquipmentsResponse? = null
 
-    fun searchEquipments(authorization: String, keyword: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun searchEquipments(authorization: String, keyword: String) = viewModelScope.launch() {
         safeSearchEquipments(authorization,keyword)
     }
 
@@ -92,7 +79,7 @@ class EquipmentsViewModel @Inject constructor(
                 val response = mdmRepository.searchEquipments(authorization, keyword)
                 _searchEquipmentsResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
             } else {
-                _searchEquipmentsResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+                _searchEquipmentsResponseLiveData.postValue(Event(Resource.Error(context.getString(R.string.mat_ket_noi_internet))))
             }
         } catch (e: Exception) {
             Log.e("SEARCHEQUIP_API_ERROR", e.toString())
@@ -119,7 +106,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private var searchEquipmentsByIdResponse: SearchEquipmentsByIdResponse? = null
 
-    fun searchEquipmentsById(authorization: String, equipmentId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun searchEquipmentsById(authorization: String, equipmentId: Int) = viewModelScope.launch() {
         safeSearchEquipmentsById(authorization,equipmentId)
     }
 
@@ -129,7 +116,7 @@ class EquipmentsViewModel @Inject constructor(
                 val response = mdmRepository.searchEquipmentsById(authorization, equipmentId)
                 _searchEquipmentsByIdResponseLiveData.postValue(Event(handleSearchEquipByIdResponse(response)))
             } else {
-                _searchEquipmentsByIdResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+                _searchEquipmentsByIdResponseLiveData.postValue(Event(Resource.Error(context.getString(R.string.mat_ket_noi_internet))))
             }
         } catch (e: Exception) {
             Log.e("SEARCHEQUIPBYID_API_ERROR", e.toString())
@@ -156,7 +143,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private var statisticalEquipmentsResponse: StatisticalEquipmentsResponse? = null
 
-    fun statisticalEquipments(authorization: String, status: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun statisticalEquipments(authorization: String, status: String) = viewModelScope.launch() {
         safeStatisticalEquipments(authorization,status)
     }
 
@@ -193,7 +180,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private var getAllDepartmentsResponse: GetAllDepartmentsResponse? = null
 
-    fun getAllDepartments(authorization: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getAllDepartments(authorization: String) = viewModelScope.launch() {
         safeGetAllDepartments(authorization)
     }
 

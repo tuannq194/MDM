@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.ItemStaffBinding
 

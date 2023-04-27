@@ -3,15 +3,12 @@ package com.ngxqt.mdm.ui.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -79,7 +76,7 @@ class HomeFragment : Fragment() {
 
         binding.homeGridview.adapter = HomeGridAdapter(requireContext(),itemModelArrayList)
 
-        binding.homeGridview.setOnItemClickListener { adapterView, view, position, id ->
+        binding.homeGridview.setOnItemClickListener { _, view, position, id ->
             view.alpha = 0.5f
             Handler(Looper.getMainLooper()).postDelayed({
                 view.alpha = 1.0f

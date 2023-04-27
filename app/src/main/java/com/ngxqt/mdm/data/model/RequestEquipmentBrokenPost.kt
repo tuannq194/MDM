@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class RequestEquipmentBrokenPost(
     @SerializedName("date_failure")
-    val date_failure: String,
+    val dateFailure: String,
     @SerializedName("reason")
     val reason: String
 )

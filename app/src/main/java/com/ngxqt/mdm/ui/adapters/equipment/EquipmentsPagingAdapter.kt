@@ -48,7 +48,7 @@ class EquipmentsPagingAdapter(private val listener: OnItemClickListener) :
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(equipmentImage)
-                //equipmentImage.setImageResource(R.drawable.logo)
+
                 equipmentTitle.text = equipment.title
                 equipmentModel.text = "Model: ${equipment.model?.trim()}"
                 equipmentSerial.text = "Serial: ${equipment.serial?.trim()}"

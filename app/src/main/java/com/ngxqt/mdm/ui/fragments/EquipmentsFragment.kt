@@ -37,11 +37,12 @@ class EquipmentsFragment : Fragment(),
     private val equipmentsPagingAdapter = EquipmentsPagingAdapter(this)
     private var mutableListDepartment: MutableList<Department>? = null
     private var buttonDepartmentClickable = false
+    private var isFirstRendered = false
     private var filterKeyword: String? = null
     private var filterStatus: String? = null
     private var filterDepartment: Int?  = null
-    private var textButtonStatus: String? = "Tất cả"
-    private var textButtonDepartment: String? = "Tất cả"
+    private var textButtonStatus: String? = null
+    private var textButtonDepartment: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,10 +58,14 @@ class EquipmentsFragment : Fragment(),
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-        getAllDepartment()
 
-        if (filterKeyword == null && filterStatus == null && filterDepartment == null){
+        //filterKeyword == null && filterStatus == null && filterDepartment == null
+        if (!isFirstRendered){
+            textButtonStatus = getString(R.string.tat_ca)
+            textButtonDepartment = getString(R.string.tat_ca)
             getEquipments(filterStatus, filterKeyword, filterDepartment)
+            getAllDepartment()
+            isFirstRendered = true
         }
 
         setButtonClearFilter()
@@ -98,9 +103,9 @@ class EquipmentsFragment : Fragment(),
             filterStatus = null
             filterDepartment = null
             binding.editTextEquipmentsSearch.text.clear()
-            textButtonStatus = "Tất cả"
+            textButtonStatus = getString(R.string.tat_ca)
             binding.btnEquipmentsFilterStatus.setText(textButtonStatus)
-            textButtonDepartment = "Tất cả"
+            textButtonDepartment = getString(R.string.tat_ca)
             binding.btnEquipmentsFilterDepartment.setText(textButtonDepartment)
             getEquipments(filterStatus, filterKeyword, filterDepartment)
             binding.btnClearFilter.visibility = View.INVISIBLE
@@ -158,7 +163,7 @@ class EquipmentsFragment : Fragment(),
 
     private fun showDialogStatus(){
         val statusList = mutableListOf("Tất Cả", "Đang Sử Dụng", "Đang Báo Hỏng", "Đang Sửa Chữa", "Đã Thanh Lý", "Ngưng Sử Dụng", "Mới")
-        val dialog = MyDialog(statusList,"Lọc Trạng Thái", object : MyDialog.onPickerItemSelectedListener{
+        val dialog = MyDialog(statusList,"Lọc Trạng Thái", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
                 textButtonStatus = statusList.get(position)
                 binding.btnEquipmentsFilterStatus.setText(textButtonStatus)
@@ -185,7 +190,7 @@ class EquipmentsFragment : Fragment(),
         for (i in 0 until (mutableListDepartment?.size ?: 0)){
             departmentList.add(mutableListDepartment?.get(i)?.title.toString())
         }
-        val dialog = MyDialog(departmentList,"Lọc Khoa Phòng", object : MyDialog.onPickerItemSelectedListener{
+        val dialog = MyDialog(departmentList,"Lọc Khoa Phòng", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
                 textButtonDepartment = departmentList.get(position)
                 binding.btnEquipmentsFilterDepartment.setText(textButtonDepartment)

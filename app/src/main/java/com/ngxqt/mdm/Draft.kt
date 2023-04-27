@@ -1,19 +1,7 @@
 package com.ngxqt.mdm
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.GetDepartmentByIdResponse
-import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
-import com.ngxqt.mdm.util.Resource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Response
-
 class Draft {
-/*private fun getAllEquipments(){
+    /*private fun getAllEquipments(){
         // Call API
         val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
@@ -101,6 +89,90 @@ class Draft {
                     }
                     is Resource.Loading -> {
                         binding.paginationProgressBar.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
+    }*/
+
+    /*private fun searchEquipments(keyword: String) {
+        // Call API
+        val userPreferences = UserPreferences(requireContext())
+        lifecycleScope.launch {
+            userPreferences.accessTokenString()?.let { viewModel.searchEquipments(it,keyword) }
+            binding.paginationProgressBar.visibility = View.VISIBLE
+        }
+        //Get LiveData
+        viewModel.searchEquipmentsResponseLiveData.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                binding.paginationProgressBar.visibility = View.INVISIBLE
+                when(it) {
+                    is Resource.Success -> {
+                        binding.tvBrokenError.visibility = View.GONE
+                        onResponseSuccess(it.data?.data)
+                    }
+                    is Resource.Error -> {
+                        binding.tvBrokenError.visibility = View.VISIBLE
+                        binding.tvBrokenError.setText("ERROR\n${it.message}")
+                        Log.e("GETALLEQUIP_OBSERVER_ERROR", it.data.toString())
+                    }
+                }
+            }
+        })
+    }*/
+
+    /*private fun onResponseSuccess(data: MutableList<Equipment>?) {
+        if (data?.isNotEmpty() == true){
+            val equipments: MutableList<Equipment>? = mutableListOf()
+            for (item in data){
+                if (item.status == "active"){
+                    equipments?.add(item)
+                }
+            }
+            if (equipments?.isNotEmpty() == true){
+                equipmentsAdapter.submitList(equipments)
+            }
+            else{
+                Toast.makeText(requireContext(), "Hãy Nhập Thiết Bị Còn Đang Sử Dụng", Toast.LENGTH_SHORT).show()
+            }
+
+        }else{
+            Toast.makeText(requireContext(), "Không Tìm Thấy Thiết Bị Chứa Từ Khóa", Toast.LENGTH_SHORT).show()
+        }
+    }*/
+
+    /*private val exceptionHandler = CoroutineExceptionHandler {_,throwable ->
+        Log.e("GETALLEQUIP_API_ERROR","exception handler ${throwable.message}")
+        _getAllEquipmentsResponseLiveData.postValue(Event(Resource.Error(throwable.message.toString())))
+    }
+    fun getAllEquipments(authorization: String) = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+        safeGetAllEquipments(authorization)
+    }
+    private suspend fun safeGetAllEquipments(authorization: String) {
+        val response = mdmRepository.getAllEquipments(authorization)
+        _getAllEquipmentsResponseLiveData.postValue(Event(handleGetAllUsersResponse(response)))
+    }*/
+
+    /*private fun getAllUsers(){
+        // Call API Get All User
+        val userPreferences = UserPreferences(requireContext())
+        lifecycleScope.launch {
+            userPreferences.accessTokenString()?.let { viewModel.getAllUsers(it) }
+            binding.paginationProgressBar.visibility = View.VISIBLE
+        }
+        //Get LiveData
+        viewModel.getAllUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                binding.paginationProgressBar.visibility = View.INVISIBLE
+                when(it) {
+                    is Resource.Success -> {
+                        staffAdapter.submitList(it.data?.data)
+                        binding.tvStaffError.visibility = View.GONE
+                    }
+                    is Resource.Error -> {
+                        binding.tvStaffError.visibility = View.VISIBLE
+                        binding.tvStaffError.setText("ERROR\n${it.message}")
+                        Log.e("GETALLUSERS_OBSERVER_ERROR", it.data.toString())
                     }
                 }
             }

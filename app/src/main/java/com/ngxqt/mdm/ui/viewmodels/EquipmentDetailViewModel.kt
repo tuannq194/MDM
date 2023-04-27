@@ -9,12 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.data.model.GetListInventoryResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -29,7 +27,7 @@ class EquipmentDetailViewModel @Inject constructor(
 
     private var getListInventorysResponse: GetListInventoryResponse? = null
 
-    fun getListInventory(authorization: String, equipmentId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun getListInventory(authorization: String, equipmentId: Int) = viewModelScope.launch() {
         safeGetListInventory(authorization, equipmentId)
     }
 

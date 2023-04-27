@@ -15,7 +15,6 @@ import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
@@ -31,7 +30,7 @@ class LoginViewModel @Inject constructor(
 
     private var loginResponse: LoginResponse? = null
 
-    fun login(post: LoginPost) = viewModelScope.launch(Dispatchers.IO) {
+    fun login(post: LoginPost) = viewModelScope.launch() {
         safeLogin(post)
     }
 
@@ -68,15 +67,21 @@ class LoginViewModel @Inject constructor(
         return Resource.Error((loginResponse ?: response.message()).toString())
     }
 
-    suspend fun saveToken(accessToken: String) {
-        mdmRepository.saveToken(accessToken)
+    fun saveToken(accessToken: String) {
+        viewModelScope.launch {
+            mdmRepository.saveToken(accessToken)
+        }
     }
 
-    suspend fun saveUserInfo(user: User) {
-        mdmRepository.saveUserInfo(user)
+    fun saveUserInfo(user: User) {
+        viewModelScope.launch {
+            mdmRepository.saveUserInfo(user)
+        }
     }
 
-    suspend fun clearData() {
-        mdmRepository.clearData()
+    fun clearData() {
+        viewModelScope.launch {
+            mdmRepository.clearData()
+        }
     }
 }

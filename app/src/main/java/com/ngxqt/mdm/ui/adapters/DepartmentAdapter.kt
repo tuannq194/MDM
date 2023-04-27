@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ngxqt.mdm.data.model.Department
-import com.ngxqt.mdm.data.model.Equipment
-import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.ItemDepartmentBinding
 
 class DepartmentAdapter(private val listener: OnItemClickListener): ListAdapter<Department,DepartmentAdapter.DepartmentVewHolder>(COMPARATOR) {

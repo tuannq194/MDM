@@ -9,8 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -22,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.FragmentStaffBinding
 import com.ngxqt.mdm.ui.adapters.StaffAdapter
@@ -153,30 +150,4 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
         }
         startActivity(chooser)
     }
-
-    /*private fun getAllUsers(){
-        // Call API Get All User
-        val userPreferences = UserPreferences(requireContext())
-        lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.getAllUsers(it) }
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        }
-        //Get LiveData
-        viewModel.getAllUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
-                when(it) {
-                    is Resource.Success -> {
-                        staffAdapter.submitList(it.data?.data)
-                        binding.tvStaffError.visibility = View.GONE
-                    }
-                    is Resource.Error -> {
-                        binding.tvStaffError.visibility = View.VISIBLE
-                        binding.tvStaffError.setText("ERROR\n${it.message}")
-                        Log.e("GETALLUSERS_OBSERVER_ERROR", it.data.toString())
-                    }
-                }
-            }
-        })
-    }*/
 }

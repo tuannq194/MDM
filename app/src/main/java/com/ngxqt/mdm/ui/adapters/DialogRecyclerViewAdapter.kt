@@ -22,12 +22,6 @@ class DialogRecyclerViewAdapter(private val listener: OnItemClickListener):
         }
         fun bind(equipment: Equipment) {
             binding.apply {
-                /*Glide.with(itemView)
-                    .load(equipment.id)
-                    .centerCrop()
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .error(R.drawable.logo)
-                    .into(equipmentImage)*/
                 equipmentImage.setImageResource(R.drawable.logo)
                 equipmentTitle.text = equipment.title
                 equipmentModel.text = "Model: ${equipment.model?.trim()}"

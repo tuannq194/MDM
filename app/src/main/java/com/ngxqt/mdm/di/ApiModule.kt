@@ -2,7 +2,6 @@ package com.ngxqt.mdm.di
 
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.util.BASE_URL
-import com.ngxqt.mdm.util.BASE_URL_KA
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +19,7 @@ object ApiModule {
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
+        String
         return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
     }
 

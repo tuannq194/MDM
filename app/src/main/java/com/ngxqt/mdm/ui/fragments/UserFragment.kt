@@ -2,14 +2,11 @@ package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -19,10 +16,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.databinding.FragmentScanBinding
 import com.ngxqt.mdm.databinding.FragmentUserBinding
 import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
-import com.ngxqt.mdm.ui.viewmodels.LoginViewModel
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -95,8 +90,6 @@ class UserFragment : Fragment() {
                         //binding.tvDepartmentError.visibility = View.GONE
                     }
                     is Resource.Error -> {
-                        //binding.tvDepartmentError.visibility = View.VISIBLE
-                        //binding.tvDepartmentError.setText("ERROR\n${it.message}")
                         Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data.toString())
                     }

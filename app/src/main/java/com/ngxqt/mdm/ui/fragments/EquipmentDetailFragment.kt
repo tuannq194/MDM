@@ -2,14 +2,11 @@ package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +33,7 @@ class EquipmentDetailFragment : Fragment() {
     private val binding get() = _binding!!
     private val args by navArgs<EquipmentDetailFragmentArgs>()
     private val inventoryAdapter = InventoryAdapter()
+    private var isFirstRendered = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,9 +83,10 @@ class EquipmentDetailFragment : Fragment() {
                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.green)
                 equipDetailErrorCardview.visibility = View.GONE
                 equipDetailError.visibility = View.VISIBLE
+                btnEquipDetailError.visibility = View.VISIBLE
             } else {
+                equipDetailError.visibility = View.GONE
                 btnEquipDetailError.visibility = View.GONE
-
                 if (equipment.reason != null){
                     equipDetailReason.text = equipment.reason
                 }
@@ -103,7 +102,11 @@ class EquipmentDetailFragment : Fragment() {
                 findNavController().navigate(action)
             }
         }
-        equipment.id?.let { getListInventory(it) }
+        if(!isFirstRendered){
+            equipment.id?.let { getListInventory(it) }
+            isFirstRendered = true
+        }
+
     }
 
     private fun setToolbar(){
@@ -115,7 +118,7 @@ class EquipmentDetailFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.recyclerViewEquipDetailInventory.apply {
             layoutManager = LinearLayoutManager(activity)
-            setHasFixedSize(true)
+            //setHasFixedSize(true)
             adapter = inventoryAdapter
         }
     }
@@ -141,6 +144,12 @@ class EquipmentDetailFragment : Fragment() {
                             val itemHeight = inventoryAdapter.getItemHeight(parent)
                             binding.recyclerViewEquipDetailInventory.layoutParams.height = inventoryAdapter.itemCount * (itemHeight)
                             binding.equipDetailInventory.visibility = View.GONE
+                            Log.d("INVENTORY","item count: ${inventoryAdapter.itemCount}\n" +
+                                    "item height: ${itemHeight}\n" +
+                                    "layout height: ${binding.recyclerViewEquipDetailInventory.layoutParams.height}")
+                            inventoryAdapter.submitList(data)
+                        } else {
+                            binding.equipDetailInventory.visibility = View.VISIBLE
                         }
                     }
                     is Resource.Error -> {

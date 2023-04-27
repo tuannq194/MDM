@@ -23,14 +23,14 @@ class NetworkUtil {
                 }
             }
             else{
-                connectivityManager.activeNetworkInfo?.run {
-                    return when(type){
-                        ConnectivityManager.TYPE_WIFI -> return true
-                        ConnectivityManager.TYPE_MOBILE -> return true
-                        ConnectivityManager.TYPE_ETHERNET -> return true
-                        else -> false
-                    }
+                val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+                if (networkCapabilities != null) {
+                    return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
                 }
+                return false
             }
             return false
         }

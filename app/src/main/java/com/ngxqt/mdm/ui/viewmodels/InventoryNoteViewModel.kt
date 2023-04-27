@@ -6,18 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.RequestEquipmentBrokenPost
-import com.ngxqt.mdm.data.model.RequestEquipmentBrokenResponse
 import com.ngxqt.mdm.data.model.RequestEquipmentInventoryPost
 import com.ngxqt.mdm.data.model.RequestEquipmentInventoryResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -32,7 +28,7 @@ class InventoryNoteViewModel @Inject constructor(
 
     private var inventoryNoteResponse: RequestEquipmentInventoryResponse? = null
 
-    fun inventoryNote(authorization: String, equipmentId: Int, post: RequestEquipmentInventoryPost) = viewModelScope.launch(Dispatchers.IO) {
+    fun inventoryNote(authorization: String, equipmentId: Int, post: RequestEquipmentInventoryPost) = viewModelScope.launch() {
         safeInventoryNote(authorization, equipmentId, post)
     }
 

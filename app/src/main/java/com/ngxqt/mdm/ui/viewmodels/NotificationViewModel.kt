@@ -6,15 +6,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.*
+import com.ngxqt.mdm.data.model.GetNotificationResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -29,7 +27,7 @@ class NotificationViewModel @Inject constructor(
 
     private var getNotificationResponse: GetNotificationResponse? = null
 
-    fun getNotification(authorization: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getNotification(authorization: String) = viewModelScope.launch() {
         safeGetNotification(authorization)
     }
 
