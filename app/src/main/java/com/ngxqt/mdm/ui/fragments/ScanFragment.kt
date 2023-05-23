@@ -128,7 +128,7 @@ class ScanFragment : Fragment() {
                             binding.tvScanError.visibility = View.GONE
                             val action = ScanFragmentDirections.actionScanFragmentToEquipmentDetailFragment(equipment)
                             findNavController().navigate(action)
-                            Log.d("SEARCHEQUIPBYID_SUCCESS", it.data.toString())
+                            Log.d("SEARCHEQUIPBYID_SUCCESS", "OK")
                         }else{
                             Toast.makeText(requireContext(), "Không Tìm Thấy Thiết Bị Chứa Từ Khóa", Toast.LENGTH_SHORT).show()
                         }

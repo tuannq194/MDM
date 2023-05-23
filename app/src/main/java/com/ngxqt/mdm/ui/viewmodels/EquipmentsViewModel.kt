@@ -126,7 +126,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private fun handleSearchEquipByIdResponse(response: Response<SearchEquipmentsByIdResponse>): Resource<SearchEquipmentsByIdResponse> {
         if (response.isSuccessful) {
-            Log.d("SEARCHEQUIPBYID_RETROFIT_SUCCESS", response.body()?.data.toString())
+            Log.d("SEARCHEQUIPBYID_RETROFIT_SUCCESS", "OK")
             response.body()?.let { resultResponse ->
                 return Resource.Success(searchEquipmentsByIdResponse ?: resultResponse)
             }

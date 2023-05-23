@@ -54,7 +54,7 @@ class LoginViewModel @Inject constructor(
 
     private fun handleLoginResponse(response: Response<LoginResponse>): Resource<LoginResponse> {
         if (response.isSuccessful) {
-            Log.d("LOGIN_RETROFIT_SUCCESS", response.body()?.accessToken.toString())
+            Log.d("LOGIN_RETROFIT_SUCCESS", "OK")
             response.body()?.let { resultResponse ->
                 return Resource.Success(loginResponse ?: resultResponse)
             }

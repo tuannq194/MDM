@@ -51,7 +51,6 @@ class StaffPagingAdapter(private val listener: OnItemClickListener) :
                 staffName.text = staff.displayName
                 staffMail.text = staff.email
                 staffPhone.text = staff.phone
-                Log.d("EventAdapter", "ds")
             }
         }
     }
