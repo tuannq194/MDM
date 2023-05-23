@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ngxqt.mdm.data.model.User
+import com.ngxqt.mdm.util.KeyStoreManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -20,10 +21,11 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 class UserPreferences @Inject constructor(@ApplicationContext context: Context) {
     private val appContext = context.applicationContext
     private val gson = Gson()
-
+    private val keyStoreManager = KeyStoreManager(appContext)
     /**User Information*/
-    suspend fun accessTokenString(): String? {
-        return appContext.dataStore.data.first()[ACCESS_TOKEN]
+    suspend fun accessTokenString(): String {
+        val cipherText = appContext.dataStore.data.first()[ACCESS_TOKEN]
+        return keyStoreManager.decryptString(cipherText.toString(),KeyStoreManager.ALIAS_TOKEN)
     }
 
     val accessToken: Flow<String?>
@@ -32,8 +34,10 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
         }
 
     suspend fun saveToken(accessToken: String) {
+        keyStoreManager.createKey(KeyStoreManager.ALIAS_TOKEN)
+        val cipherText = keyStoreManager.encryptString(accessToken, KeyStoreManager.ALIAS_TOKEN)
         appContext.dataStore.edit { preferences ->
-            preferences[ACCESS_TOKEN] = "Bearer " + accessToken
+            preferences[ACCESS_TOKEN] = cipherText
         }
     }
 
@@ -63,6 +67,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
         appContext.dataStore.edit { preferences ->
             preferences.clear()
         }
+        keyStoreManager.deleteKey(KeyStoreManager.ALIAS_TOKEN)
     }
 
     companion object {

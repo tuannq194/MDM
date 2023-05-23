@@ -71,7 +71,9 @@ class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
         // Call API Get All User
         val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.getAllDepartments(it) }
+            userPreferences.accessTokenString().let {
+                viewModel.getAllDepartments(it)
+            }
             binding.paginationProgressBar.visibility = View.VISIBLE
         }
         //Get LiveData

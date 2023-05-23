@@ -9,7 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -19,7 +20,6 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentHomeBinding
 import com.ngxqt.mdm.ui.adapters.HomeGridAdapter
 import com.ngxqt.mdm.ui.model.HomeItemModel
-import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -47,8 +47,8 @@ class HomeFragment : Fragment() {
 
     private fun setUserInfo() {
         val userPreferences = UserPreferences(requireContext())
-        lifecycleScope.launch {
-            val user = userPreferences.accessUserInfo()
+        userPreferences.accessUserInfoFlow.asLiveData().observe(viewLifecycleOwner, Observer {
+            val user = it
             binding.apply {
                 Glide.with(root)
                     .load(user?.profilePhotoUrl)
@@ -58,7 +58,7 @@ class HomeFragment : Fragment() {
                     .into(userImage)
                 userName.text = "${user?.displayName?.trim()}"
             }
-        }
+        })
     }
 
     private fun setToolbar(){

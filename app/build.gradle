@@ -8,6 +8,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('D:\\AndroidStudio\\keystore\\keystore-MDM-release-040523.jks')
+            storePassword '19042000'
+            keyAlias 'key0'
+            keyPassword '19042000'
+        }
+        release {
+            storeFile file('D:\\AndroidStudio\\keystore\\keystore-MDM-release-040523.jks')
+            storePassword '19042000'
+            keyAlias 'key0'
+            keyPassword '19042000'
+        }
+    }
     namespace 'com.ngxqt.mdm'
     compileSdk 33
 
@@ -22,10 +36,20 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            keyAlias 'key0'
+            keyPassword '19042000'
+            storeFile file('D:/AndroidStudio/keystore/keystore-MDM-release-040523.jks')
+            storePassword '19042000'
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     buildFeatures {
@@ -90,6 +114,7 @@ dependencies {
     kapt "androidx.hilt:hilt-compiler:1.0.0"
 
     //Datastore
+    implementation "androidx.datastore:datastore:1.0.0"
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
     //Permissions

@@ -72,10 +72,9 @@ class LoginFragment : Fragment() {
         val token = data?.accessToken ?: ""
         val tokenType = data?.tokenType ?: ""
         val userInfo = data?.user
-        Log.d("LOGIN_OBSERVER", token.substringAfter("|"))
         if (token != ""){
             lifecycleScope.launch {
-                viewModel.saveToken(tokenType+" "+ token.substringAfter("|"))
+                viewModel.saveToken("$tokenType ${token.substringAfter("|")}")
                 userInfo?.let { viewModel.saveUserInfo(it) }
                 findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
             }
