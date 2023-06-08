@@ -10,10 +10,12 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
+import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.LoginPost
 import com.ngxqt.mdm.data.model.LoginResponse
 import com.ngxqt.mdm.databinding.FragmentLoginBinding
