@@ -68,9 +68,24 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
             preferences[SETTING_PASSWORD]
         }
 
-    suspend fun saveSettingPassword(isSaved: Boolean) {
+    suspend fun saveSettingPassword(isTurnOn: Boolean) {
         appContext.dataStore.edit { preferences ->
-            preferences[SETTING_PASSWORD] = isSaved
+            preferences[SETTING_PASSWORD] = isTurnOn
+        }
+    }
+
+    suspend fun accessSettingBiometricBoolean(): Boolean? {
+        return appContext.dataStore.data.first()[SETTING_BIOMETRIC]
+    }
+
+    val accessSettingBiometric: Flow<Boolean?>
+        get() = appContext.dataStore.data.map { preferences ->
+            preferences[SETTING_BIOMETRIC]
+        }
+
+    suspend fun saveSettingBiometric(isTurnOn: Boolean) {
+        appContext.dataStore.edit { preferences ->
+            preferences[SETTING_BIOMETRIC] = isTurnOn
         }
     }
 
@@ -85,6 +100,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     companion object {
         private val ACCESS_TOKEN = stringPreferencesKey("key_access_token")
         private val USER_INFO = stringPreferencesKey("user_info")
-        private val SETTING_PASSWORD = booleanPreferencesKey("setting_info")
+        private val SETTING_PASSWORD = booleanPreferencesKey("setting_password")
+        private val SETTING_BIOMETRIC = booleanPreferencesKey("setting_biometric")
     }
 }

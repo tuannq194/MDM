@@ -90,8 +90,12 @@ class MDMRepository @Inject constructor(
         preferences.saveUserInfo(user)
     }
 
-    suspend fun saveSettingPassword(isSaved: Boolean) {
-        preferences.saveSettingPassword(isSaved)
+    suspend fun saveSettingPassword(isTurnOn: Boolean) {
+        preferences.saveSettingPassword(isTurnOn)
+    }
+
+    suspend fun saveSettingBiometric(isTurnOn: Boolean) {
+        preferences.saveSettingBiometric(isTurnOn)
     }
 
     suspend fun clearData() {

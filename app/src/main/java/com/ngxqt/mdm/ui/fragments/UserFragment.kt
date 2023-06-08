@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -18,12 +20,15 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentUserBinding
 import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
+import com.ngxqt.mdm.util.BiometricHelper
+import com.ngxqt.mdm.util.BiometricHelper.authenticate
+import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class UserFragment : Fragment() {
+class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
     private val viewModel: DepartmentViewModel by viewModels()
     private var _binding: FragmentUserBinding? = null
     private val binding get() = _binding!!
@@ -40,10 +45,13 @@ class UserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val biometricPrompt = initBiometric(requireActivity(), this)
         setUserInfo()
         binding.userSetting.setOnClickListener {
-            findNavController().navigate(R.id.action_userFragment_to_settingFragment)
+            UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+                if (isTurnedOn == true) authenticate(biometricPrompt)
+                else findNavController().navigate(R.id.action_userFragment_to_settingFragment)
+            })
         }
         binding.userLogout.setOnClickListener {
             lifecycleScope.launch {
@@ -101,11 +109,23 @@ class UserFragment : Fragment() {
         })
     }
 
-
     private fun setToolbar(){
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).menu.findItem(R.id.menu_user).isChecked = true
         binding.toolbar.toolbarTitle.setText("Cá Nhân")
         binding.toolbar.toolbarBack.setOnClickListener { findNavController().navigateUp() }
+    }
+
+    override fun onAuthenticationSuccess() {
+        Log.d("UserFragment","onAuthenticationSuccess")
+        findNavController().navigate(R.id.action_userFragment_to_settingFragment)
+    }
+
+    override fun onAuthenticationError(errorCode: Int, errorMessage: String) {
+        Toast.makeText(requireContext(), "$errorMessage", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAuthenticationFailed() {
+        Toast.makeText(requireContext(), "Xác thực thất bại", Toast.LENGTH_SHORT).show()
     }
 }
