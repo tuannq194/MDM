@@ -42,7 +42,10 @@ class UserFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUserInfo()
-        binding.btnLogOut.setOnClickListener {
+        binding.userSetting.setOnClickListener {
+            findNavController().navigate(R.id.action_userFragment_to_settingFragment)
+        }
+        binding.userLogout.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.clearData()
                 findNavController().navigate(R.id.action_userFragment_to_loginFragment)
@@ -61,13 +64,13 @@ class UserFragment : Fragment() {
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(userImage)
-                userName.text = "${user?.displayName?.trim()?: ""}"
-                userPhone.text = "${user?.phone?.trim()?: ""}"
+                userName.text = "${user?.displayName?.trim()?: "Không có dữ liệu"}"
+                userPhone.text = "${user?.phone?.trim()?: "Không có dữ liệu"}"
 
-                userBirthday.text = "${user?.birthday?.trim()?: ""}"
-                userGender.text = "${user?.gender?.trim()?: ""}"
-                userEmail.text = "${user?.email?.trim()?: ""}"
-                userAddress.text = "${user?.address?.trim()?: ""}"
+                userBirthday.text = "${user?.birthday?.trim()?: "Không có dữ liệu"}"
+                userGender.text = "${user?.gender?.trim()?: "Không có dữ liệu"}"
+                userEmail.text = "${user?.email?.trim()?: "Không có dữ liệu"}"
+                userAddress.text = "${user?.address?.trim()?: "Không có dữ liệu"}"
             }
             setUserDepartment(user?.departmentId)
         }
@@ -100,6 +103,7 @@ class UserFragment : Fragment() {
 
 
     private fun setToolbar(){
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.VISIBLE
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).menu.findItem(R.id.menu_user).isChecked = true
         binding.toolbar.toolbarTitle.setText("Cá Nhân")
         binding.toolbar.toolbarBack.setOnClickListener { findNavController().navigateUp() }

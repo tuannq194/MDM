@@ -21,11 +21,11 @@ class SplashFragment : Fragment() {
     ): View? {
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.GONE
         Handler(Looper.getMainLooper()).postDelayed({
-            UserPreferences(requireContext()).accessToken.asLiveData().observe(viewLifecycleOwner, Observer {
-                if (it.isNullOrEmpty()){
-                    findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
-                } else{
+            UserPreferences(requireContext()).accessSettingPassword.asLiveData().observe(viewLifecycleOwner, Observer { isSaved ->
+                if (isSaved == true){
                     findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+                } else {
+                    findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
                 }
             })
         }, 500)

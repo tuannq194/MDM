@@ -3,6 +3,7 @@ package com.ngxqt.mdm.data.local
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -61,6 +62,17 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
             preferences[USER_INFO] = gson.toJson(user)
         }
     }
+    /** Setting Information*/
+    val accessSettingPassword: Flow<Boolean?>
+        get() = appContext.dataStore.data.map { preferences ->
+            preferences[SETTING_PASSWORD]
+        }
+
+    suspend fun saveSettingPassword(isSaved: Boolean) {
+        appContext.dataStore.edit { preferences ->
+            preferences[SETTING_PASSWORD] = isSaved
+        }
+    }
 
     /** Clear Datastore*/
     suspend fun clearData() {
@@ -73,5 +85,6 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     companion object {
         private val ACCESS_TOKEN = stringPreferencesKey("key_access_token")
         private val USER_INFO = stringPreferencesKey("user_info")
+        private val SETTING_PASSWORD = booleanPreferencesKey("setting_info")
     }
 }
