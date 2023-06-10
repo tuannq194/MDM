@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -22,6 +24,8 @@ import com.ngxqt.mdm.data.model.RequestEquipmentInventoryPost
 import com.ngxqt.mdm.databinding.FragmentInventoryNoteBinding
 import com.ngxqt.mdm.ui.viewmodels.InventoryNoteViewModel
 import com.ngxqt.mdm.util.BASE_URL_KA
+import com.ngxqt.mdm.util.BiometricHelper
+import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,12 +33,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class InventoryNoteFragment : Fragment() {
+class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
     private val viewModel: InventoryNoteViewModel by viewModels()
     private var _binding: FragmentInventoryNoteBinding? = null
     private val binding get() = _binding!!
     private val args by navArgs<InventoryNoteFragmentArgs>()
     private var inventoryNote = false
+    private lateinit var biometricPrompt: BiometricPrompt
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +53,7 @@ class InventoryNoteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        biometricPrompt = initBiometric(requireActivity(), this)
         setEquipmentDetail()
     }
 
@@ -87,9 +93,12 @@ class InventoryNoteFragment : Fragment() {
                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.green)
             }
             btnInventory.setOnClickListener {
-                val reason = binding.editTextNote.text.toString().trim()
-                if (reason.isNotEmpty()){
-                    equipment.id?.let { requestInventory(it, reason) }
+                val note = binding.editTextNote.text.toString().trim()
+                if (note.isNotEmpty()){
+                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+                        if (isTurnedOn == true) BiometricHelper.authenticate(biometricPrompt)
+                        else equipment.id?.let { requestInventory(it, note) }
+                    })
                 } else{
                     Toast.makeText(requireContext(), "Vui Lòng Nhập Ghi Chú Kiểm Kê", Toast.LENGTH_SHORT).show()
                 }
@@ -137,4 +146,17 @@ class InventoryNoteFragment : Fragment() {
         })
     }
 
+    override fun onAuthenticationSuccess() {
+        Log.d("InventoryNoteFragment","onAuthenticationSuccess")
+        val note = binding.editTextNote.text.toString().trim()
+        args.equipment.id?.let { requestInventory(it, note) }
+    }
+
+    override fun onAuthenticationError(errorCode: Int, errorMessage: String) {
+        Toast.makeText(requireContext(), "$errorMessage", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAuthenticationFailed() {
+        Toast.makeText(requireContext(), "Xác thực thất bại", Toast.LENGTH_SHORT).show()
+    }
 }

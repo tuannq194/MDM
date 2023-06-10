@@ -14,27 +14,15 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val mdmRepository: MDMRepository, @ApplicationContext private val context: Context
 ) : ViewModel() {
-    fun saveSettingPassword(isSaved: Boolean) {
+    fun saveSettingPassword(isTurnOn: Boolean) {
         viewModelScope.launch {
-            mdmRepository.saveSettingPassword(isSaved)
+            mdmRepository.saveSettingPassword(isTurnOn)
         }
     }
 
-    fun saveToken(accessToken: String) {
+    fun saveSettingBiometric(isTurnOn: Boolean) {
         viewModelScope.launch {
-            mdmRepository.saveToken(accessToken)
-        }
-    }
-
-    fun saveUserInfo(user: User) {
-        viewModelScope.launch {
-            mdmRepository.saveUserInfo(user)
-        }
-    }
-
-    fun clearData() {
-        viewModelScope.launch {
-            mdmRepository.clearData()
+            mdmRepository.saveSettingBiometric(isTurnOn)
         }
     }
 }

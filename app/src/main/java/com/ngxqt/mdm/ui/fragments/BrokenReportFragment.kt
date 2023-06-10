@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -22,6 +24,9 @@ import com.ngxqt.mdm.data.model.RequestEquipmentBrokenPost
 import com.ngxqt.mdm.databinding.FragmentBrokenReportBinding
 import com.ngxqt.mdm.ui.viewmodels.BrokenReportViewModel
 import com.ngxqt.mdm.util.BASE_URL_KA
+import com.ngxqt.mdm.util.BiometricHelper
+import com.ngxqt.mdm.util.BiometricHelper.authenticate
+import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,12 +34,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class BrokenReportFragment : Fragment() {
+class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
     private val viewModel: BrokenReportViewModel by viewModels()
     private var _binding: FragmentBrokenReportBinding? = null
     private val binding get() = _binding!!
     private val args by navArgs<BrokenReportFragmentArgs>()
     private var reportBroken = false
+    private lateinit var biometricPrompt: BiometricPrompt
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,7 +54,9 @@ class BrokenReportFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        biometricPrompt = initBiometric(requireActivity(),this)
         setEquipmentDetail()
+
     }
 
     private fun setToolbar(){
@@ -89,7 +97,10 @@ class BrokenReportFragment : Fragment() {
             btnBrokenReport.setOnClickListener {
                 val reason = binding.editTextReason.text.toString().trim()
                 if (reason.isNotEmpty()){
-                    equipment.id?.let { requestBroken(it, reason) }
+                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+                        if (isTurnedOn == true) authenticate(biometricPrompt)
+                        else equipment.id?.let { requestBroken(it, reason) }
+                    })
                 } else{
                     Toast.makeText(requireContext(), "Vui Lòng Nhập Lí Do Báo Hỏng", Toast.LENGTH_SHORT).show()
                 }
@@ -139,5 +150,19 @@ class BrokenReportFragment : Fragment() {
                 }
             }
         })
+    }
+
+    override fun onAuthenticationSuccess() {
+        Log.d("BrokenReportFragment","onAuthenticationSuccess")
+        val reason = binding.editTextReason.text.toString().trim()
+        args.equipment.id?.let { requestBroken(it, reason) }
+    }
+
+    override fun onAuthenticationError(errorCode: Int, errorMessage: String) {
+        Toast.makeText(requireContext(), "$errorMessage", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAuthenticationFailed() {
+        Toast.makeText(requireContext(), "Xác thực thất bại", Toast.LENGTH_SHORT).show()
     }
 }
