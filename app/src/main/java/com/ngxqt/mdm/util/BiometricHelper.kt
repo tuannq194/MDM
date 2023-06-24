@@ -73,6 +73,7 @@ object BiometricHelper {
                 false
             }
             else -> {
+                Toast.makeText(context,"Thiết bị chưa có thông tin sinh trắc học", Toast.LENGTH_SHORT).show()
                 false
             }
         }
