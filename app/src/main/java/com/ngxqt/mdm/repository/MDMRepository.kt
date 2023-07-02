@@ -86,6 +86,10 @@ class MDMRepository @Inject constructor(
         preferences.saveToken(accessToken)
     }
 
+    suspend fun saveBaseUrl(baseUrl: String) {
+        preferences.saveBaseUrl(baseUrl)
+    }
+
     suspend fun saveUserInfo(user: User) {
         preferences.saveUserInfo(user)
     }

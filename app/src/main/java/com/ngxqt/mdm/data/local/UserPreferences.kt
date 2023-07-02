@@ -42,6 +42,20 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
         }
     }
 
+    /***/
+    val accessBaseUrl: Flow<String?>
+        get() = appContext.dataStore.data.map { preferences ->
+            preferences[BASE_URL]
+        }
+
+    suspend fun saveBaseUrl(baseUrl: String) {
+        keyStoreManager.createKey(KeyStoreManager.ALIAS_TOKEN)
+        val cipherText = keyStoreManager.encryptString(baseUrl, KeyStoreManager.ALIAS_TOKEN)
+        appContext.dataStore.edit { preferences ->
+            preferences[BASE_URL] = cipherText
+        }
+    }
+
     suspend fun accessUserInfo(): User? {
         val jsonString = appContext.dataStore.data.first()?.get(USER_INFO)
         return if (jsonString != null) {
@@ -99,6 +113,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
 
     companion object {
         private val ACCESS_TOKEN = stringPreferencesKey("key_access_token")
+        private val BASE_URL = stringPreferencesKey("base_url")
         private val USER_INFO = stringPreferencesKey("user_info")
         private val SETTING_PASSWORD = booleanPreferencesKey("setting_password")
         private val SETTING_BIOMETRIC = booleanPreferencesKey("setting_biometric")

@@ -1,5 +1,6 @@
 package com.ngxqt.mdm.di
 
+import android.util.Log
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.util.BASE_URL
 import dagger.Module
@@ -42,6 +43,7 @@ object ApiModule {
     @Provides
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
+        Log.d("provideRetrofit", "RUN HERE")
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             //.addConverterFactory(ScalarsConverterFactory.create())
