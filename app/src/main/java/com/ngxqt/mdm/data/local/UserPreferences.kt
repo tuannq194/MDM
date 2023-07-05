@@ -1,6 +1,7 @@
 package com.ngxqt.mdm.data.local
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -24,9 +25,9 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     private val gson = Gson()
     private val keyStoreManager = KeyStoreManager(appContext)
     /**User Information*/
-    suspend fun accessTokenString(): String {
+    suspend fun accessTokenString(): String? {
         val cipherText = appContext.dataStore.data.first()[ACCESS_TOKEN]
-        return keyStoreManager.decryptString(cipherText.toString(),KeyStoreManager.ALIAS_TOKEN)
+        return keyStoreManager.decryptString(cipherText,KeyStoreManager.ALIAS_TOKEN)
     }
 
     val accessToken: Flow<String?>
@@ -42,17 +43,21 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
         }
     }
 
-    /***/
+    /**Base URl*/
+    suspend fun accessBaseUrlString(): String? {
+        Log.d("accessBaseUrlString","${appContext.dataStore.data.first()[BASE_URL]}")
+        return appContext.dataStore.data.first()[BASE_URL]
+    }
+
     val accessBaseUrl: Flow<String?>
         get() = appContext.dataStore.data.map { preferences ->
             preferences[BASE_URL]
         }
 
     suspend fun saveBaseUrl(baseUrl: String) {
-        keyStoreManager.createKey(KeyStoreManager.ALIAS_TOKEN)
-        val cipherText = keyStoreManager.encryptString(baseUrl, KeyStoreManager.ALIAS_TOKEN)
         appContext.dataStore.edit { preferences ->
-            preferences[BASE_URL] = cipherText
+            preferences[BASE_URL] = baseUrl
+            Log.d("saveBaseUrl","${baseUrl}")
         }
     }
 

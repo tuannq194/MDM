@@ -9,7 +9,6 @@ import android.widget.Toast
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.KeyStore
-import java.security.PrivateKey
 import javax.crypto.Cipher
 
 class KeyStoreManager(private val context: Context) {
@@ -77,7 +76,9 @@ class KeyStoreManager(private val context: Context) {
         return Base64.encodeToString(cipherText, Base64.NO_WRAP)
     }
 
-    fun decryptString(cipherText: String, alias: String): String {
+    fun decryptString(cipherText: String?, alias: String?): String? {
+        Log.d("decryptString","cipherText = ${cipherText}, alias = ${alias}")
+        if (cipherText.isNullOrEmpty() || alias.isNullOrEmpty()) return null
         val privateKeyEntry = keyStore.getEntry(alias, null) as KeyStore.PrivateKeyEntry
         val privateKey = privateKeyEntry.privateKey
         val cipher = Cipher.getInstance(TRANSFORMATION)

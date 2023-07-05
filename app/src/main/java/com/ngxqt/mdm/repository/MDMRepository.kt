@@ -7,11 +7,11 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.*
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.ui.paging.EquipmentsPagingSource
+import dagger.hilt.android.scopes.ViewModelScoped
 import retrofit2.Response
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+@ViewModelScoped
 class MDMRepository @Inject constructor(
     private val mdmApi: ApiInterface,
     private val preferences: UserPreferences
