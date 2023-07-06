@@ -6,21 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.LoginPost
 import com.ngxqt.mdm.data.model.LoginResponse
 import com.ngxqt.mdm.databinding.FragmentLoginBinding
 import com.ngxqt.mdm.ui.viewmodels.LoginViewModel
 import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.isEmailValid
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -29,7 +27,6 @@ class LoginFragment : Fragment() {
     private val viewModel: LoginViewModel by viewModels()
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-    private var backPressedCount = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +40,6 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setBackPressed()
         binding.buttonLogin.setOnClickListener {
             onLogin()
 
@@ -92,24 +88,9 @@ class LoginFragment : Fragment() {
             val userLoginPost = LoginPost(email, password)
             viewModel.login(userLoginPost)
         } else {
-            Toast.makeText(requireContext(), "Hãy Điền Chính Xác Thông Tin", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Email Hoặc Mật Khẩu Không Đúng", Toast.LENGTH_SHORT).show()
         }
 
-    }
-
-    fun isEmailValid(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    private fun setBackPressed(){
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (backPressedCount == 1){
-                requireActivity().finishAffinity()
-            } else {
-                backPressedCount++
-                Toast.makeText(requireContext(), "Nhấn hai lần để thoát ứng dụng", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     override fun onDestroyView() {
