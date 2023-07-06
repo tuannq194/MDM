@@ -56,7 +56,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
         binding.userLogout.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.clearData()
-                findNavController().navigate(R.id.action_userFragment_to_loginFragment)
+                findNavController().navigate(R.id.action_userFragment_to_baseUrlFragment5)
             }
         }
     }

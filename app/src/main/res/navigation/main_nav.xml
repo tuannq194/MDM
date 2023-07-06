@@ -111,15 +111,15 @@
         android:label="fragment_user"
         tools:layout="@layout/fragment_user" >
         <action
-            android:id="@+id/action_userFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
+            android:id="@+id/action_userFragment_to_settingFragment"
+            app:destination="@id/settingFragment"
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right"/>
         <action
-            android:id="@+id/action_userFragment_to_settingFragment"
-            app:destination="@id/settingFragment"
+            android:id="@+id/action_userFragment_to_baseUrlFragment5"
+            app:destination="@id/baseUrlFragment5"
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
