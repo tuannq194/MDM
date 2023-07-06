@@ -1,6 +1,7 @@
 package com.ngxqt.mdm.data.local
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -24,9 +25,9 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     private val gson = Gson()
     private val keyStoreManager = KeyStoreManager(appContext)
     /**User Information*/
-    suspend fun accessTokenString(): String {
+    suspend fun accessTokenString(): String? {
         val cipherText = appContext.dataStore.data.first()[ACCESS_TOKEN]
-        return keyStoreManager.decryptString(cipherText.toString(),KeyStoreManager.ALIAS_TOKEN)
+        return keyStoreManager.decryptString(cipherText,KeyStoreManager.ALIAS_TOKEN)
     }
 
     val accessToken: Flow<String?>
@@ -39,6 +40,24 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
         val cipherText = keyStoreManager.encryptString(accessToken, KeyStoreManager.ALIAS_TOKEN)
         appContext.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN] = cipherText
+        }
+    }
+
+    /**Base URl*/
+    suspend fun accessBaseUrlString(): String? {
+        Log.d("accessBaseUrlString","${appContext.dataStore.data.first()[BASE_URL]}")
+        return appContext.dataStore.data.first()[BASE_URL]
+    }
+
+    val accessBaseUrl: Flow<String?>
+        get() = appContext.dataStore.data.map { preferences ->
+            preferences[BASE_URL]
+        }
+
+    suspend fun saveBaseUrl(baseUrl: String) {
+        appContext.dataStore.edit { preferences ->
+            preferences[BASE_URL] = baseUrl
+            Log.d("saveBaseUrl","${baseUrl}")
         }
     }
 
@@ -99,6 +118,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
 
     companion object {
         private val ACCESS_TOKEN = stringPreferencesKey("key_access_token")
+        private val BASE_URL = stringPreferencesKey("base_url")
         private val USER_INFO = stringPreferencesKey("user_info")
         private val SETTING_PASSWORD = booleanPreferencesKey("setting_password")
         private val SETTING_BIOMETRIC = booleanPreferencesKey("setting_biometric")

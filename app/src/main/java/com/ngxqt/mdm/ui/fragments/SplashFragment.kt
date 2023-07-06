@@ -35,7 +35,7 @@ class SplashFragment : Fragment(), BiometricHelper.BiometricCallback {
                         else findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                     })
                 } else {
-                    findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+                    findNavController().navigate(R.id.action_splashFragment_to_baseUrlFragment5)
                 }
             })
 

@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentUserBinding
-import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
+import com.ngxqt.mdm.ui.viewmodels.UserViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
-    private val viewModel: DepartmentViewModel by viewModels()
+    private val viewModel: UserViewModel by viewModels()
     private var _binding: FragmentUserBinding? = null
     private val binding get() = _binding!!
 
@@ -63,6 +63,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
 
     private fun setUserInfo() {
         val userPreferences = UserPreferences(requireContext())
+        var departmentId: MutableLiveData<Int?> = MutableLiveData(null)
         lifecycleScope.launch {
             val user = userPreferences.accessUserInfo()
             binding.apply {
@@ -80,8 +81,12 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
                 userEmail.text = "${user?.email?.trim()?: "Không có dữ liệu"}"
                 userAddress.text = "${user?.address?.trim()?: "Không có dữ liệu"}"
             }
-            setUserDepartment(user?.departmentId)
+            departmentId.value = user?.departmentId
         }
+        departmentId.observe(viewLifecycleOwner, Observer { id ->
+            if (id == null) binding.userDepartment.text = "Không có dữ liệu"
+            else setUserDepartment(id)
+        })
     }
 
     private fun setUserDepartment(departmentId: Int?) {
@@ -97,7 +102,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
                 binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
-                        binding.userDepartment.text = "${it.data?.data?.title?: ""}"
+                        binding.userDepartment.text = "${it.data?.data?.title?: "Không có dữ liệu"}"
                         //binding.tvDepartmentError.visibility = View.GONE
                     }
                     is Resource.Error -> {
