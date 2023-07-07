@@ -27,6 +27,7 @@ import com.ngxqt.mdm.util.BASE_URL_KA
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.observeOnce
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -40,6 +41,7 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
     private val args by navArgs<InventoryNoteFragmentArgs>()
     private var inventoryNote = false
     private lateinit var biometricPrompt: BiometricPrompt
+    private var isTurnedOn: Boolean? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +66,9 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     private fun setEquipmentDetail(){
+        UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observeOnce(viewLifecycleOwner, Observer {
+            isTurnedOn = it
+        })
         val equipment = args.equipment
         binding.apply {
             val imgPath = equipment.path ?: equipment.urlImg?.substringAfterLast("/") ?: ""
@@ -95,10 +100,8 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
             btnInventory.setOnClickListener {
                 val note = binding.editTextNote.text.toString().trim()
                 if (note.isNotEmpty()){
-                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
-                        if (isTurnedOn == true) BiometricHelper.authenticate(biometricPrompt)
-                        else equipment.id?.let { requestInventory(it, note) }
-                    })
+                    if (isTurnedOn == true) BiometricHelper.authenticate(biometricPrompt)
+                    else equipment.id?.let { requestInventory(it, note) }
                 } else{
                     Toast.makeText(requireContext(), "Vui Lòng Nhập Ghi Chú Kiểm Kê", Toast.LENGTH_SHORT).show()
                 }
