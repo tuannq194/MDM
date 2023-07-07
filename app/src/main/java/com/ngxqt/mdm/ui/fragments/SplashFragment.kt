@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.biometric.BiometricPrompt
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
@@ -19,6 +18,7 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
+import com.ngxqt.mdm.util.observeOnce
 
 class SplashFragment : Fragment(), BiometricHelper.BiometricCallback {
     override fun onCreateView(
@@ -28,9 +28,9 @@ class SplashFragment : Fragment(), BiometricHelper.BiometricCallback {
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.GONE
         val biometricPrompt = initBiometric(requireActivity(),this)
         Handler(Looper.getMainLooper()).postDelayed({
-            UserPreferences(requireContext()).accessSettingPassword.asLiveData().observe(viewLifecycleOwner, Observer { isSavePassswordTurnedOn ->
+            UserPreferences(requireContext()).accessSettingPassword.asLiveData().observeOnce(viewLifecycleOwner, Observer { isSavePassswordTurnedOn ->
                 if (isSavePassswordTurnedOn == true){
-                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isBiometricTurnedOn ->
+                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observeOnce(viewLifecycleOwner, Observer { isBiometricTurnedOn ->
                         if (isBiometricTurnedOn == true) authenticate(biometricPrompt)
                         else findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                     })

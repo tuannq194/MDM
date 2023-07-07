@@ -21,6 +21,7 @@ import com.ngxqt.mdm.ui.viewmodels.SettingViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.checkDeviceHasBiometric
+import com.ngxqt.mdm.util.observeOnce
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -77,10 +78,10 @@ class SettingFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     private fun setToggleButton(){
-        UserPreferences(requireContext()).accessSettingPassword.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+        UserPreferences(requireContext()).accessSettingPassword.asLiveData().observeOnce(viewLifecycleOwner, Observer { isTurnedOn ->
             binding.settingSavePassword.isChecked = isTurnedOn == true
         })
-        UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+        UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observeOnce(viewLifecycleOwner, Observer { isTurnedOn ->
             binding.settingBiometric.isChecked = isTurnedOn == true
         })
     }

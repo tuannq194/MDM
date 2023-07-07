@@ -24,6 +24,7 @@ import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.observeOnce
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -48,7 +49,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
         val biometricPrompt = initBiometric(requireActivity(), this)
         setUserInfo()
         binding.userSetting.setOnClickListener {
-            UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+            UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observeOnce(viewLifecycleOwner, Observer { isTurnedOn ->
                 if (isTurnedOn == true) authenticate(biometricPrompt)
                 else findNavController().navigate(R.id.action_userFragment_to_settingFragment)
             })
@@ -83,7 +84,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
             }
             departmentId.value = user?.departmentId
         }
-        departmentId.observe(viewLifecycleOwner, Observer { id ->
+        departmentId.observeOnce(viewLifecycleOwner, Observer { id ->
             if (id == null) binding.userDepartment.text = "Không có dữ liệu"
             else setUserDepartment(id)
         })

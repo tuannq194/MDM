@@ -28,6 +28,7 @@ import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.observeOnce
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -41,6 +42,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
     private val args by navArgs<BrokenReportFragmentArgs>()
     private var reportBroken = false
     private lateinit var biometricPrompt: BiometricPrompt
+    private var isTurnedOn: Boolean? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +68,9 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     private fun setEquipmentDetail(){
+        UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observeOnce(viewLifecycleOwner, Observer {
+            isTurnedOn = it
+        })
         val equipment = args.equipment
         binding.apply {
             val imgPath = equipment.path ?: equipment.urlImg?.substringAfterLast("/") ?: ""
@@ -97,10 +102,8 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
             btnBrokenReport.setOnClickListener {
                 val reason = binding.editTextReason.text.toString().trim()
                 if (reason.isNotEmpty()){
-                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
-                        if (isTurnedOn == true) authenticate(biometricPrompt)
-                        else equipment.id?.let { requestBroken(it, reason) }
-                    })
+                    if (isTurnedOn == true) authenticate(biometricPrompt)
+                    else equipment.id?.let { requestBroken(it, reason) }
                 } else{
                     Toast.makeText(requireContext(), "Vui Lòng Nhập Lí Do Báo Hỏng", Toast.LENGTH_SHORT).show()
                 }
