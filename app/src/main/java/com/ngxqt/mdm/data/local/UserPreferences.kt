@@ -27,7 +27,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     /**User Information*/
     suspend fun accessTokenString(): String? {
         val cipherText = appContext.dataStore.data.first()[ACCESS_TOKEN]
-        return keyStoreManager.decryptString(cipherText,KeyStoreManager.ALIAS_TOKEN)
+        return keyStoreManager.decryptLongString(cipherText,KeyStoreManager.ALIAS_TOKEN)
     }
 
     val accessToken: Flow<String?>
@@ -37,7 +37,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
 
     suspend fun saveToken(accessToken: String) {
         keyStoreManager.createKey(KeyStoreManager.ALIAS_TOKEN)
-        val cipherText = keyStoreManager.encryptString(accessToken, KeyStoreManager.ALIAS_TOKEN)
+        val cipherText = keyStoreManager.encryptLongString(accessToken, KeyStoreManager.ALIAS_TOKEN)
         appContext.dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN] = cipherText
         }
