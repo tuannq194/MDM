@@ -68,15 +68,14 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
             val user = userPreferences.accessUserInfo()
             binding.apply {
                 Glide.with(root)
-                    .load(user?.profilePhotoUrl)
+                    .load(user?.image)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(userImage)
-                userName.text = "${user?.displayName?.trim()?: "Không có dữ liệu"}"
+                userName.text = "${user?.name?.trim()?: "Không có dữ liệu"}"
                 userPhone.text = "${user?.phone?.trim()?: "Không có dữ liệu"}"
-
-                userBirthday.text = "${user?.birthday?.trim()?: "Không có dữ liệu"}"
+                userRole.text = "${user?.role?.name?.trim()?: "Không có dữ liệu"}"
                 userGender.text = "${user?.gender?.trim()?: "Không có dữ liệu"}"
                 userEmail.text = "${user?.email?.trim()?: "Không có dữ liệu"}"
                 userAddress.text = "${user?.address?.trim()?: "Không có dữ liệu"}"

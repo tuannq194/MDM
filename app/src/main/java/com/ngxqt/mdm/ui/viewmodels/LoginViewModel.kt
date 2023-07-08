@@ -17,7 +17,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,11 +43,8 @@ class LoginViewModel @Inject constructor(
                 _loginResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception) {
-            Log.e("LOGIN_API_ERROR", e.toString())
-            when (e) {
-                is IOException -> _loginResponseLiveData.postValue(Event(Resource.Error("Lỗi Mạng")))
-                else ->_loginResponseLiveData.postValue(Event(Resource.Error("Lỗi")))
-            }
+            Log.d("LOGIN_API_ERROR", e.message.toString())
+            _loginResponseLiveData.postValue(Event(Resource.Error("${e.message.toString()}")))
         }
     }
 
@@ -59,10 +55,12 @@ class LoginViewModel @Inject constructor(
                 return Resource.Success(loginResponse ?: resultResponse)
             }
         } else {
-            Log.e("LOGIN_RETROFIT_ERROR", response.toString())
-            if (response.code()==400){
-                return Resource.Error("Tài Khoản Hoặc Mật Khẩu Không Đúng")
-            }
+            Log.d("LOGIN_RETROFIT_ERROR", response.toString())
+            var res = response.body()?.message.toString()
+            if (response.code()==401) res = "Email Hoặc Mật Khẩu Không Đúng"
+            else if (response.code()==400) res = "Invalid request body"
+            else if (response.code()==500) res = "Internal server error"
+            return Resource.Error(res)
         }
         return Resource.Error((loginResponse ?: response.message()).toString())
     }
@@ -76,12 +74,6 @@ class LoginViewModel @Inject constructor(
     fun saveUserInfo(user: User) {
         viewModelScope.launch {
             mdmRepository.saveUserInfo(user)
-        }
-    }
-
-    fun clearData() {
-        viewModelScope.launch {
-            mdmRepository.clearData()
         }
     }
 }

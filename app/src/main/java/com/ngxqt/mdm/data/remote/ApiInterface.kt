@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiInterface {
-    @POST("api/login")
+    @POST("v1/api/auth/login")
     suspend fun userLogin(@Body post: LoginPost): Response<LoginResponse>
 
     @GET("api/v1/users")

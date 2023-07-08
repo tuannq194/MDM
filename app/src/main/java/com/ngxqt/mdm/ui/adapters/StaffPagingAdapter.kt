@@ -1,6 +1,5 @@
 package com.ngxqt.mdm.ui.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -43,12 +42,12 @@ class StaffPagingAdapter(private val listener: OnItemClickListener) :
         fun bind(staff: User) {
             binding.apply {
                 Glide.with(itemView)
-                    .load(staff.profilePhotoUrl)
+                    .load(staff.image)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(staffImage)
-                staffName.text = staff.displayName
+                staffName.text = staff.name
                 staffMail.text = staff.email
                 staffPhone.text = staff.phone
             }

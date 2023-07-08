@@ -30,12 +30,12 @@ class StaffAdapter(private val listener: OnItemClickListener): ListAdapter<User,
         fun bind(staff: User) {
             binding.apply {
                 Glide.with(itemView)
-                    .load(staff.profilePhotoUrl)
+                    .load(staff.image)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(staffImage)
-                staffName.text = staff.displayName?.trim()
+                staffName.text = staff.name?.trim()
                 staffMail.text = staff.email?.trim()
                 staffPhone.text = staff.phone?.trim()
             }

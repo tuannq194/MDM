@@ -51,12 +51,12 @@ class HomeFragment : Fragment() {
             val user = it
             binding.apply {
                 Glide.with(root)
-                    .load(user?.profilePhotoUrl)
+                    .load(user?.image)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(userImage)
-                userName.text = "${user?.displayName?.trim()}"
+                userName.text = "${user?.name?.trim()}"
             }
         })
     }

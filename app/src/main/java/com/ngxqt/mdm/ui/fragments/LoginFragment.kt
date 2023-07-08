@@ -67,17 +67,17 @@ class LoginFragment : Fragment() {
     }
 
     private fun onLoginSuccess(data: LoginResponse?) {
-        val token = data?.accessToken ?: ""
-        val tokenType = data?.tokenType ?: ""
-        val userInfo = data?.user
-        if (token != ""){
+        val success = data?.success
+        val token = data?.data?.accessToken
+        val userInfo = data?.data?.user
+        if (success == true){
             lifecycleScope.launch {
-                viewModel.saveToken("$tokenType ${token.substringAfter("|")}")
+                token?.let { viewModel.saveToken("Bearer $token") }
                 userInfo?.let { viewModel.saveUserInfo(it) }
                 findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
             }
         } else {
-            Toast.makeText(requireContext(), "Đăng Nhập Thất Bại", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "${data?.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
