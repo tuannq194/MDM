@@ -12,12 +12,3 @@ data class LoginResponse(
     @SerializedName("code")
     val code: Int?
 )
-
-data class Data(
-    @SerializedName("user")
-    val user: User?,
-    @SerializedName("access_token")
-    val accessToken: String?,
-    @SerializedName("refresh_token")
-    val refreshToken: String?,
-)

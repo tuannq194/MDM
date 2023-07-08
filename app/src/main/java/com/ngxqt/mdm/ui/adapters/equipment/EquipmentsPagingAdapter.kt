@@ -10,7 +10,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.ItemEquipmentBinding
-import com.ngxqt.mdm.util.BASE_URL_KA
 
 class EquipmentsPagingAdapter(private val listener: OnItemClickListener) :
     PagingDataAdapter<Equipment, EquipmentsPagingAdapter.EquipmentViewHolder>(EQUIPMENT_COMPARATOR) {
@@ -43,24 +42,16 @@ class EquipmentsPagingAdapter(private val listener: OnItemClickListener) :
         fun bind(equipment: Equipment) {
             binding.apply {
                 Glide.with(itemView)
-                    .load(BASE_URL_KA +"/public/uploads/"+equipment.path)
+                    .load(equipment.image)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(equipmentImage)
 
-                equipmentTitle.text = equipment.title
+                equipmentTitle.text = equipment.name
                 equipmentModel.text = "Model: ${equipment.model?.trim()}"
                 equipmentSerial.text = "Serial: ${equipment.serial?.trim()}"
-                equipmentStatus.text = equipment.status?.trim().let {
-                    if (it == "active") {"Đang Sử Dụng"}
-                    else if (it == "was_broken") {"Đang Báo Hỏng"}
-                    else if (it == "corrected") {"Đang Sửa Chữa"}
-                    else if (it == "liquidated") {"Đã Thanh Lý"}
-                    else if (it == "inactive") {"Ngừng Sử Dụng"}
-                    else if (it == "not_handed") {"Mới"}
-                    else {""}
-                }
+                equipmentStatus.text = "Trạng thái: ${equipment.equipmentStatus?.name?.trim()}"
             }
         }
     }

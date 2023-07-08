@@ -39,7 +39,7 @@ class EquipmentsFragment : Fragment(),
     private var buttonDepartmentClickable = false
     private var isFirstRendered = false
     private var filterKeyword: String? = null
-    private var filterStatus: String? = null
+    private var filterStatus: Int? = null
     private var filterDepartment: Int?  = null
     private var textButtonStatus: String? = null
     private var textButtonDepartment: String? = null
@@ -64,7 +64,7 @@ class EquipmentsFragment : Fragment(),
             textButtonStatus = getString(R.string.tat_ca)
             textButtonDepartment = getString(R.string.tat_ca)
             getEquipments(filterStatus, filterKeyword, filterDepartment)
-            getAllDepartment()
+            //getAllDepartment()
             isFirstRendered = true
         }
 
@@ -90,11 +90,8 @@ class EquipmentsFragment : Fragment(),
         binding.btnEquipmentsFilterDepartment.apply {
             setText(textButtonDepartment)
             setOnClickListener {
-                if (buttonDepartmentClickable){
-                    showDialogDepartment()
-                } else {
-                    Toast.makeText(requireContext(),"Đợi Tải Dữ Liệu", Toast.LENGTH_SHORT).show()
-                }
+                if (buttonDepartmentClickable) showDialogDepartment()
+                else Toast.makeText(requireContext(),"Đợi Tải Dữ Liệu", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -129,7 +126,7 @@ class EquipmentsFragment : Fragment(),
         }
         binding.buttonRetry.setOnClickListener {
             equipmentsPagingAdapter.retry()
-            getAllDepartment()
+            //getAllDepartment()
         }
         equipmentsPagingAdapter.addLoadStateListener { loadState ->
             binding.apply {
@@ -167,17 +164,16 @@ class EquipmentsFragment : Fragment(),
             override fun onPickerItemSelected(position: Int) {
                 textButtonStatus = statusList.get(position)
                 binding.btnEquipmentsFilterStatus.setText(textButtonStatus)
-                filterStatus = textButtonStatus.let {
-                    if (it == "Đang Sử Dụng") {"active"}
-                    else if (it == "Đang Báo Hỏng") {"was_broken"}
-                    else if (it == "Đang Sửa Chữa") {"corrected"}
-                    else if (it == "Đã Thanh Lý") {"liquidated"}
-                    else if (it == "Ngưng Sử Dụng") {"inactive"}
-                    else if (it == "Mới") {"not_handed"}
-                    else if (it == "Tất Cả") {null}
-                    else {null}
+                filterStatus = when(textButtonStatus) {
+                    "Mới" -> 2
+                    "Đang Sử Dụng" -> 3
+                    "Đang Báo Hỏng" -> 4
+                    "Đang Sửa Chữa" -> 5
+                    "Đã Thanh Lý" -> 6
+                    "Ngưng Sử Dụng" -> 7
+                    "Tất Cả" -> null
+                    else -> null
                 }
-                //filterKeyword = null
                 getEquipments(filterStatus, filterKeyword, filterDepartment)
                 setButtonClearFilter()
             }
@@ -198,7 +194,7 @@ class EquipmentsFragment : Fragment(),
                     if (it==0){null}
                     else {mutableListDepartment?.get(position-1)?.id}
                 }
-                //filterKeyword = null
+
                 getEquipments(filterStatus, filterKeyword, filterDepartment)
                 setButtonClearFilter()
             }
@@ -231,12 +227,19 @@ class EquipmentsFragment : Fragment(),
         })
     }
 
-    private fun getEquipments(status: String?, keyword: String?, departmentId: Int?){
+    private fun getEquipments(status: Int?, name: String?, departmentId: Int?){
         // Call API
         lifecycleScope.launch {
-            UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
-                equipmentsPagingAdapter.submitData(lifecycle,it)
-            }}
+            UserPreferences(requireContext()).accessTokenString()?.let {token ->
+                viewModel.getEquipments(
+                    authorization = token,
+                    name = name,
+                    departmentId = departmentId,
+                    statusId = status
+                ).observe(viewLifecycleOwner){
+                    equipmentsPagingAdapter.submitData(lifecycle,it)
+                }
+            }
         }
     }
 

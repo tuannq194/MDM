@@ -25,78 +25,20 @@ class EquipmentsViewModel @Inject constructor(
     private val mdmRepository: MDMRepository, @ApplicationContext private val context: Context
 ) : ViewModel() {
     //GET EQUIPMENTS V2
-    fun getEquipments(authorization: String, status: String?, keyword: String?, departmentId: Int?): LiveData<PagingData<Equipment>>{
-        return mdmRepository.getEquipments(authorization, status, keyword, departmentId).cachedIn(viewModelScope)
-    }
-
-    //GET ALL EQUIPMENTS V1
-    private val _getAllEquipmentsResponseLiveData: MutableLiveData<Event<Resource<GetAllEquipmentsResponse>>> = MutableLiveData()
-    val getAllEquipmentsResponseLiveData: LiveData<Event<Resource<GetAllEquipmentsResponse>>>
-        get() = _getAllEquipmentsResponseLiveData
-
-    private var getAllEquipmentsResponse: GetAllEquipmentsResponse? = null
-
-    fun getAllEquipments(authorization: String) = viewModelScope.launch() {
-        safeGetAllEquipments(authorization)
-    }
-
-    private suspend fun safeGetAllEquipments(authorization: String) {
-        try {
-            val response = mdmRepository.getAllEquipments(authorization)
-            _getAllEquipmentsResponseLiveData.postValue(Event(handleGetAllUsersResponse(response)))
-        } catch (e: Exception) {
-            Log.e("GETALLEQUIP_API_ERROR", e.message.toString())
-            _getAllEquipmentsResponseLiveData.postValue(Event(Resource.Error(e.message.toString())))
-        }
-    }
-
-    private fun handleGetAllUsersResponse(response: Response<GetAllEquipmentsResponse>): Resource<GetAllEquipmentsResponse> {
-        if (response.isSuccessful) {
-            Log.d("GETALLEQUIP_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
-            response.body()?.let { resultResponse ->
-                return Resource.Success(getAllEquipmentsResponse ?: resultResponse)
-            }
-        } else {
-            Log.e("GETALLEQUIP_RETROFIT_ERROR", response.toString())
-        }
-        return Resource.Error((getAllEquipmentsResponse ?: response.message()).toString())
-    }
-
-    //SEARCH EQUIPMENT
-    private val _searchEquipmentsResponseLiveData: MutableLiveData<Event<Resource<GetAllEquipmentsResponse>>> = MutableLiveData()
-    val searchEquipmentsResponseLiveData: LiveData<Event<Resource<GetAllEquipmentsResponse>>>
-        get() = _searchEquipmentsResponseLiveData
-
-    private var searchEquipmentsResponse: GetAllEquipmentsResponse? = null
-
-    fun searchEquipments(authorization: String, keyword: String) = viewModelScope.launch() {
-        safeSearchEquipments(authorization,keyword)
-    }
-
-    private suspend fun safeSearchEquipments(authorization: String, keyword: String) {
-        try {
-            if(hasInternetConnection(context)){
-                val response = mdmRepository.searchEquipments(authorization, keyword)
-                _searchEquipmentsResponseLiveData.postValue(Event(handleSearchUsersResponse(response)))
-            } else {
-                _searchEquipmentsResponseLiveData.postValue(Event(Resource.Error(context.getString(R.string.mat_ket_noi_internet))))
-            }
-        } catch (e: Exception) {
-            Log.e("SEARCHEQUIP_API_ERROR", e.toString())
-            _searchEquipmentsResponseLiveData.postValue(Event(Resource.Error(e.toString())))
-        }
-    }
-
-    private fun handleSearchUsersResponse(response: Response<GetAllEquipmentsResponse>): Resource<GetAllEquipmentsResponse> {
-        if (response.isSuccessful) {
-            Log.d("SEARCHEQUIP_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
-            response.body()?.let { resultResponse ->
-                return Resource.Success(searchEquipmentsResponse ?: resultResponse)
-            }
-        } else {
-            Log.e("SEARCHEQUIP_RETROFIT_ERROR", response.toString())
-        }
-        return Resource.Error((searchEquipmentsResponse ?: response.message()).toString())
+    fun getEquipments(
+        authorization: String,
+        name: String? = null,
+        departmentId: Int? = null,
+        statusId: Int? = null,
+        typeId: Int? = null,
+        riskLevel: Int? = null,
+        yearInUse: Int? = null,
+        yearOfManufacture: Int? = null
+    ): LiveData<PagingData<Equipment>>{
+        return mdmRepository.getEquipments(
+            authorization, name, departmentId, statusId,
+            typeId, riskLevel, yearInUse, yearOfManufacture
+        ).cachedIn(viewModelScope)
     }
 
     //SEARCH EQUIPMENT BY ID
@@ -136,42 +78,6 @@ class EquipmentsViewModel @Inject constructor(
         return Resource.Error((searchEquipmentsByIdResponse ?: response.message()).toString())
     }
 
-    //STATISTICAL EQUIPMENT
-    private val _statisticalEquipmentsResponseLiveData: MutableLiveData<Event<Resource<StatisticalEquipmentsResponse>>> = MutableLiveData()
-    val statisticalEquipmentsResponseLiveData: LiveData<Event<Resource<StatisticalEquipmentsResponse>>>
-        get() = _statisticalEquipmentsResponseLiveData
-
-    private var statisticalEquipmentsResponse: StatisticalEquipmentsResponse? = null
-
-    fun statisticalEquipments(authorization: String, status: String) = viewModelScope.launch() {
-        safeStatisticalEquipments(authorization,status)
-    }
-
-    private suspend fun safeStatisticalEquipments(authorization: String, status: String) {
-        try {
-            if(hasInternetConnection(context)){
-                val response = mdmRepository.statisticalEquipments(authorization, status)
-                _statisticalEquipmentsResponseLiveData.postValue(Event(handleStatisticalResponse(response)))
-            }else{
-                _statisticalEquipmentsResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
-            }
-        } catch (e: Exception) {
-            Log.e("STATISTICAL_API_ERROR", e.toString())
-            _statisticalEquipmentsResponseLiveData.postValue(Event(Resource.Error(e.toString())))
-        }
-    }
-
-    private fun handleStatisticalResponse(response: Response<StatisticalEquipmentsResponse>): Resource<StatisticalEquipmentsResponse> {
-        if (response.isSuccessful) {
-            Log.d("STATISTICAL_RETROFIT_SUCCESS", "OK")
-            response.body()?.let { resultResponse ->
-                return Resource.Success(statisticalEquipmentsResponse ?: resultResponse)
-            }
-        } else {
-            Log.e("STATISTICAL_RETROFIT_ERROR", response.toString())
-        }
-        return Resource.Error((statisticalEquipmentsResponse ?: response.message()).toString())
-    }
 
     /**GET ALL DEPARTMENT*/
     private val _getAllDepartmentsResponseLiveData: MutableLiveData<Event<Resource<GetAllDepartmentsResponse>>> = MutableLiveData()

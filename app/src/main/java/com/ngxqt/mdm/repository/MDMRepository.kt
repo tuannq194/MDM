@@ -28,15 +28,22 @@ class MDMRepository @Inject constructor(
         return mdmApi.searchUsers(authorization, keyword)
     }
 
-    fun getEquipments(authorization: String, status: String?, keyword: String?, departmentId: Int?) =
-        Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                maxSize = 100,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { EquipmentsPagingSource(mdmApi, authorization, status, keyword, departmentId) }
-        ).liveData
+    fun getEquipments(
+        authorization: String, name: String?, departmentId: Int?, statusId: Int?,
+        typeId: Int?, riskLevel: Int?, yearInUse: Int?, yearOfManufacture: Int?
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            maxSize = 100,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            EquipmentsPagingSource(
+                mdmApi, authorization, name, departmentId, statusId,
+                typeId, riskLevel, yearInUse, yearOfManufacture
+            )
+        }
+    ).liveData
 
     suspend fun getAllEquipments(authorization: String): Response<GetAllEquipmentsResponse> {
         return mdmApi.getAllEquipments(authorization)

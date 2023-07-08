@@ -21,7 +21,6 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentEquipmentDetailBinding
 import com.ngxqt.mdm.ui.adapters.InventoryAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentDetailViewModel
-import com.ngxqt.mdm.util.BASE_URL_KA
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -56,30 +55,21 @@ class EquipmentDetailFragment : Fragment() {
     private fun setEquipmentDetail(){
         val equipment = args.equipment
         binding.apply {
-            val imgPath = equipment.path ?: equipment.urlImg?.substringAfterLast("/") ?: ""
             Glide.with(root)
-                .load(BASE_URL_KA +"/public/uploads/"+imgPath)
+                .load(equipment.image)
                 .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .error(R.drawable.logo)
                 .into(equipDetailImage)
-            equipDetailTitle.text = equipment.title
-            equipDetailStatus.text = equipment.status?.trim().let {
-                if (it == "active") {"Đang Sử Dụng"}
-                else if (it == "was_broken") {"Đang Báo Hỏng"}
-                else if (it == "corrected") {"Đang Sửa Chữa"}
-                else if (it == "liquidated") {"Đã Thanh Lý"}
-                else if (it == "inactive") {"Ngừng Sử Dụng"}
-                else if (it == "not_handed") {"Mới"}
-                else {""}
-            }
+            equipDetailTitle.text = equipment.name
+            equipDetailStatus.text = equipment.equipmentStatus?.name?.trim()
             equipDetailModel.text = equipment.model
             equipDetailSerial.text = equipment.serial
-            equipDetailYearManufacture.text = equipment.yearManufacture
-            equipDetailYearUse.text = equipment.yearUse
-            equipDetailManufacturer.text = equipment.manufacturer
-            equipDetailOrigin.text = equipment.origin
-            if (equipment.status == "active" || equipment.status == "not_handed" ){
+            equipDetailYearManufacture.text = equipment.yearOfManufacture.toString()
+            equipDetailYearUse.text = equipment.yearInUse.toString()
+            equipDetailManufacturer.text = equipment.manufacturerId
+            equipDetailOrigin.text = equipment.manufacturingCountryId
+            if (equipment.equipmentStatus?.id == 2  || equipment.equipmentStatus?.id == 3){
                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.green)
                 equipDetailErrorCardview.visibility = View.GONE
                 equipDetailError.visibility = View.VISIBLE
@@ -87,10 +77,8 @@ class EquipmentDetailFragment : Fragment() {
             } else {
                 equipDetailError.visibility = View.GONE
                 btnEquipDetailError.visibility = View.GONE
-                if (equipment.reason != null){
-                    equipDetailReason.text = equipment.reason
-                }
-                equipDetailDateFailure.text = equipment.dateFailure
+                equipDetailReason.text = "Không có thông tin"
+                equipDetailDateFailure.text = "Không có thông tin"
             }
 
             btnEquipDetailInventory.setOnClickListener {

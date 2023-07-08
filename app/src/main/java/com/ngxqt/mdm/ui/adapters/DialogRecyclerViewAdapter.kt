@@ -23,10 +23,10 @@ class DialogRecyclerViewAdapter(private val listener: OnItemClickListener):
         fun bind(equipment: Equipment) {
             binding.apply {
                 equipmentImage.setImageResource(R.drawable.logo)
-                equipmentTitle.text = equipment.title
+                equipmentTitle.text = equipment.name
                 equipmentModel.text = "Model: ${equipment.model?.trim()}"
                 equipmentSerial.text = "Serial: ${equipment.serial?.trim()}"
-                equipmentStatus.text = "Status: ${equipment.status?.trim()}"
+                equipmentStatus.text = "Trạng thái: ${equipment.equipmentStatus?.name?.trim()}"
             }
         }
     }

@@ -26,15 +26,18 @@ interface ApiInterface {
     @GET("api/v1/statistical-by-info")
     suspend fun statisticalEquipments(@Header("Authorization") authorization: String, @Query("status") status: String): Response<StatisticalEquipmentsResponse>
 
-    @GET("api/v2/equipments")
+    @GET("v1/api/equipment/search")
     suspend fun getEquipments(
         @Header("Authorization") authorization: String,
-        @Query("page") page: Int,
-        @Query("per_page") perPage: Int,
-        @Query("status") status: String?,
-        @Query("keyword") keyword: String?,
-        @Query("department_id") departmentId: Int?
-    ): Response<GetEquipmentsResponse>
+        @Query("page") page: Int? = null,
+        @Query("name") name: String? = null,
+        @Query("department_id") departmentId: Int? = null,
+        @Query("status_id") statusId: Int? = null,
+        @Query("type_id") typeId: Int? = null,
+        @Query("risk_level") riskLevel: Int? = null,
+        @Query("year_in_use") yearInUse: Int? = null,
+        @Query("year_of_manufacture") yearOfManufacture: Int? = null
+    ): Response<HostResponse>
 
     @GET("api/v1/departments")
     suspend fun getAllDepartments(@Header("Authorization") authorization: String): Response<GetAllDepartmentsResponse>

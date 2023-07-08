@@ -7,28 +7,40 @@ import com.ngxqt.mdm.data.remote.ApiInterface
 import retrofit2.HttpException
 import java.io.IOException
 
-
-
 class EquipmentsPagingSource(
     private val mdmApi: ApiInterface,
     private val authorization: String,
-    private val status: String?,
-    private val keyword: String?,
-    private val departmenId: Int?
+    private val name: String?,
+    private val departmentId: Int?,
+    private val statusId: Int?,
+    private val typeId: Int?,
+    private val riskLevel: Int?,
+    private val yearInUse: Int?,
+    private val yearOfManufacture: Int?
 ) : PagingSource<Int,Equipment>() {
     companion object {
         private const val STARTING_INDEX = 1
-        private const val PER_PAGE = 10
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Equipment> {
         val page = params.key ?: STARTING_INDEX
 
         return try {
-            val response = mdmApi.getEquipments(authorization, page, PER_PAGE, status, keyword, departmenId)
+            val response = mdmApi.getEquipments(
+                authorization,
+                page,
+                name,
+                departmentId,
+                statusId,
+                typeId,
+                riskLevel,
+                yearInUse,
+                yearOfManufacture
+            )
             if (response.isSuccessful) {
                 response.body()?.let { body ->
-                    val data = body.data.data
+                    var data: MutableList<Equipment> = mutableListOf()
+                    body.data?.equipments?.rows?.let { data = body.data.equipments.rows }
                     LoadResult.Page(
                         data = data,
                         prevKey = if (page == STARTING_INDEX) null else page - 1,
