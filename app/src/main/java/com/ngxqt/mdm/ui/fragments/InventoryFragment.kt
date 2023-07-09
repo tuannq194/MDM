@@ -8,17 +8,20 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
+import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentInventoryBinding
 import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class InventoryFragment : Fragment(),
@@ -48,11 +51,10 @@ class InventoryFragment : Fragment(),
             findNavController().navigate(R.id.action_inventoryFragment_to_scanFragment)
         }
 
-
         binding.btnInventorySearch.setOnClickListener {
             filterKeyword = binding.editTextEquipmentsSearch.text.toString().trim()
             if (filterKeyword!!.isNotEmpty()){
-                getEquipments(null,filterKeyword, null)
+                getEquipments(null,filterKeyword)
             } else{
                 Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
             }
@@ -77,7 +79,7 @@ class InventoryFragment : Fragment(),
         }
         binding.buttonRetry.setOnClickListener {
             equipmentsPagingAdapter.retry()
-            getEquipments(null,filterKeyword, null)
+            getEquipments(null,filterKeyword)
         }
         equipmentsPagingAdapter.addLoadStateListener { loadState ->
             binding.apply {
@@ -104,13 +106,20 @@ class InventoryFragment : Fragment(),
         }
     }
 
-    private fun getEquipments(status: String?, keyword: String?, departmentId: Int?){
+    private fun getEquipments(status: Int?, name: String?, departmentId: Int? = null){
         // Call API
-        /*lifecycleScope.launch {
-            UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
-                equipmentsPagingAdapter.submitData(lifecycle,it)
-            }}
-        }*/
+        lifecycleScope.launch {
+            UserPreferences(requireContext()).accessTokenString()?.let { token ->
+                viewModel.getEquipments(
+                    authorization = token,
+                    name = name,
+                    departmentId = departmentId,
+                    statusId = status
+                ).observe(viewLifecycleOwner){
+                    equipmentsPagingAdapter.submitData(lifecycle,it)
+                }
+            }
+        }
     }
 
     override fun onItemClick(equipment: Equipment) {

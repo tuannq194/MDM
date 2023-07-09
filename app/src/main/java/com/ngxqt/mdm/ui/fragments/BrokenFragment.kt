@@ -8,17 +8,20 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
+import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentBrokenBinding
 import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class BrokenFragment : Fragment(),
@@ -44,10 +47,6 @@ class BrokenFragment : Fragment(),
 
         setupRecyclerView()
 
-        if (filterKeyword != null) {
-            getEquipments("active",filterKeyword, null)
-        }
-
         binding.btnBrokenScan.setOnClickListener {
             findNavController().navigate(R.id.action_brokenFragment_to_scanFragment)
         }
@@ -55,7 +54,7 @@ class BrokenFragment : Fragment(),
         binding.btnBrokenSearch.setOnClickListener {
             filterKeyword = binding.editTextEquipmentsSearch.text.toString().trim()
             if (filterKeyword!!.isNotEmpty()){
-                getEquipments("active",filterKeyword, null)
+                getEquipments(3,filterKeyword)
             } else{
                 Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
             }
@@ -80,7 +79,7 @@ class BrokenFragment : Fragment(),
         }
         binding.buttonRetry.setOnClickListener {
             equipmentsPagingAdapter.retry()
-            getEquipments("active",filterKeyword, null)
+            getEquipments(3,filterKeyword)
         }
         equipmentsPagingAdapter.addLoadStateListener { loadState ->
             binding.apply {
@@ -106,22 +105,24 @@ class BrokenFragment : Fragment(),
             }
         }
     }
-
-
-
-    private fun getEquipments(status: String?, keyword: String?, departmentId: Int?){
+    private fun getEquipments(status: Int?, name: String?, departmentId: Int? = null){
         // Call API
-        /*lifecycleScope.launch {
-            UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
-                equipmentsPagingAdapter.submitData(lifecycle,it)
-            }}
-        }*/
+        lifecycleScope.launch {
+            UserPreferences(requireContext()).accessTokenString()?.let { token ->
+                viewModel.getEquipments(
+                    authorization = token,
+                    name = name,
+                    departmentId = departmentId,
+                    statusId = status
+                ).observe(viewLifecycleOwner){
+                    equipmentsPagingAdapter.submitData(lifecycle,it)
+                }
+            }
+        }
     }
 
     override fun onItemClick(equipment: Equipment) {
         val action = BrokenFragmentDirections.actionBrokenFragmentToBrokenReportFragment(equipment)
         findNavController().navigate(action)
     }
-
-
 }

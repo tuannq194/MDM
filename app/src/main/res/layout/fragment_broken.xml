@@ -246,7 +246,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="Không Tìm Thấy Thiết Bị\nCòn Hoạt Động Chứa Từ khóa"
+            android:text="Không Tìm Thấy Thiết Bị\nCòn Hoạt Động Và Chứa Từ khóa"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
