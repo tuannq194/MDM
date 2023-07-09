@@ -78,7 +78,6 @@ class EquipmentsViewModel @Inject constructor(
         return Resource.Error((searchEquipmentsByIdResponse ?: response.message()).toString())
     }
 
-
     /**GET ALL DEPARTMENT*/
     private val _getAllDepartmentsResponseLiveData: MutableLiveData<Event<Resource<GetAllDepartmentsResponse>>> = MutableLiveData()
     val getAllDepartmentsResponseLiveData: LiveData<Event<Resource<GetAllDepartmentsResponse>>>
@@ -106,7 +105,7 @@ class EquipmentsViewModel @Inject constructor(
 
     private fun handleGetAllDepartmentsResponse(response: Response<GetAllDepartmentsResponse>): Resource<GetAllDepartmentsResponse> {
         if (response.isSuccessful) {
-            Log.d("GETALLDEPARTMENT_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
+            Log.d("GETALLDEPARTMENT_RETROFIT_SUCCESS", response.body()?.message.toString())
             response.body()?.let { resultResponse ->
                 return Resource.Success(getAllDepartmentsResponse ?: resultResponse)
             }

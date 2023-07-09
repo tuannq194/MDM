@@ -6,6 +6,7 @@ import androidx.paging.liveData
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.*
 import com.ngxqt.mdm.data.remote.ApiInterface
+import com.ngxqt.mdm.ui.paging.DepartmentsPagingSource
 import com.ngxqt.mdm.ui.paging.EquipmentsPagingSource
 import dagger.hilt.android.scopes.ViewModelScoped
 import retrofit2.Response
@@ -41,6 +42,21 @@ class MDMRepository @Inject constructor(
             EquipmentsPagingSource(
                 mdmApi, authorization, name, departmentId, statusId,
                 typeId, riskLevel, yearInUse, yearOfManufacture
+            )
+        }
+    ).liveData
+
+    fun getDepartments(
+        authorization: String, keyword: String?
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            maxSize = 100,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            DepartmentsPagingSource(
+                mdmApi, authorization, keyword
             )
         }
     ).liveData

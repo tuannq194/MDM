@@ -20,7 +20,7 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentEquipmentsBinding
-import com.ngxqt.mdm.ui.adapters.equipment.EquipmentLoadStateAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
@@ -35,7 +35,7 @@ class EquipmentsFragment : Fragment(),
     private var _binding: FragmentEquipmentsBinding? = null
     private val binding get() = _binding!!
     private val equipmentsPagingAdapter = EquipmentsPagingAdapter(this)
-    private var mutableListDepartment: MutableList<Department>? = null
+    private var mutableListDepartment: MutableList<Department>? = mutableListOf()
     private var buttonDepartmentClickable = false
     private var isFirstRendered = false
     private var filterKeyword: String? = null
@@ -59,12 +59,11 @@ class EquipmentsFragment : Fragment(),
 
         setupRecyclerView()
 
-        //filterKeyword == null && filterStatus == null && filterDepartment == null
         if (!isFirstRendered){
             textButtonStatus = getString(R.string.tat_ca)
             textButtonDepartment = getString(R.string.tat_ca)
             getEquipments(filterStatus, filterKeyword, filterDepartment)
-            //getAllDepartment()
+            getAllDepartment()
             isFirstRendered = true
         }
 
@@ -120,13 +119,13 @@ class EquipmentsFragment : Fragment(),
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = equipmentsPagingAdapter.withLoadStateHeaderAndFooter(
-                header = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() },
-                footer = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() }
+                header = ItemLoadStateAdapter { equipmentsPagingAdapter.retry() },
+                footer = ItemLoadStateAdapter { equipmentsPagingAdapter.retry() }
             )
         }
         binding.buttonRetry.setOnClickListener {
             equipmentsPagingAdapter.retry()
-            //getAllDepartment()
+            getAllDepartment()
         }
         equipmentsPagingAdapter.addLoadStateListener { loadState ->
             binding.apply {
@@ -184,7 +183,7 @@ class EquipmentsFragment : Fragment(),
     private fun showDialogDepartment(){
         val departmentList: MutableList<String> = mutableListOf("Tất cả")
         for (i in 0 until (mutableListDepartment?.size ?: 0)){
-            departmentList.add(mutableListDepartment?.get(i)?.title.toString())
+            departmentList.add(mutableListDepartment?.get(i)?.name.toString())
         }
         val dialog = MyDialog(departmentList,"Lọc Khoa Phòng", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
@@ -215,7 +214,7 @@ class EquipmentsFragment : Fragment(),
                 binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
-                        mutableListDepartment = it.data?.data
+                        mutableListDepartment = it.data?.data?.departments
                         buttonDepartmentClickable = true
                     }
                     is Resource.Error -> {

@@ -5,38 +5,39 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.databinding.FragmentDepartmentBinding
-import com.ngxqt.mdm.ui.adapters.DepartmentAdapter
+import com.ngxqt.mdm.ui.adapters.DepartmentsPagingAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
-import com.ngxqt.mdm.util.Resource
 import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
+class DepartmentFragment : Fragment(), DepartmentsPagingAdapter.OnItemClickListener {
     private val viewModel: DepartmentViewModel by viewModels()
     private var _binding: FragmentDepartmentBinding? = null
     private val binding get() = _binding!!
-    private val departmentAdapter = DepartmentAdapter(this)
+    private val departmentsPagingAdapter = DepartmentsPagingAdapter(this)
     private var disposable: Disposable? = null
+    private var isFirstRendered = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +52,10 @@ class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        getAllDepartments()
+        if (!isFirstRendered){
+            getDepartments(null)
+            isFirstRendered = true
+        }
     }
     private fun setToolbar(){
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.GONE
@@ -63,43 +67,54 @@ class DepartmentFragment : Fragment(), DepartmentAdapter.OnItemClickListener {
         binding.recyclerViewDepartment.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
-            adapter = departmentAdapter
+            adapter = departmentsPagingAdapter.withLoadStateHeaderAndFooter(
+                header = ItemLoadStateAdapter { departmentsPagingAdapter.retry() },
+                footer = ItemLoadStateAdapter { departmentsPagingAdapter.retry() }
+            )
+        }
+        binding.buttonRetry.setOnClickListener {
+            departmentsPagingAdapter.retry()
+        }
+        departmentsPagingAdapter.addLoadStateListener { loadState ->
+            binding.apply {
+                paginationProgressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                recyclerViewDepartment.isVisible = loadState.source.refresh is LoadState.NotLoading
+                buttonRetry.isVisible = loadState.source.refresh is LoadState.Error
+                textViewError.isVisible = loadState.source.refresh is LoadState.Error
+                imageError.isVisible = loadState.source.refresh is LoadState.Error
+
+                //Empty View
+                if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && departmentsPagingAdapter.itemCount <= 0){
+                    recyclerViewDepartment.isVisible = false
+                    imageEmpty.isVisible = true
+                    textViewEmpty.isVisible = true
+                } else {
+                    imageEmpty.isVisible = false
+                    textViewEmpty.isVisible = false
+                }
+            }
         }
     }
 
-    private fun getAllDepartments(){
-        // Call API Get All User
-        val userPreferences = UserPreferences(requireContext())
+    private fun getDepartments(keyword: String?){
+        // Call API
         lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let {
-                viewModel.getAllDepartments(it)
-            }
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        }
-        //Get LiveData
-        viewModel.getAllDepartmentsResponseLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
-                when(it) {
-                    is Resource.Success -> {
-                        departmentAdapter.submitList(it.data?.data)
-                        binding.tvDepartmentError.visibility = View.GONE
-                    }
-                    is Resource.Error -> {
-                        binding.tvDepartmentError.visibility = View.VISIBLE
-                        binding.tvDepartmentError.setText("ERROR\n${it.message}")
-                        Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data.toString())
-                    }
+            UserPreferences(requireContext()).accessTokenString()?.let {token ->
+                viewModel.getDepartments(
+                    authorization = token,
+                    keyword = keyword
+                ).observe(viewLifecycleOwner){
+                    departmentsPagingAdapter.submitData(lifecycle,it)
                 }
             }
-        })
+        }
     }
 
     override fun onEmailClick(department: Department) {
         val intent= Intent(Intent.ACTION_SENDTO)
         intent.setData(Uri.parse("mailto:${department.email}"))
         intent.putExtra(Intent.EXTRA_SUBJECT, "[Hệ thống quản lý thiết bị y tế]")
-        intent.putExtra(Intent.EXTRA_TEXT, "Kính gửi ${department.title}")
+        intent.putExtra(Intent.EXTRA_TEXT, "Kính gửi ${department.name}")
         val chooser = Intent.createChooser(intent, "Chọn ứng dụng để thực hiện gửi mail:")
         startActivity(chooser)
     }

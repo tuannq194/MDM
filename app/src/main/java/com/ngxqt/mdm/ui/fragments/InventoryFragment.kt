@@ -8,20 +8,17 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentInventoryBinding
-import com.ngxqt.mdm.ui.adapters.equipment.EquipmentLoadStateAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class InventoryFragment : Fragment(),
@@ -74,8 +71,8 @@ class InventoryFragment : Fragment(),
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = equipmentsPagingAdapter.withLoadStateHeaderAndFooter(
-                header = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() },
-                footer = EquipmentLoadStateAdapter { equipmentsPagingAdapter.retry() }
+                header = ItemLoadStateAdapter { equipmentsPagingAdapter.retry() },
+                footer = ItemLoadStateAdapter { equipmentsPagingAdapter.retry() }
             )
         }
         binding.buttonRetry.setOnClickListener {
@@ -109,11 +106,11 @@ class InventoryFragment : Fragment(),
 
     private fun getEquipments(status: String?, keyword: String?, departmentId: Int?){
         // Call API
-        lifecycleScope.launch {
+        /*lifecycleScope.launch {
             UserPreferences(requireContext()).accessTokenString()?.let { viewModel.getEquipments(it,status,keyword,departmentId).observe(viewLifecycleOwner){
                 equipmentsPagingAdapter.submitData(lifecycle,it)
             }}
-        }
+        }*/
     }
 
     override fun onItemClick(equipment: Equipment) {

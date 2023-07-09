@@ -29,10 +29,10 @@ class DepartmentAdapter(private val listener: OnItemClickListener): ListAdapter<
 
         fun bind(department: Department) {
             binding.apply {
-                departmentTitle.text = department.title?.trim()
-                departmentEmailText.text = department.email?.trim()
-                departmentPhoneText.text = department.phone?.trim()
-                departmentAddressText.text = department.address?.trim()
+                departmentTitle.text = "${department.name?.trim()?: "Không có dữ liệu"}"
+                departmentEmailText.text = "${department.email?.trim()?: "Không có dữ liệu"}"
+                departmentPhoneText.text = "${department.phone?.trim()?: "Không có dữ liệu"}"
+                departmentAddressText.text = "${department.address?.trim()?: "Không có dữ liệu"}"
             }
         }
     }

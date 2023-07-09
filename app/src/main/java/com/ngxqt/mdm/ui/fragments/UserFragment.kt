@@ -101,7 +101,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
                 binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
-                        binding.userDepartment.text = "${it.data?.data?.title?: "Không có dữ liệu"}"
+                        binding.userDepartment.text = "${it.data?.data?.name?: "Không có dữ liệu"}"
                         //binding.tvDepartmentError.visibility = View.GONE
                     }
                     is Resource.Error -> {

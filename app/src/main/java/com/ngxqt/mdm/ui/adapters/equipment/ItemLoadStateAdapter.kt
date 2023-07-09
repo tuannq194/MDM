@@ -8,8 +8,8 @@ import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ngxqt.mdm.databinding.EquipmentLoadStateFooterBinding
 
-class EquipmentLoadStateAdapter(private val retry: () -> Unit) :
-       LoadStateAdapter<EquipmentLoadStateAdapter.LoadStateViewHolder>(){
+class ItemLoadStateAdapter(private val retry: () -> Unit) :
+       LoadStateAdapter<ItemLoadStateAdapter.LoadStateViewHolder>(){
        override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): LoadStateViewHolder {
               val binding = EquipmentLoadStateFooterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
               return LoadStateViewHolder(binding)

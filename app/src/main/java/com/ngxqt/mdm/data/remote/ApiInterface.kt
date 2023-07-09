@@ -39,8 +39,17 @@ interface ApiInterface {
         @Query("year_of_manufacture") yearOfManufacture: Int? = null
     ): Response<HostResponse>
 
-    @GET("api/v1/departments")
-    suspend fun getAllDepartments(@Header("Authorization") authorization: String): Response<GetAllDepartmentsResponse>
+    @GET("v1/api/department/search")
+    suspend fun getDepartments(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int? = null,
+        @Query("keyword") keyword: String? = null
+    ): Response<HostResponse>
+
+    @GET("v1/api/department/search")
+    suspend fun getAllDepartments(
+        @Header("Authorization") authorization: String
+    ): Response<GetAllDepartmentsResponse>
 
     @GET("api/v1/departments/{id}")
     suspend fun getDepartmentById(@Header("Authorization") authorization: String, @Path("id") departmentId: Int?): Response<GetDepartmentByIdResponse>
