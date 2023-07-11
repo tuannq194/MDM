@@ -14,6 +14,7 @@ data class Data(
     @SerializedName("access_token") val accessToken: String?,
     @SerializedName("refresh_token") val refreshToken: String?,
     @SerializedName("equipments") val equipments: Equipments?,
+    @SerializedName("equipment") val equipment: Equipment?,
     @SerializedName("departments") val departments: Departments?,
     @SerializedName("count") val count: Int?
 )

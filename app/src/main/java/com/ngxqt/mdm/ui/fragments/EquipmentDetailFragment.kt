@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,9 +19,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
+import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentEquipmentDetailBinding
 import com.ngxqt.mdm.ui.adapters.InventoryAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentDetailViewModel
+import com.ngxqt.mdm.util.EquipmentStatusEnum
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -47,13 +50,12 @@ class EquipmentDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setEquipmentDetail()
+        getEquipmentById(args.equipmentId)
         setupRecyclerView()
 
     }
 
-    private fun setEquipmentDetail(){
-        val equipment = args.equipment
+    private fun setEquipmentDetail(equipment: Equipment){
         binding.apply {
             Glide.with(root)
                 .load(equipment.image)
@@ -61,15 +63,16 @@ class EquipmentDetailFragment : Fragment() {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .error(R.drawable.logo)
                 .into(equipDetailImage)
-            equipDetailTitle.text = equipment.name
-            equipDetailStatus.text = equipment.equipmentStatus?.name?.trim()
-            equipDetailModel.text = equipment.model
-            equipDetailSerial.text = equipment.serial
-            equipDetailYearManufacture.text = equipment.yearOfManufacture.toString()
-            equipDetailYearUse.text = equipment.yearInUse.toString()
-            equipDetailManufacturer.text = equipment.manufacturerId
-            equipDetailOrigin.text = equipment.manufacturingCountryId
-            if (equipment.equipmentStatus?.id == 2  || equipment.equipmentStatus?.id == 3){
+            equipDetailTitle.text = "${equipment.name?: "Không có dữ liệu"}"
+            equipDetailStatus.text = "${equipment.equipmentStatus?.name?.trim()?: "Không có dữ liệu"}"
+            equipDetailModel.text = "${equipment.model?: "Không có dữ liệu"}"
+            equipDetailSerial.text = "${equipment.serial?: "Không có dữ liệu"}"
+            equipDetailYearManufacture.text = "${equipment.yearOfManufacture?: "Không có dữ liệu"}"
+            equipDetailYearUse.text = "${equipment.yearInUse?: "Không có dữ liệu"}"
+            equipDetailManufacturer.text = "${equipment.manufacturerId?: "Không có dữ liệu"}"
+            equipDetailOrigin.text = "${equipment.manufacturingCountryId?: "Không có dữ liệu"}"
+            if (equipment.equipmentStatus?.id == EquipmentStatusEnum.NEW.id
+                || equipment.equipmentStatus?.id == EquipmentStatusEnum.ACTIVE.id){
                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.green)
                 equipDetailErrorCardview.visibility = View.GONE
                 equipDetailError.visibility = View.VISIBLE
@@ -77,8 +80,8 @@ class EquipmentDetailFragment : Fragment() {
             } else {
                 equipDetailError.visibility = View.GONE
                 btnEquipDetailError.visibility = View.GONE
-                equipDetailReason.text = "Không có thông tin"
-                equipDetailDateFailure.text = "Không có thông tin"
+                equipDetailReason.text = "Không có dữ liệu"
+                equipDetailDateFailure.text = "Không có dữ liệu"
             }
 
             btnEquipDetailInventory.setOnClickListener {
@@ -109,6 +112,39 @@ class EquipmentDetailFragment : Fragment() {
             //setHasFixedSize(true)
             adapter = inventoryAdapter
         }
+    }
+
+    private fun getEquipmentById(equipmentId: Int) {
+        // Call API
+        val userPreferences = UserPreferences(requireContext())
+        lifecycleScope.launch {
+            userPreferences.accessTokenString()?.let { viewModel.getEquipmentById(it,equipmentId) }
+            binding.paginationProgressBar.visibility = View.VISIBLE
+        }
+        //Get LiveData
+        viewModel.getEquipmentByIdResponseLiveData.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                binding.paginationProgressBar.visibility = View.INVISIBLE
+                when(it) {
+                    is Resource.Success -> {
+                        binding.paginationProgressBar.visibility = View.GONE
+                        val equipment = it.data?.data?.equipment
+                        if (equipment != null){
+                            binding.tvEquipmentDetailError.visibility = View.GONE
+                            setEquipmentDetail(equipment)
+                            Log.d("SEARCHEQUIPBYID_SUCCESS", "OK")
+                        }else{
+                            Toast.makeText(requireContext(), "Không Tìm Thấy Thiết Bị", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    is Resource.Error -> {
+                        binding.tvEquipmentDetailError.visibility = View.VISIBLE
+                        binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
+                        Log.e("SEARCHEQUIPBYID_OBSERVER_ERROR", it.data.toString())
+                    }
+                }
+            }
+        })
     }
 
     private fun getListInventory(equipmentId: Int){

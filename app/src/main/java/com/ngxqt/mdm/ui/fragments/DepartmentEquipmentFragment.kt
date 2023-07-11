@@ -71,7 +71,9 @@ class DepartmentEquipmentFragment : Fragment(), EquipmentsPagingAdapter.OnItemCl
     }
 
     override fun onItemClick(equipment: Equipment) {
-        val action = DepartmentEquipmentFragmentDirections.actionDepartmentEquipmentFragmentToEquipmentDetailFragment(equipment)
-        findNavController().navigate(action)
+        equipment.id?.let {
+            val action = DepartmentEquipmentFragmentDirections.actionDepartmentEquipmentFragmentToEquipmentDetailFragment(it)
+            findNavController().navigate(action)
+        }
     }
 }

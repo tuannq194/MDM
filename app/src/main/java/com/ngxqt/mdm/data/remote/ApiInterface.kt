@@ -20,8 +20,8 @@ interface ApiInterface {
     @GET("api/v1/equipments")
     suspend fun searchEquipments(@Header("Authorization") authorization: String, @Query("keyword") keyword: String): Response<GetAllEquipmentsResponse>
 
-    @GET("api/v1/equipments/{id}")
-    suspend fun searchEquipmentsById(@Header("Authorization") authorization: String, @Path("id") equipmentId: Int): Response<SearchEquipmentsByIdResponse>
+    @GET("v1/api/equipment/detail")
+    suspend fun getEquipmentById(@Header("Authorization") authorization: String, @Query("id") equipmentId: Int): Response<HostResponse>
 
     @GET("api/v1/statistical-by-info")
     suspend fun statisticalEquipments(@Header("Authorization") authorization: String, @Query("status") status: String): Response<StatisticalEquipmentsResponse>

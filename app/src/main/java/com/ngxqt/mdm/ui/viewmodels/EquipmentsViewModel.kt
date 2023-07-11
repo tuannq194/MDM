@@ -41,43 +41,6 @@ class EquipmentsViewModel @Inject constructor(
         ).cachedIn(viewModelScope)
     }
 
-    //SEARCH EQUIPMENT BY ID
-    private val _searchEquipmentsByIdResponseLiveData: MutableLiveData<Event<Resource<SearchEquipmentsByIdResponse>>> = MutableLiveData()
-    val searchEquipmentsByIdResponseLiveData: LiveData<Event<Resource<SearchEquipmentsByIdResponse>>>
-        get() = _searchEquipmentsByIdResponseLiveData
-
-    private var searchEquipmentsByIdResponse: SearchEquipmentsByIdResponse? = null
-
-    fun searchEquipmentsById(authorization: String, equipmentId: Int) = viewModelScope.launch() {
-        safeSearchEquipmentsById(authorization,equipmentId)
-    }
-
-    private suspend fun safeSearchEquipmentsById(authorization: String, equipmentId: Int) {
-        try {
-            if(hasInternetConnection(context)){
-                val response = mdmRepository.searchEquipmentsById(authorization, equipmentId)
-                _searchEquipmentsByIdResponseLiveData.postValue(Event(handleSearchEquipByIdResponse(response)))
-            } else {
-                _searchEquipmentsByIdResponseLiveData.postValue(Event(Resource.Error(context.getString(R.string.mat_ket_noi_internet))))
-            }
-        } catch (e: Exception) {
-            Log.e("SEARCHEQUIPBYID_API_ERROR", e.toString())
-            _searchEquipmentsByIdResponseLiveData.postValue(Event(Resource.Error(e.toString())))
-        }
-    }
-
-    private fun handleSearchEquipByIdResponse(response: Response<SearchEquipmentsByIdResponse>): Resource<SearchEquipmentsByIdResponse> {
-        if (response.isSuccessful) {
-            Log.d("SEARCHEQUIPBYID_RETROFIT_SUCCESS", "OK")
-            response.body()?.let { resultResponse ->
-                return Resource.Success(searchEquipmentsByIdResponse ?: resultResponse)
-            }
-        } else {
-            Log.e("SEARCHEQUIPBYID_RETROFIT_ERROR", response.toString())
-        }
-        return Resource.Error((searchEquipmentsByIdResponse ?: response.message()).toString())
-    }
-
     /**GET ALL DEPARTMENT*/
     private val _getAllDepartmentsResponseLiveData: MutableLiveData<Event<Resource<GetAllDepartmentsResponse>>> = MutableLiveData()
     val getAllDepartmentsResponseLiveData: LiveData<Event<Resource<GetAllDepartmentsResponse>>>
@@ -114,6 +77,4 @@ class EquipmentsViewModel @Inject constructor(
         }
         return Resource.Error((getAllDepartmentsResponse ?: response.message()).toString())
     }
-
-
 }

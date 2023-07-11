@@ -2,31 +2,20 @@ package com.ngxqt.mdm.ui.fragments
 
 import android.Manifest
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.budiyev.android.codescanner.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentScanBinding
-import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
-import com.ngxqt.mdm.util.Resource
 import com.tbruyelle.rxpermissions3.RxPermissions
-import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class ScanFragment : Fragment() {
-    private val viewModel: EquipmentsViewModel by viewModels()
     private var _binding: FragmentScanBinding? = null
     private val binding get() = _binding!!
     private lateinit var codeScanner: CodeScanner
@@ -88,11 +77,12 @@ class ScanFragment : Fragment() {
             // Callbacks
             decodeCallback = DecodeCallback {
                 getActivity()?.runOnUiThread {
-                    val intValue = it.toString().toIntOrNull()
-                    if (intValue != null) {
-                        searchEquipmentsById(intValue)
+                    val equipmentId = it.toString().toIntOrNull()
+                    if (equipmentId != null) {
+                        val action = ScanFragmentDirections.actionScanFragmentToEquipmentDetailFragment(equipmentId)
+                        findNavController().navigate(action)
                     } else {
-                        Toast.makeText(requireContext(), "Mã QR Không Chính Xác", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Mã QR Không Phải ID Của Thiết Bị", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -107,39 +97,5 @@ class ScanFragment : Fragment() {
             codeScanner.startPreview()
             binding.tvScanError.visibility = View.INVISIBLE
         }
-    }
-
-    private fun searchEquipmentsById(equipmentId: Int) {
-        // Call API
-        val userPreferences = UserPreferences(requireContext())
-        lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.searchEquipmentsById(it,equipmentId) }
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        }
-        //Get LiveData
-        viewModel.searchEquipmentsByIdResponseLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
-                when(it) {
-                    is Resource.Success -> {
-                        binding.paginationProgressBar.visibility = View.GONE
-                        val equipment = it.data?.data
-                        if (equipment != null){
-                            binding.tvScanError.visibility = View.GONE
-                            val action = ScanFragmentDirections.actionScanFragmentToEquipmentDetailFragment(equipment)
-                            findNavController().navigate(action)
-                            Log.d("SEARCHEQUIPBYID_SUCCESS", "OK")
-                        }else{
-                            Toast.makeText(requireContext(), "Không Tìm Thấy Thiết Bị Chứa Từ Khóa", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    is Resource.Error -> {
-                        binding.tvScanError.visibility = View.VISIBLE
-                        binding.tvScanError.setText("ERROR\n${it.message}")
-                        Log.e("SEARCHEQUIPBYID_OBSERVER_ERROR", it.data.toString())
-                    }
-                }
-            }
-        })
     }
 }

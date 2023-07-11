@@ -24,6 +24,7 @@ import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
+import com.ngxqt.mdm.util.EquipmentStatusEnum
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -164,12 +165,12 @@ class EquipmentsFragment : Fragment(),
                 textButtonStatus = statusList.get(position)
                 binding.btnEquipmentsFilterStatus.setText(textButtonStatus)
                 filterStatus = when(textButtonStatus) {
-                    "Mới" -> 2
-                    "Đang Sử Dụng" -> 3
-                    "Đang Báo Hỏng" -> 4
-                    "Đang Sửa Chữa" -> 5
-                    "Đã Thanh Lý" -> 6
-                    "Ngưng Sử Dụng" -> 7
+                    "Mới" -> EquipmentStatusEnum.NEW.id
+                    "Đang Sử Dụng" -> EquipmentStatusEnum.ACTIVE.id
+                    "Đang Báo Hỏng" -> EquipmentStatusEnum.WAS_BROKEN.id
+                    "Đang Sửa Chữa" -> EquipmentStatusEnum.REPAIRED.id
+                    "Đã Thanh Lý" -> EquipmentStatusEnum.LIQUIDATED.id
+                    "Ngưng Sử Dụng" -> EquipmentStatusEnum.INACTIVE.id
                     "Tất Cả" -> null
                     else -> null
                 }
@@ -243,8 +244,10 @@ class EquipmentsFragment : Fragment(),
     }
 
     override fun onItemClick(equipment: Equipment) {
-        val action = EquipmentsFragmentDirections.actionEquipmentsFragmentToEquipmentDetailFragment(equipment)
-        findNavController().navigate(action)
+        equipment.id?.let {
+            val action = EquipmentsFragmentDirections.actionEquipmentsFragmentToEquipmentDetailFragment(it)
+            findNavController().navigate(action)
+        }
     }
 
     override fun onDestroy() {

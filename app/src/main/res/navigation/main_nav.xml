@@ -149,8 +149,8 @@
         android:label="fragment_equipment_detail"
         tools:layout="@layout/fragment_equipment_detail" >
         <argument
-            android:name="equipment"
-            app:argType="com.ngxqt.mdm.data.model.Equipment" />
+            android:name="equipmentId"
+            app:argType="integer" />
         <action
             android:id="@+id/action_equipmentDetailFragment_to_inventoryNoteFragment"
             app:destination="@id/inventoryNoteFragment"

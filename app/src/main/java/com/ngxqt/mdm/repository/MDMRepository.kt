@@ -69,8 +69,8 @@ class MDMRepository @Inject constructor(
         return mdmApi.searchEquipments(authorization, keyword)
     }
 
-    suspend fun searchEquipmentsById(authorization: String, equipmentId: Int): Response<SearchEquipmentsByIdResponse> {
-        return mdmApi.searchEquipmentsById(authorization, equipmentId)
+    suspend fun getEquipmentById(authorization: String, equipmentId: Int): Response<HostResponse> {
+        return mdmApi.getEquipmentById(authorization, equipmentId)
     }
 
     suspend fun statisticalEquipments(authorization: String, status: String): Response<StatisticalEquipmentsResponse> {
