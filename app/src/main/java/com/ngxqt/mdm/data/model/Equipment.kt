@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Equipment(
+    // Field of EquipmentI
     @SerializedName("id") val id: Int?,
     @SerializedName("name") val name: String?,
     @SerializedName("model") val model: String?,
@@ -41,39 +42,25 @@ data class Equipment(
     @SerializedName("regular_room_environment_inspection") val regularRoomEnvironmentInspection: Int?,
     @SerializedName("createdAt") val createdAt: String?,
     @SerializedName("updatedAt") val updatedAt: String?,
-    @SerializedName("Equipment_Type") val equipmentType: EquipmentType?,
-    @SerializedName("Equipment_Unit") val equipmentUnit: EquipmentUnit?,
-    @SerializedName("Equipment_Status") val equipmentStatus: EquipmentStatus?,
-    @SerializedName("Equipment_Risk_Level") val equipmentRiskLevel: EquipmentRiskLevel?,
-    @SerializedName("Department") val department: EquipmentDepartment?
+    @SerializedName("Equipment_Type") val equipmentType: EquipmentSubField?,
+    @SerializedName("Equipment_Unit") val equipmentUnit: EquipmentSubField?,
+    @SerializedName("Equipment_Status") val equipmentStatus: EquipmentSubField?,
+    @SerializedName("Equipment_Risk_Level") val equipmentRiskLevel: EquipmentSubField?,
+    @SerializedName("Department") val department: EquipmentSubField?,
+
+    // More field for Equipment Inventory History
+    @SerializedName("equipment_id") val equipmentId: Int?,
+    @SerializedName("inventory_date") val inventoryDate: String?,
+    @SerializedName("inventory_create_user_id") val inventoryCreateUserId: Int?,
+    @SerializedName("inventory_approve_user_id") val inventoryApproveUserId: Int?,
+    @SerializedName("times") val times: Int?,
+    @SerializedName("status") val status: Int?,
+    @SerializedName("inventory_create_user") val inventoryCreateUser: EquipmentSubField?,
+    @SerializedName("inventory_approve_user") val inventoryApproveUser: EquipmentSubField?
 ) : Parcelable
 
 @Parcelize
-data class EquipmentType(
-    @SerializedName("id") val id: Int?,
-    @SerializedName("name") val name: String?
-) : Parcelable
-
-@Parcelize
-data class EquipmentUnit(
-    @SerializedName("id") val id: Int?,
-    @SerializedName("name") val name: String?
-) : Parcelable
-
-@Parcelize
-data class EquipmentStatus(
-    @SerializedName("id") val id: Int?,
-    @SerializedName("name") val name: String?
-) : Parcelable
-
-@Parcelize
-data class EquipmentRiskLevel(
-    @SerializedName("id") val id: Int?,
-    @SerializedName("name") val name: String?
-) : Parcelable
-
-@Parcelize
-data class EquipmentDepartment(
+data class EquipmentSubField(
     @SerializedName("id") val id: Int?,
     @SerializedName("name") val name: String?
 ) : Parcelable

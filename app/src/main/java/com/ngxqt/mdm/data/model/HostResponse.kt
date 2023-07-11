@@ -16,6 +16,7 @@ data class Data(
     @SerializedName("equipments") val equipments: Equipments?,
     @SerializedName("equipment") val equipment: Equipment?,
     @SerializedName("departments") val departments: Departments?,
+    @SerializedName("repair_info") val repairInfo: MutableList<RepairInfo>?,
     @SerializedName("count") val count: Int?
 )
 

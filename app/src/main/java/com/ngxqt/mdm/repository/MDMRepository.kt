@@ -21,12 +21,8 @@ class MDMRepository @Inject constructor(
         return mdmApi.userLogin(post)
     }
 
-    suspend fun getAllUsers(authorization: String): Response<GetAllUsersResponse> {
-        return mdmApi.getAllUsers(authorization)
-    }
-
-    suspend fun searchUsers(authorization: String, keyword: String?): Response<GetAllUsersResponse> {
-        return mdmApi.searchUsers(authorization, keyword)
+    suspend fun getEquipmentById(authorization: String, equipmentId: Int): Response<HostResponse> {
+        return mdmApi.getEquipmentById(authorization, equipmentId)
     }
 
     fun getEquipments(
@@ -61,24 +57,34 @@ class MDMRepository @Inject constructor(
         }
     ).liveData
 
+    suspend fun getAllDepartments(authorization: String): Response<GetAllDepartmentsResponse> {
+        return mdmApi.getAllDepartments(authorization)
+    }
+
+    suspend fun getRepairHistory(authorization: String, equipment_id: Int?): Response<HostResponse> {
+        return mdmApi.getRepairHistory(authorization, equipment_id)
+    }
+
+    suspend fun getInventoryHistory(authorization: String, equipment_id: Int?, page: Int?): Response<HostResponse> {
+        return mdmApi.getInventoryHistory(authorization, equipment_id, page)
+    }
+
+
+
+    suspend fun getAllUsers(authorization: String): Response<GetAllUsersResponse> {
+        return mdmApi.getAllUsers(authorization)
+    }
+
+    suspend fun searchUsers(authorization: String, keyword: String?): Response<GetAllUsersResponse> {
+        return mdmApi.searchUsers(authorization, keyword)
+    }
+
     suspend fun getAllEquipments(authorization: String): Response<GetAllEquipmentsResponse> {
         return mdmApi.getAllEquipments(authorization)
     }
 
     suspend fun searchEquipments(authorization: String, keyword: String): Response<GetAllEquipmentsResponse> {
         return mdmApi.searchEquipments(authorization, keyword)
-    }
-
-    suspend fun getEquipmentById(authorization: String, equipmentId: Int): Response<HostResponse> {
-        return mdmApi.getEquipmentById(authorization, equipmentId)
-    }
-
-    suspend fun statisticalEquipments(authorization: String, status: String): Response<StatisticalEquipmentsResponse> {
-        return mdmApi.statisticalEquipments(authorization, status)
-    }
-
-    suspend fun getAllDepartments(authorization: String): Response<GetAllDepartmentsResponse> {
-        return mdmApi.getAllDepartments(authorization)
     }
 
     suspend fun getDepartmentById(authorization: String, departmentId: Int?): Response<GetDepartmentByIdResponse> {

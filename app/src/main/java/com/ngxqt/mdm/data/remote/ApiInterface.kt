@@ -8,23 +8,8 @@ interface ApiInterface {
     @POST("v1/api/auth/login")
     suspend fun userLogin(@Body post: LoginPost): Response<LoginResponse>
 
-    @GET("api/v1/users")
-    suspend fun getAllUsers(@Header("Authorization") authorization: String): Response<GetAllUsersResponse>
-
-    @GET("api/v1/users")
-    suspend fun searchUsers(@Header("Authorization") authorization: String, @Query("keyword") keyword: String?): Response<GetAllUsersResponse>
-
-    @GET("api/v1/equipments")
-    suspend fun getAllEquipments(@Header("Authorization") authorization: String): Response<GetAllEquipmentsResponse>
-
-    @GET("api/v1/equipments")
-    suspend fun searchEquipments(@Header("Authorization") authorization: String, @Query("keyword") keyword: String): Response<GetAllEquipmentsResponse>
-
     @GET("v1/api/equipment/detail")
     suspend fun getEquipmentById(@Header("Authorization") authorization: String, @Query("id") equipmentId: Int): Response<HostResponse>
-
-    @GET("api/v1/statistical-by-info")
-    suspend fun statisticalEquipments(@Header("Authorization") authorization: String, @Query("status") status: String): Response<StatisticalEquipmentsResponse>
 
     @GET("v1/api/equipment/search")
     suspend fun getEquipments(
@@ -50,6 +35,31 @@ interface ApiInterface {
     suspend fun getAllDepartments(
         @Header("Authorization") authorization: String
     ): Response<GetAllDepartmentsResponse>
+
+    @GET("v1/api/equipment_repair/history_repair")
+    suspend fun getRepairHistory(
+        @Header("Authorization") authorization: String,
+        @Query("id") equipment_id: Int? = null,
+    ): Response<HostResponse>
+
+    @GET("v1/api/equipment_inventory/history_inventory_of_equipment")
+    suspend fun getInventoryHistory(
+        @Header("Authorization") authorization: String,
+        @Query("equipment_id") equipmentId: Int? = null,
+        @Query("page") page: Int? = null
+    ): Response<HostResponse>
+
+    @GET("api/v1/users")
+    suspend fun getAllUsers(@Header("Authorization") authorization: String): Response<GetAllUsersResponse>
+
+    @GET("api/v1/users")
+    suspend fun searchUsers(@Header("Authorization") authorization: String, @Query("keyword") keyword: String?): Response<GetAllUsersResponse>
+
+    @GET("api/v1/equipments")
+    suspend fun getAllEquipments(@Header("Authorization") authorization: String): Response<GetAllEquipmentsResponse>
+
+    @GET("api/v1/equipments")
+    suspend fun searchEquipments(@Header("Authorization") authorization: String, @Query("keyword") keyword: String): Response<GetAllEquipmentsResponse>
 
     @GET("api/v1/departments/{id}")
     suspend fun getDepartmentById(@Header("Authorization") authorization: String, @Path("id") departmentId: Int?): Response<GetDepartmentByIdResponse>

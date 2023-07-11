@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.GetListInventoryResponse
 import com.ngxqt.mdm.data.model.HostResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
@@ -61,41 +60,77 @@ class EquipmentDetailViewModel @Inject constructor(
         return Resource.Error((getEquipmentByIdResponse ?: response.message()).toString())
     }
 
+    /** HISROTY REPAIR*/
+    private val _getRepairHisResLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
+    val getRepairHisResLiveData: LiveData<Event<Resource<HostResponse>>>
+        get() = _getRepairHisResLiveData
 
-    /** OLD FUNCTION*/
-    private val _getListInventoryResponseLiveData: MutableLiveData<Event<Resource<GetListInventoryResponse>>> = MutableLiveData()
-    val getListInventoryResponseLiveData: LiveData<Event<Resource<GetListInventoryResponse>>>
-        get() = _getListInventoryResponseLiveData
+    private var getRepairHisResponse: HostResponse? = null
 
-    private var getListInventorysResponse: GetListInventoryResponse? = null
-
-    fun getListInventory(authorization: String, equipmentId: Int) = viewModelScope.launch() {
-        safeGetListInventory(authorization, equipmentId)
+    fun getRepairHistory(authorization: String, equipmentId: Int?) = viewModelScope.launch() {
+        safeGetRepairHis(authorization, equipmentId)
     }
 
-    private suspend fun safeGetListInventory(authorization: String, equipmentId: Int) {
+    private suspend fun safeGetRepairHis(authorization: String, equipmentId: Int?) {
         try {
             if(hasInternetConnection(context)){
-                val response = mdmRepository.getListInventoryById(authorization, equipmentId)
-                _getListInventoryResponseLiveData.postValue(Event(handleGetAllUsersResponse(response)))
+                val response = mdmRepository.getRepairHistory(authorization, equipmentId)
+                _getRepairHisResLiveData.postValue(Event(handleGetRepairHisResponse(response)))
             } else {
-                _getListInventoryResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+                _getRepairHisResLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception) {
-            Log.e("GETLISTINVENTORY_API_ERROR", e.toString())
-            _getListInventoryResponseLiveData.postValue(Event(Resource.Error(e.toString())))
+            Log.e("GET_REPAIR_HIS_API_ERROR", e.toString())
+            _getRepairHisResLiveData.postValue(Event(Resource.Error(e.toString())))
         }
     }
 
-    private fun handleGetAllUsersResponse(response: Response<GetListInventoryResponse>): Resource<GetListInventoryResponse> {
+    private fun handleGetRepairHisResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
-            Log.d("GETLISTINVENTORY_API_SUCCESS", response.body()?.dataLength.toString())
+            Log.d("GET_REPAIR_HIS_API_SUCCESS", response.body()?.message.toString())
             response.body()?.let { resultResponse ->
-                return Resource.Success(getListInventorysResponse ?: resultResponse)
+                return Resource.Success(getRepairHisResponse ?: resultResponse)
             }
         } else {
-            Log.e("GETLISTINVENTORY_API_ERROR", response.toString())
+            Log.e("GET_REPAIR_HIS_API_ERROR", response.toString())
         }
-        return Resource.Error((getListInventorysResponse ?: response.message()).toString())
+        return Resource.Error((getRepairHisResponse ?: response.message()).toString())
+    }
+
+    /** HISROTY INVENTORY*/
+    private val _getInventoryHisResLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
+    val getInventoryHisResponseLiveData: LiveData<Event<Resource<HostResponse>>>
+        get() = _getInventoryHisResLiveData
+
+    private var getInventoryHisResponse: HostResponse? = null
+
+    fun getInventoryHistory(authorization: String, equipmentId: Int, page: Int?) = viewModelScope.launch() {
+        safeGetInventoryHis(authorization, equipmentId, page)
+    }
+
+    private suspend fun safeGetInventoryHis(authorization: String, equipmentId: Int?, page: Int?) {
+        try {
+            if(hasInternetConnection(context)){
+                val response = mdmRepository.getInventoryHistory(authorization, equipmentId, page)
+                _getInventoryHisResLiveData.postValue(Event(handleGetAllUsersResponse(response)))
+            } else {
+                _getInventoryHisResLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
+            }
+        } catch (e: Exception) {
+            Log.e("GET_INVENTORY_HIS_API_ERROR", e.toString())
+            _getInventoryHisResLiveData.postValue(Event(Resource.Error(e.toString())))
+        }
+    }
+
+    private fun handleGetAllUsersResponse(response: Response<HostResponse>): Resource<HostResponse> {
+        if (response.isSuccessful) {
+            Log.d("GET_INVENTORY_HIS_API_SUCCESS", response.body()?.message.toString())
+            response.body()?.let { resultResponse ->
+                return Resource.Success(getInventoryHisResponse ?: resultResponse)
+            }
+        } else {
+            Log.e("GET_INVENTORY_HIS_API_ERROR", response.toString())
+        }
+        return Resource.Error((getInventoryHisResponse ?: response.message()).toString())
     }
 }
