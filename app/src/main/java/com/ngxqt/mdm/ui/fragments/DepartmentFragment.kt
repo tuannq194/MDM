@@ -82,6 +82,10 @@ class DepartmentFragment : Fragment(), DepartmentsPagingAdapter.OnItemClickListe
                 buttonRetry.isVisible = loadState.source.refresh is LoadState.Error
                 textViewError.isVisible = loadState.source.refresh is LoadState.Error
                 imageError.isVisible = loadState.source.refresh is LoadState.Error
+                if (loadState.source.refresh is LoadState.Error) {
+                    val errorState = loadState.source.refresh as LoadState.Error
+                    textViewError.text = "${errorState.error.message}"
+                }
 
                 //Empty View
                 if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && departmentsPagingAdapter.itemCount <= 0){

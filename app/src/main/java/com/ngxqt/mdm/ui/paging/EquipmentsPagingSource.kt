@@ -37,7 +37,7 @@ class EquipmentsPagingSource(
                 yearInUse,
                 yearOfManufacture
             )
-            if (response.isSuccessful) {
+            if (response.body()?.success == true) {
                 response.body()?.let { body ->
                     var data: MutableList<Equipment> = mutableListOf()
                     body.data?.equipments?.rows?.let { data = body.data.equipments.rows }
@@ -50,7 +50,7 @@ class EquipmentsPagingSource(
                     LoadResult.Error(NullPointerException("Response body is null"))
                 }
             } else {
-                LoadResult.Error(HttpException(response))
+                LoadResult.Error(Error("Lỗi ${response.body()?.code}: ${response.body()?.message}"))
             }
         } catch (exception: IOException) {
             LoadResult.Error(exception)

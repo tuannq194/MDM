@@ -25,7 +25,7 @@ class DepartmentsPagingSource(
                 page,
                 keyword
             )
-            if (response.isSuccessful) {
+            if (response.body()?.success == true) {
                 response.body()?.let { body ->
                     var data: MutableList<Department> = mutableListOf()
                     body.data?.departments?.rows?.let { data = body.data.departments.rows }
@@ -38,7 +38,7 @@ class DepartmentsPagingSource(
                     LoadResult.Error(NullPointerException("Response body is null"))
                 }
             } else {
-                LoadResult.Error(HttpException(response))
+                LoadResult.Error(Error("Lỗi ${response.body()?.code}: ${response.body()?.message}"))
             }
         } catch (exception: IOException) {
             LoadResult.Error(exception)

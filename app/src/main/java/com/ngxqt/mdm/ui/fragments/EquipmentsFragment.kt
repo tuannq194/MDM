@@ -20,8 +20,8 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentEquipmentsBinding
-import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.EquipmentStatusEnum
@@ -135,6 +135,10 @@ class EquipmentsFragment : Fragment(),
                 buttonRetry.isVisible = loadState.source.refresh is LoadState.Error
                 textViewError.isVisible = loadState.source.refresh is LoadState.Error
                 imageError.isVisible = loadState.source.refresh is LoadState.Error
+                if (loadState.source.refresh is LoadState.Error) {
+                    val errorState = loadState.source.refresh as LoadState.Error
+                    textViewError.text = "${errorState.error.message}"
+                }
 
                 //Empty View
                 if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && equipmentsPagingAdapter.itemCount <= 0){
@@ -215,12 +219,16 @@ class EquipmentsFragment : Fragment(),
                 binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
-                        mutableListDepartment = it.data?.data?.departments
-                        buttonDepartmentClickable = true
+                        if (it.data?.success == true) {
+                            mutableListDepartment = it.data?.data?.departments
+                            buttonDepartmentClickable = true
+                        } else {
+                            Toast.makeText(requireContext(),it.data?.message,Toast.LENGTH_SHORT).show()
+                        }
                     }
                     is Resource.Error -> {
-                        Toast.makeText(requireContext(),it.message,Toast.LENGTH_SHORT).show()
-                        Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data.toString())
+                        Toast.makeText(requireContext(),"${it.data?.message}",Toast.LENGTH_SHORT).show()
+                        Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data?.message.toString())
                     }
                 }
             }

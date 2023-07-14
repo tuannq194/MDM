@@ -17,8 +17,8 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentBrokenBinding
-import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
+import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -90,6 +90,10 @@ class BrokenFragment : Fragment(),
                 cardViewRetry.isVisible = loadState.source.refresh is LoadState.Error
                 textViewError.isVisible = loadState.source.refresh is LoadState.Error
                 imageError.isVisible = loadState.source.refresh is LoadState.Error
+                if (loadState.source.refresh is LoadState.Error) {
+                    val errorState = loadState.source.refresh as LoadState.Error
+                    textViewError.text = "${errorState.error.message}"
+                }
 
                 //Empty View
                 if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && equipmentsPagingAdapter.itemCount <= 0){
