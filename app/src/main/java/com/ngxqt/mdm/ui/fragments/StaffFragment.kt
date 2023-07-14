@@ -121,7 +121,6 @@ class StaffFragment : Fragment(),UserPagingAdapter.OnItemClickListener {
                     roleId = rollId,
                     departmentId = departmentId
                 ).observe(viewLifecycleOwner){
-                    Log.d("TAG","${it}")
                     userPagingAdapter.submitData(lifecycle,it)
                 }
             }

@@ -79,10 +79,9 @@ interface ApiInterface {
         @Body post: RepairPost
     ): Response<HostResponse>
 
-    /**
-     * Old function
-     */
-
-    @GET("api/v1/notification")
-    suspend fun getNotification(@Header("Authorization") authorization: String): Response<GetNotificationResponse>
+    @GET("v1/api/notification/list")
+    suspend fun getNotification(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int? = null
+    ): Response<HostResponse>
 }

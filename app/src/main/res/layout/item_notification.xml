@@ -39,7 +39,7 @@
             android:maxLines="2"
             android:textColor="@color/black"
             android:textSize="14dp"
-            tools:text="Nội dung: Thiết bị abc đã được báo hỏng. Mức độ quan trọng: " />
+            tools:text="Nội dung: Thiết bị abc đã được báo hỏng rất là nặngggggggggggggg" />
 
         <TextView
             android:id="@+id/noti_user"

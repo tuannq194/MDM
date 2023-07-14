@@ -4,13 +4,16 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.*
+import com.ngxqt.mdm.data.model.GetAllDepartmentsResponse
+import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.ui.paging.DepartmentsPagingSource
 import com.ngxqt.mdm.ui.paging.EquipmentsPagingSource
+import com.ngxqt.mdm.ui.paging.NotificationPagingSource
 import com.ngxqt.mdm.ui.paging.UserPagingSource
 import dagger.hilt.android.scopes.ViewModelScoped
 import retrofit2.Response
@@ -103,13 +106,28 @@ class MDMRepository @Inject constructor(
         return mdmApi.requestRepairEquipment(authorization, post)
     }
 
+    fun getNotification(
+        authorization: String
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            maxSize = 100,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            NotificationPagingSource(
+                mdmApi, authorization
+            )
+        }
+    ).liveData
+
 
     /**
      * Old function
      */
-    suspend fun getNotification(authorization: String): Response<GetNotificationResponse> {
+    /*suspend fun getNotification(authorization: String): Response<GetNotificationResponse> {
         return mdmApi.getNotification(authorization)
-    }
+    }*/
 
     suspend fun saveToken(accessToken: String) {
         preferences.saveToken(accessToken)
