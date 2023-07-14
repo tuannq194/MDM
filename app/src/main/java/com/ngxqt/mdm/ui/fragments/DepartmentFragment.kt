@@ -23,7 +23,7 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.databinding.FragmentDepartmentBinding
 import com.ngxqt.mdm.ui.adapters.DepartmentsPagingAdapter
-import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
+import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.viewmodels.DepartmentViewModel
 import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.hilt.android.AndroidEntryPoint

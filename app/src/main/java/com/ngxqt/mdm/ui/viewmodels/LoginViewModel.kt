@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.LoginPost
-import com.ngxqt.mdm.data.model.LoginResponse
+import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
@@ -23,11 +23,11 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val mdmRepository: MDMRepository, @ApplicationContext private val context: Context
 ) : ViewModel() {
-    private val _loginResponseLiveData: MutableLiveData<Event<Resource<LoginResponse>>> = MutableLiveData()
-    val loginResponseLiveData: LiveData<Event<Resource<LoginResponse>>>
+    private val _loginResponseLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
+    val loginResponseLiveData: LiveData<Event<Resource<HostResponse>>>
         get() = _loginResponseLiveData
 
-    private var loginResponse: LoginResponse? = null
+    private var loginResponse: HostResponse? = null
 
     fun login(post: LoginPost) = viewModelScope.launch() {
         safeLogin(post)
@@ -48,7 +48,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun handleLoginResponse(response: Response<LoginResponse>): Resource<LoginResponse> {
+    private fun handleLoginResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
             Log.d("LOGIN_RETROFIT_SUCCESS", "OK")
             response.body()?.let { resultResponse ->

@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.data.model.HostResponse
-import com.ngxqt.mdm.data.model.InventoryPost
+import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection

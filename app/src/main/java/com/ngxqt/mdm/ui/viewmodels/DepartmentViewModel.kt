@@ -1,22 +1,15 @@
 package com.ngxqt.mdm.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ngxqt.mdm.data.model.Department
-import com.ngxqt.mdm.data.model.GetListEquipmentsByDepartmentIdResponse
 import com.ngxqt.mdm.repository.MDMRepository
-import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,39 +23,5 @@ class DepartmentViewModel @Inject constructor(
         return mdmRepository.getDepartments(
             authorization, keyword
         ).cachedIn(viewModelScope)
-    }
-
-    /**GET LIST EQUIPMENT BY DEPARTMENT*/
-    private val _getListEquipByDepartmentResponseLiveData: MutableLiveData<Event<Resource<GetListEquipmentsByDepartmentIdResponse>>> = MutableLiveData()
-    val getListEquipByDepartmentResponseLiveData: LiveData<Event<Resource<GetListEquipmentsByDepartmentIdResponse>>>
-        get() = _getListEquipByDepartmentResponseLiveData
-
-    private var getListEquipByDepartmentResponse: GetListEquipmentsByDepartmentIdResponse? = null
-
-    fun getListEquipmentByDepartmentId(authorization: String, departmentId: Int) = viewModelScope.launch() {
-        safeGetListEquipByDepartment(authorization, departmentId)
-    }
-
-    private suspend fun safeGetListEquipByDepartment(authorization: String, departmentId: Int) {
-        try {
-            val response = mdmRepository.getListEquipmentsByDepartmenId(authorization, departmentId)
-            _getListEquipByDepartmentResponseLiveData.postValue(Event(handleGetListEquipByDepartmentResponse(response)))
-        } catch (e: Exception){
-            Log.e("GETEQUIPbyDEPARTMENT_API_ERROR", e.toString())
-            _getListEquipByDepartmentResponseLiveData.postValue(Event(Resource.Error(e.toString())))
-        }
-
-    }
-
-    private fun handleGetListEquipByDepartmentResponse(response: Response<GetListEquipmentsByDepartmentIdResponse>): Resource<GetListEquipmentsByDepartmentIdResponse> {
-        if (response.isSuccessful) {
-            Log.d("GETEQUIPbyDEPARTMENT_RETROFIT_SUCCESS", response.body()?.dataLength.toString())
-            response.body()?.let { resultResponse ->
-                return Resource.Success(getListEquipByDepartmentResponse ?: resultResponse)
-            }
-        } else {
-            Log.e("GETEQUIPbyDEPARTMENT_RETROFIT_ERROR", response.toString())
-        }
-        return Resource.Error((getListEquipByDepartmentResponse ?: response.message()).toString())
     }
 }

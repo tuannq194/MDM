@@ -15,7 +15,7 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentDepartmentEquipmentBinding
-import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
+import com.ngxqt.mdm.ui.adapters.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

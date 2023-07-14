@@ -1,12 +1,15 @@
 package com.ngxqt.mdm.data.remote
 
 import com.ngxqt.mdm.data.model.*
+import com.ngxqt.mdm.data.model.postmodel.InventoryPost
+import com.ngxqt.mdm.data.model.postmodel.LoginPost
+import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiInterface {
     @POST("v1/api/auth/login")
-    suspend fun userLogin(@Body post: LoginPost): Response<LoginResponse>
+    suspend fun userLogin(@Body post: LoginPost): Response<HostResponse>
 
     @GET("v1/api/equipment/detail")
     suspend fun getEquipmentById(@Header("Authorization") authorization: String, @Query("id") equipmentId: Int): Response<HostResponse>
@@ -42,6 +45,15 @@ interface ApiInterface {
         @Query("id") departmentId: Int?
     ): Response<HostResponse>
 
+    @GET("/v1/api/user/search")
+    suspend fun getUsers(
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int? = null,
+        @Query("keyword") keyword: String? = null,
+        @Query("role_id") roleId: Int? = null,
+        @Query("department_id") departmentId: Int? = null
+    ): Response<HostResponse>
+
     @GET("v1/api/equipment_repair/history_repair")
     suspend fun getRepairHistory(
         @Header("Authorization") authorization: String,
@@ -67,33 +79,9 @@ interface ApiInterface {
         @Body post: RepairPost
     ): Response<HostResponse>
 
-
-
-    @GET("api/v1/users")
-    suspend fun getAllUsers(@Header("Authorization") authorization: String): Response<GetAllUsersResponse>
-
-    @GET("api/v1/users")
-    suspend fun searchUsers(@Header("Authorization") authorization: String, @Query("keyword") keyword: String?): Response<GetAllUsersResponse>
-
-    @GET("api/v1/equipments")
-    suspend fun getAllEquipments(@Header("Authorization") authorization: String): Response<GetAllEquipmentsResponse>
-
-    @GET("api/v1/equipments")
-    suspend fun searchEquipments(@Header("Authorization") authorization: String, @Query("keyword") keyword: String): Response<GetAllEquipmentsResponse>
-
-
-
-    @GET("api/v1/listEquipmentInventory/{id}")
-    suspend fun getListEquipmentsByDepartmenId(@Header("Authorization") authorization: String, @Path("id") departmentId: Int): Response<GetListEquipmentsByDepartmentIdResponse>
-
-    @GET("api/v1/listInventoryByEquipmentID/{id}")
-    suspend fun getListInventoryById(@Header("Authorization") authorization: String, @Path("id") equipmentId: Int): Response<GetListInventoryResponse>
-
-    @POST("api/v1/equipment/{id}")
-    suspend fun requestEquipmentBroken(@Header("Authorization") authorization: String, @Path("id") equipmentId: Int, @Body post: RequestEquipmentBrokenPost): Response<RequestEquipmentBrokenResponse>
-
-    @POST("api/v1/createInventory/{id}")
-    suspend fun requestEquipmentInventory(@Header("Authorization") authorization: String, @Path("id") equipmentId: Int, @Body post: RequestEquipmentInventoryPost): Response<RequestEquipmentInventoryResponse>
+    /**
+     * Old function
+     */
 
     @GET("api/v1/notification")
     suspend fun getNotification(@Header("Authorization") authorization: String): Response<GetNotificationResponse>

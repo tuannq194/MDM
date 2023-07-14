@@ -11,8 +11,8 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.ItemStaffBinding
 
-class StaffPagingAdapter(private val listener: OnItemClickListener) :
-    PagingDataAdapter<User, StaffPagingAdapter.StaffViewHolder>(EVENT_COMPARATOR) {
+class UserPagingAdapter(private val listener: OnItemClickListener) :
+    PagingDataAdapter<User, UserPagingAdapter.StaffViewHolder>(EVENT_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StaffViewHolder {
         val binding = ItemStaffBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -29,33 +29,44 @@ class StaffPagingAdapter(private val listener: OnItemClickListener) :
     inner class StaffViewHolder(private val binding: ItemStaffBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.setOnClickListener {
-                val position = bindingAdapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val event = getItem(position)
-                    if (event!=null)
-                        listener.onItemClick(event)
+            binding.apply {
+                staffMail.setOnClickListener {
+                    val position = bindingAdapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        val user = getItem(position)
+                        if (user!=null)
+                            listener.onEmailClick(user)
+                    }
+                }
+                staffPhone.setOnClickListener {
+                    val position = bindingAdapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        val user = getItem(position)
+                        if (user!=null)
+                            listener.onPhoneClick(user)
+                    }
                 }
             }
         }
 
-        fun bind(staff: User) {
+        fun bind(user: User) {
             binding.apply {
                 Glide.with(itemView)
-                    .load(staff.image)
+                    .load(user.image)
                     .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.logo)
                     .into(staffImage)
-                staffName.text = staff.name
-                staffMail.text = staff.email
-                staffPhone.text = staff.phone
+                staffName.text = "${user.name?: "Không có dữ liệu"}"
+                staffMail.text = "${user.email?: "Không có dữ liệu"}"
+                staffPhone.text = "${user.phone?: "Không có dữ liệu"}"
             }
         }
     }
 
     interface OnItemClickListener {
-        fun onItemClick(staff: User)
+        fun onEmailClick(user: User)
+        fun onPhoneClick(user: User)
     }
 
     companion object{

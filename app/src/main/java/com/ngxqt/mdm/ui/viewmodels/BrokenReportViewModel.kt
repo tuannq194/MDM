@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.data.model.HostResponse
-import com.ngxqt.mdm.data.model.RepairPost
+import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.CoroutineDispatcherProvider
 import com.ngxqt.mdm.util.Event

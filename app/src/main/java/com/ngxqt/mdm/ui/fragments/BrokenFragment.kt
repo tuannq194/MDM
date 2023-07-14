@@ -17,8 +17,8 @@ import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentBrokenBinding
-import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
-import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
+import com.ngxqt.mdm.ui.adapters.EquipmentsPagingAdapter
+import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

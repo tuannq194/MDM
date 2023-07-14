@@ -5,9 +5,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.*
+import com.ngxqt.mdm.data.model.postmodel.InventoryPost
+import com.ngxqt.mdm.data.model.postmodel.LoginPost
+import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.ui.paging.DepartmentsPagingSource
 import com.ngxqt.mdm.ui.paging.EquipmentsPagingSource
+import com.ngxqt.mdm.ui.paging.UserPagingSource
 import dagger.hilt.android.scopes.ViewModelScoped
 import retrofit2.Response
 import javax.inject.Inject
@@ -17,7 +21,7 @@ class MDMRepository @Inject constructor(
     private val mdmApi: ApiInterface,
     private val preferences: UserPreferences
 ) {
-    suspend fun login(post: LoginPost): Response<LoginResponse> {
+    suspend fun login(post: LoginPost): Response<HostResponse> {
         return mdmApi.userLogin(post)
     }
 
@@ -65,12 +69,28 @@ class MDMRepository @Inject constructor(
         return mdmApi.getDepartmentById(authorization,departmentId)
     }
 
-    suspend fun getRepairHistory(authorization: String, equipment_id: Int?): Response<HostResponse> {
-        return mdmApi.getRepairHistory(authorization, equipment_id)
+    fun getUsers(
+        authorization: String, keyword: String?,
+        roleId: Int?, departmentId: Int?
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            maxSize = 100,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            UserPagingSource(
+                mdmApi, authorization, keyword, roleId, departmentId
+            )
+        }
+    ).liveData
+
+    suspend fun getRepairHistory(authorization: String, equipmentId: Int?): Response<HostResponse> {
+        return mdmApi.getRepairHistory(authorization, equipmentId)
     }
 
-    suspend fun getInventoryHistory(authorization: String, equipment_id: Int?, page: Int?): Response<HostResponse> {
-        return mdmApi.getInventoryHistory(authorization, equipment_id, page)
+    suspend fun getInventoryHistory(authorization: String, equipmentId: Int?, page: Int?): Response<HostResponse> {
+        return mdmApi.getInventoryHistory(authorization, equipmentId, page)
     }
 
     suspend fun requestInventoryEquipment(authorization: String, post: InventoryPost): Response<HostResponse> {
@@ -87,38 +107,6 @@ class MDMRepository @Inject constructor(
     /**
      * Old function
      */
-    suspend fun getAllUsers(authorization: String): Response<GetAllUsersResponse> {
-        return mdmApi.getAllUsers(authorization)
-    }
-
-    suspend fun searchUsers(authorization: String, keyword: String?): Response<GetAllUsersResponse> {
-        return mdmApi.searchUsers(authorization, keyword)
-    }
-
-    suspend fun getAllEquipments(authorization: String): Response<GetAllEquipmentsResponse> {
-        return mdmApi.getAllEquipments(authorization)
-    }
-
-    suspend fun searchEquipments(authorization: String, keyword: String): Response<GetAllEquipmentsResponse> {
-        return mdmApi.searchEquipments(authorization, keyword)
-    }
-
-    suspend fun getListEquipmentsByDepartmenId(authorization: String, departmentId: Int): Response<GetListEquipmentsByDepartmentIdResponse> {
-        return mdmApi.getListEquipmentsByDepartmenId(authorization, departmentId)
-    }
-
-    suspend fun getListInventoryById(authorization: String, equipmentId: Int): Response<GetListInventoryResponse> {
-        return mdmApi.getListInventoryById(authorization, equipmentId)
-    }
-
-    suspend fun requestEquipmentBroken(authorization: String, equipmentId: Int, post: RequestEquipmentBrokenPost): Response<RequestEquipmentBrokenResponse> {
-        return mdmApi.requestEquipmentBroken(authorization, equipmentId, post)
-    }
-
-    suspend fun requestEquipmentInventory(authorization: String, equipmentId: Int, post: RequestEquipmentInventoryPost): Response<RequestEquipmentInventoryResponse> {
-        return mdmApi.requestEquipmentInventory(authorization, equipmentId, post)
-    }
-
     suspend fun getNotification(authorization: String): Response<GetNotificationResponse> {
         return mdmApi.getNotification(authorization)
     }

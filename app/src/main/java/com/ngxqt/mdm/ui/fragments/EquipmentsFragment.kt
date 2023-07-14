@@ -20,8 +20,8 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Department
 import com.ngxqt.mdm.data.model.Equipment
 import com.ngxqt.mdm.databinding.FragmentEquipmentsBinding
-import com.ngxqt.mdm.ui.adapters.equipment.EquipmentsPagingAdapter
-import com.ngxqt.mdm.ui.adapters.equipment.ItemLoadStateAdapter
+import com.ngxqt.mdm.ui.adapters.EquipmentsPagingAdapter
+import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.EquipmentStatusEnum

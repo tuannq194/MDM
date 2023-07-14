@@ -11,6 +11,7 @@ data class HostResponse(
 
 data class Data(
     @SerializedName("user") val user: User?,
+    @SerializedName("users") val users: Users?,
     @SerializedName("access_token") val accessToken: String?,
     @SerializedName("refresh_token") val refreshToken: String?,
     @SerializedName("equipments") val equipments: Equipments?,
@@ -29,4 +30,9 @@ data class Equipments(
 data class Departments(
     @SerializedName("count") val count: Int?,
     @SerializedName("rows") val rows: MutableList<Department>?
+)
+
+data class Users(
+    @SerializedName("count") val count: Int?,
+    @SerializedName("rows") val rows: MutableList<User>?
 )

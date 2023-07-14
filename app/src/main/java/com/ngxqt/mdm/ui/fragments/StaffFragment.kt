@@ -11,32 +11,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.User
 import com.ngxqt.mdm.databinding.FragmentStaffBinding
-import com.ngxqt.mdm.ui.adapters.StaffAdapter
+import com.ngxqt.mdm.ui.adapters.UserPagingAdapter
+import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.viewmodels.StaffViewModel
-import com.ngxqt.mdm.util.Resource
 import com.tbruyelle.rxpermissions3.RxPermissions
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
+class StaffFragment : Fragment(),UserPagingAdapter.OnItemClickListener {
     private val viewModel: StaffViewModel by viewModels()
     private var _binding: FragmentStaffBinding? = null
     private val binding get() = _binding!!
-    private val staffAdapter = StaffAdapter(this)
+    private val userPagingAdapter = UserPagingAdapter(this)
     private var disposable: Disposable? = null
+    private var isFirstRendered = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,12 +54,15 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-        searchUser(null)
+        if (!isFirstRendered){
+            getUsers(null)
+            isFirstRendered = true
+        }
 
         binding.btnStaffSearch.setOnClickListener {
             val keyword = binding.editTextStaffSearch.text.toString().trim()
             if (keyword.isNotEmpty()){
-                searchUser(keyword)
+                getUsers(keyword)
             } else{
                 Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
             }
@@ -73,44 +78,54 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
         binding.recyclerViewStaff.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
-            adapter = staffAdapter
+            adapter = userPagingAdapter.withLoadStateHeaderAndFooter(
+                header = ItemLoadStateAdapter { userPagingAdapter.retry() },
+                footer = ItemLoadStateAdapter { userPagingAdapter.retry() }
+            )
+        }
+        binding.buttonRetry.setOnClickListener {
+            userPagingAdapter.retry()
+        }
+        userPagingAdapter.addLoadStateListener { loadState ->
+            binding.apply {
+                paginationProgressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                recyclerViewStaff.isVisible = loadState.source.refresh is LoadState.NotLoading
+                buttonRetry.isVisible = loadState.source.refresh is LoadState.Error
+                textViewError.isVisible = loadState.source.refresh is LoadState.Error
+                imageError.isVisible = loadState.source.refresh is LoadState.Error
+                if (loadState.source.refresh is LoadState.Error) {
+                    val errorState = loadState.source.refresh as LoadState.Error
+                    textViewError.text = "${errorState.error.message}"
+                }
+
+                //Empty View
+                if(loadState.source.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && userPagingAdapter.itemCount <= 0){
+                    recyclerViewStaff.isVisible = false
+                    imageEmpty.isVisible = true
+                    textViewEmpty.isVisible = true
+                } else {
+                    imageEmpty.isVisible = false
+                    textViewEmpty.isVisible = false
+                }
+            }
         }
     }
 
-    private fun searchUser(keyword: String?) {
+    private fun getUsers(keyword: String?, rollId: Int? = null, departmentId:Int? = null){
         // Call API
-        val userPreferences = UserPreferences(requireContext())
         lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.searchUsers(it,keyword) }
-
-        }
-        //Get LiveData
-        viewModel.searchUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                when(it) {
-                    is Resource.Success -> {
-                        binding.paginationProgressBar.visibility = View.GONE
-                        binding.tvStaffError.visibility = View.GONE
-                        val data = it.data?.data
-                        if (data?.isNotEmpty() == true){
-                            staffAdapter.submitList(data)
-                            binding.tvStaffError.visibility = View.GONE
-                        }else{
-                            Toast.makeText(requireContext(), "Không Tìm Thấy Nhân Viên Có Từ Khóa", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    is Resource.Error -> {
-                        binding.paginationProgressBar.visibility = View.GONE
-                        binding.tvStaffError.visibility = View.VISIBLE
-                        binding.tvStaffError.setText("ERROR\n${it.message}")
-                        Log.e("SEARCHSTAFF_OBSERVER_ERROR", it.data.toString())
-                    }
-                    is Resource.Loading -> {
-                        binding.paginationProgressBar.visibility = View.VISIBLE
-                    }
+            UserPreferences(requireContext()).accessTokenString()?.let {token ->
+                viewModel.getUsers(
+                    authorization = token,
+                    keyword = keyword,
+                    roleId = rollId,
+                    departmentId = departmentId
+                ).observe(viewLifecycleOwner){
+                    Log.d("TAG","${it}")
+                    userPagingAdapter.submitData(lifecycle,it)
                 }
             }
-        })
+        }
     }
 
     override fun onEmailClick(user: User) {

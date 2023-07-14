@@ -21,7 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.model.Equipment
-import com.ngxqt.mdm.data.model.InventoryPost
+import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.databinding.FragmentInventoryNoteBinding
 import com.ngxqt.mdm.ui.viewmodels.InventoryNoteViewModel
 import com.ngxqt.mdm.util.BiometricHelper

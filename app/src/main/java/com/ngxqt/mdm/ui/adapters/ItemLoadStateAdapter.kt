@@ -1,4 +1,4 @@
-package com.ngxqt.mdm.ui.adapters.equipment
+package com.ngxqt.mdm.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
