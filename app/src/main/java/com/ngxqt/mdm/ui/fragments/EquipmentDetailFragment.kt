@@ -99,7 +99,6 @@ class EquipmentDetailFragment : Fragment() {
         //Get LiveData
         viewModel.getEquipmentByIdResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
                         binding.paginationProgressBar.visibility = View.GONE
@@ -114,10 +113,14 @@ class EquipmentDetailFragment : Fragment() {
                         }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvEquipmentDetailError.visibility = View.VISIBLE
                         binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
                         Log.e("SEARCHEQUIPBYID_OBSERVER_ERROR", it.data.toString())
                         binding.btnEquipDetailInventory.visibility = View.GONE
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }
@@ -162,9 +165,9 @@ class EquipmentDetailFragment : Fragment() {
         //Get LiveData
         viewModel.getRepairHisResLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         val repairInfo = it.data?.data?.repairInfo
                         if (repairInfo.isNullOrEmpty()) {
                             binding.equipDetailRepair.visibility = View.VISIBLE
@@ -174,12 +177,15 @@ class EquipmentDetailFragment : Fragment() {
                             binding.equipDetailRepair.visibility = View.GONE
                             binding.equipDetailRepairCardview.visibility = View.VISIBLE
                         }
-
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvEquipmentDetailError.visibility = View.VISIBLE
                         binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
                         Log.e("GET_REPAIR_HIS_OBSERVER_ERROR", it.data.toString())
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }
@@ -215,6 +221,9 @@ class EquipmentDetailFragment : Fragment() {
                         binding.tvEquipmentDetailError.visibility = View.VISIBLE
                         binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
                         Log.e("GET_INVENTORY_HIS_OBSERVER_ERROR", it.data.toString())
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }

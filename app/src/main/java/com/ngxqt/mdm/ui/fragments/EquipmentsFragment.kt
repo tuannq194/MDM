@@ -216,9 +216,9 @@ class EquipmentsFragment : Fragment(),
         //Get LiveData
         viewModel.getAllDepartmentsResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let { it ->
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         if (it.data?.success == true) {
                             mutableListDepartment = it.data?.data?.departments
                             buttonDepartmentClickable = true
@@ -227,8 +227,12 @@ class EquipmentsFragment : Fragment(),
                         }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         Toast.makeText(requireContext(),"${it.data?.message}",Toast.LENGTH_SHORT).show()
                         Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data?.message.toString())
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }

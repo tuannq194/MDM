@@ -160,6 +160,9 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
                         Log.e("BROKENREPORT_OBSERVER_ERROR", it.data.toString())
                         Toast.makeText(requireContext(),"Báo Hỏng Thất Bại", Toast.LENGTH_SHORT).show()
                     }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
+                    }
                 }
             }
         })

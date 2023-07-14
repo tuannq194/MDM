@@ -69,15 +69,19 @@ class NotiFragment : Fragment() {
         //Get LiveData
         viewModel.getNotificationResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when(it) {
                     is Resource.Success -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         notificationAdapter.submitList(it.data?.data)
                         binding.tvNotiError.visibility = View.GONE
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("GETNOTI_OBSERVER_ERROR", it.data.toString())
+                    }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
                     }
                 }
             }

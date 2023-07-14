@@ -42,19 +42,23 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonLogin.setOnClickListener {
             onLogin()
-
         }
         viewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when (it) {
                     is Resource.Success -> {
-                        binding.tvError.visibility = View.GONE
-                        onLoginSuccess(it.data)
+                        binding.paginationProgressBar.visibility = View.GONE
+                        if (it.data?.success == true) {
+                            binding.tvError.visibility = View.GONE
+                            onLoginSuccess(it.data)
+                        } else {
+                            Toast.makeText(requireContext(),it.data?.message,Toast.LENGTH_SHORT).show()
+                        }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvError.visibility = View.GONE
-                        Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Đăng nhập thất bại\nLỗi: ${it.message.toString()}", Toast.LENGTH_SHORT).show()
                         Log.e("LOGIN_OBSERVER_ERROR", it.message.toString())
                     }
                     is Resource.Loading -> {

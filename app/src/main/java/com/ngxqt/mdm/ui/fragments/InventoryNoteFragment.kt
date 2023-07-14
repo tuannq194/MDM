@@ -151,6 +151,9 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
                         Toast.makeText(requireContext(),"Kiểm Kê Thất Bại", Toast.LENGTH_SHORT).show()
                         Log.e("INVENTORYNOTE_OBSERVER_ERROR", it.data.toString())
                     }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
+                    }
                 }
             }
         })

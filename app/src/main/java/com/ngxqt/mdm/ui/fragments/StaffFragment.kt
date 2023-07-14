@@ -87,10 +87,9 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
         //Get LiveData
         viewModel.searchUsersResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-
                 when(it) {
                     is Resource.Success -> {
-                        binding.paginationProgressBar.visibility = View.INVISIBLE
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvStaffError.visibility = View.GONE
                         val data = it.data?.data
                         if (data?.isNotEmpty() == true){
@@ -101,7 +100,7 @@ class StaffFragment : Fragment(),StaffAdapter.OnItemClickListener {
                         }
                     }
                     is Resource.Error -> {
-                        binding.paginationProgressBar.visibility = View.INVISIBLE
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvStaffError.visibility = View.VISIBLE
                         binding.tvStaffError.setText("ERROR\n${it.message}")
                         Log.e("SEARCHSTAFF_OBSERVER_ERROR", it.data.toString())

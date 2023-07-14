@@ -61,6 +61,10 @@ class MDMRepository @Inject constructor(
         return mdmApi.getAllDepartments(authorization)
     }
 
+    suspend fun getDepartmentById(authorization: String, departmentId: Int?): Response<HostResponse> {
+        return mdmApi.getDepartmentById(authorization,departmentId)
+    }
+
     suspend fun getRepairHistory(authorization: String, equipment_id: Int?): Response<HostResponse> {
         return mdmApi.getRepairHistory(authorization, equipment_id)
     }
@@ -80,7 +84,9 @@ class MDMRepository @Inject constructor(
     }
 
 
-
+    /**
+     * Old function
+     */
     suspend fun getAllUsers(authorization: String): Response<GetAllUsersResponse> {
         return mdmApi.getAllUsers(authorization)
     }
@@ -95,10 +101,6 @@ class MDMRepository @Inject constructor(
 
     suspend fun searchEquipments(authorization: String, keyword: String): Response<GetAllEquipmentsResponse> {
         return mdmApi.searchEquipments(authorization, keyword)
-    }
-
-    suspend fun getDepartmentById(authorization: String, departmentId: Int?): Response<GetDepartmentByIdResponse> {
-        return mdmApi.getDepartmentById(authorization,departmentId)
     }
 
     suspend fun getListEquipmentsByDepartmenId(authorization: String, departmentId: Int): Response<GetListEquipmentsByDepartmentIdResponse> {

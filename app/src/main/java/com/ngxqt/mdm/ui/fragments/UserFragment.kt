@@ -83,8 +83,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
             departmentId.value = user?.departmentId
         }
         departmentId.observe(viewLifecycleOwner, Observer { id ->
-            if (id == null) binding.userDepartment.text = "Không có dữ liệu"
-            else setUserDepartment(id)
+            setUserDepartment(id)
         })
     }
 
@@ -98,17 +97,25 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
         //Get LiveData
         viewModel.getDepartmentByIdResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
+                var departmentText = "Không có dữ liệu"
                 when(it) {
                     is Resource.Success -> {
-                        binding.userDepartment.text = "${it.data?.data?.name?: "Không có dữ liệu"}"
-                        //binding.tvDepartmentError.visibility = View.GONE
+                        binding.paginationProgressBar.visibility = View.GONE
+                        if (it.data?.success == true) {
+                            val data = it.data?.data?.department?.name
+                            data?.let { departmentText = data}
+                        }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data.toString())
                     }
+                    is Resource.Loading -> {
+                        binding.paginationProgressBar.visibility = View.VISIBLE
+                    }
                 }
+                binding.userDepartment.text = departmentText
             }
         })
     }

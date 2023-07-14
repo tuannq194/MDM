@@ -36,6 +36,12 @@ interface ApiInterface {
         @Header("Authorization") authorization: String
     ): Response<GetAllDepartmentsResponse>
 
+    @GET("/v1/api/department/detail")
+    suspend fun getDepartmentById(
+        @Header("Authorization") authorization: String,
+        @Query("id") departmentId: Int?
+    ): Response<HostResponse>
+
     @GET("v1/api/equipment_repair/history_repair")
     suspend fun getRepairHistory(
         @Header("Authorization") authorization: String,
@@ -75,8 +81,7 @@ interface ApiInterface {
     @GET("api/v1/equipments")
     suspend fun searchEquipments(@Header("Authorization") authorization: String, @Query("keyword") keyword: String): Response<GetAllEquipmentsResponse>
 
-    @GET("api/v1/departments/{id}")
-    suspend fun getDepartmentById(@Header("Authorization") authorization: String, @Path("id") departmentId: Int?): Response<GetDepartmentByIdResponse>
+
 
     @GET("api/v1/listEquipmentInventory/{id}")
     suspend fun getListEquipmentsByDepartmenId(@Header("Authorization") authorization: String, @Path("id") departmentId: Int): Response<GetListEquipmentsByDepartmentIdResponse>
