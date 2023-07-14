@@ -69,6 +69,16 @@ class MDMRepository @Inject constructor(
         return mdmApi.getInventoryHistory(authorization, equipment_id, page)
     }
 
+    suspend fun requestInventoryEquipment(authorization: String, post: InventoryPost): Response<HostResponse> {
+        val list: MutableList<InventoryPost> = mutableListOf()
+        list.add(post)
+        return mdmApi.requestInventoryEquipment(authorization, list)
+    }
+
+    suspend fun requestRepairEquipment(authorization: String, post: RepairPost): Response<HostResponse> {
+        return mdmApi.requestRepairEquipment(authorization, post)
+    }
+
 
 
     suspend fun getAllUsers(authorization: String): Response<GetAllUsersResponse> {

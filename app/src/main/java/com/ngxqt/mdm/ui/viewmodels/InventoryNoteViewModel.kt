@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.RequestEquipmentInventoryPost
-import com.ngxqt.mdm.data.model.RequestEquipmentInventoryResponse
+import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.InventoryPost
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
@@ -22,20 +22,20 @@ import javax.inject.Inject
 class InventoryNoteViewModel @Inject constructor(
     private val mdmRepository: MDMRepository, @ApplicationContext private val context: Context
 ) : ViewModel() {
-    private val _inventoryNoteResponseLiveData: MutableLiveData<Event<Resource<RequestEquipmentInventoryResponse>>> = MutableLiveData()
-    val inventoryNoteResponseLiveData: LiveData<Event<Resource<RequestEquipmentInventoryResponse>>>
+    private val _inventoryNoteResponseLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
+    val inventoryNoteResponseLiveData: LiveData<Event<Resource<HostResponse>>>
         get() = _inventoryNoteResponseLiveData
 
-    private var inventoryNoteResponse: RequestEquipmentInventoryResponse? = null
+    private var inventoryNoteResponse: HostResponse? = null
 
-    fun inventoryNote(authorization: String, equipmentId: Int, post: RequestEquipmentInventoryPost) = viewModelScope.launch() {
-        safeInventoryNote(authorization, equipmentId, post)
+    fun inventoryNote(authorization: String, post: InventoryPost) = viewModelScope.launch() {
+        safeInventoryNote(authorization, post)
     }
 
-    private suspend fun safeInventoryNote(authorization: String, equipmentId: Int, post: RequestEquipmentInventoryPost) {
+    private suspend fun safeInventoryNote(authorization: String, post: InventoryPost) {
         try {
             if(hasInternetConnection(context)){
-                val response = mdmRepository.requestEquipmentInventory(authorization, equipmentId, post)
+                val response = mdmRepository.requestInventoryEquipment(authorization, post)
                 _inventoryNoteResponseLiveData.postValue(Event(handleInventoryNoteResponse(response)))
             } else {
                 _inventoryNoteResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
@@ -47,7 +47,7 @@ class InventoryNoteViewModel @Inject constructor(
 
     }
 
-    private fun handleInventoryNoteResponse(response: Response<RequestEquipmentInventoryResponse>): Resource<RequestEquipmentInventoryResponse> {
+    private fun handleInventoryNoteResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
             Log.d("INVENTORY_RETROFIT_SUCCESS", "OK")
             response.body()?.let { resultResponse ->

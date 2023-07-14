@@ -20,14 +20,17 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.RequestEquipmentBrokenPost
+import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.RepairPost
 import com.ngxqt.mdm.databinding.FragmentBrokenReportBinding
 import com.ngxqt.mdm.ui.viewmodels.BrokenReportViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
+import com.ngxqt.mdm.util.EquipmentStatusEnum
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,7 +41,8 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
     private var _binding: FragmentBrokenReportBinding? = null
     private val binding get() = _binding!!
     private val args by navArgs<BrokenReportFragmentArgs>()
-    private var reportBroken = false
+    private var isSendRepairRequest = false
+    private var isTurnOnBiometric = false
     private lateinit var biometricPrompt: BiometricPrompt
 
     override fun onCreateView(
@@ -55,7 +59,6 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
         super.onViewCreated(view, savedInstanceState)
         biometricPrompt = initBiometric(requireActivity(),this)
         setEquipmentDetail()
-
     }
 
     private fun setToolbar(){
@@ -66,6 +69,9 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
 
     private fun setEquipmentDetail(){
         val equipment = args.equipment
+        UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+            isTurnOnBiometric = isTurnedOn == true
+        })
         binding.apply {
             Glide.with(root)
                 .load(equipment.image)
@@ -73,77 +79,86 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .error(R.drawable.logo)
                 .into(equipDetailImage)
-            equipDetailTitle.text = equipment.name
-            equipDetailStatus.text = equipment.equipmentStatus?.name.let {
-                if (it == "active") {"Đang Sử Dụng"}
-                else if (it == "was_broken") {"Đang Báo Hỏng"}
-                else if (it == "corrected") {"Đang Sửa Chữa"}
-                else if (it == "liquidated") {"Đã Thanh Lý"}
-                else if (it == "inactive") {"Ngừng Sử Dụng"}
-                else if (it == "not_handed") {"Mới"}
-                else {""}
-            }
-            equipDetailModel.text = equipment.model
-            equipDetailSerial.text = equipment.serial
-            equipDetailYearManufacture.text = equipment.yearOfManufacture.toString()
-            equipDetailYearUse.text = equipment.yearInUse.toString()
-            equipDetailManufacturer.text = equipment.manufacturerId
-            equipDetailOrigin.text = equipment.manufacturingCountryId
-            if (equipment.equipmentStatus?.name == "active"){
+            equipDetailTitle.text = "${equipment.name?: "Không có dữ liệu"}"
+            equipDetailStatus.text = "${equipment.equipmentStatus?.name?.trim()?: "Không có dữ liệu"}"
+            equipDetailModel.text = "${equipment.model?: "Không có dữ liệu"}"
+            equipDetailSerial.text = "${equipment.serial?: "Không có dữ liệu"}"
+            equipDetailYearManufacture.text = "${equipment.yearOfManufacture?: "Không có dữ liệu"}"
+            equipDetailYearUse.text = "${equipment.yearInUse?: "Không có dữ liệu"}"
+            equipDetailManufacturer.text = "${equipment.manufacturerId?: "Không có dữ liệu"}"
+            equipDetailOrigin.text = "${equipment.manufacturingCountryId?: "Không có dữ liệu"}"
+            if (equipment.equipmentStatus?.id == EquipmentStatusEnum.ACTIVE.id){
                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.green)
             }
             btnBrokenReport.setOnClickListener {
                 val reason = binding.editTextReason.text.toString().trim()
                 if (reason.isNotEmpty()){
-                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
-                        if (isTurnedOn == true) authenticate(biometricPrompt)
-                        else equipment.id?.let { requestBroken(it, reason) }
-                    })
+                    if (isTurnOnBiometric == true) authenticate(biometricPrompt)
+                    else equipment?.let { requestBroken(equipment, reason) }
                 } else{
                     Toast.makeText(requireContext(), "Vui Lòng Nhập Lí Do Báo Hỏng", Toast.LENGTH_SHORT).show()
                 }
             }
-
         }
-
     }
 
-    private fun requestBroken(id: Int, reason: String) {
+    private fun requestBroken(equipment: Equipment, reason: String) {
         //call api
-        val calendar = Calendar.getInstance()
-        val dateFailure = SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(calendar.time)
-        val requestEquipmentBrokenPost = RequestEquipmentBrokenPost(dateFailure, reason)
-        val userPreferences = UserPreferences(requireContext())
-        if (reportBroken == false) {
-            lifecycleScope.launch {
-                userPreferences.accessTokenString()?.let { viewModel.brokenReport(it,id, requestEquipmentBrokenPost) }
+        lifecycleScope.launch {
+            val deferredUserId = async { UserPreferences(requireContext()).accessUserInfo()?.id }
+            val equipmentId = equipment.id
+            val equipmentName = equipment.name
+            val departmentId = equipment.department?.id
+            val departmentName = equipment.department?.name
+            val userId = deferredUserId.await()
+            val repairDate = SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().time)
+            val statusId = equipment.statusId
+            val code = "ok"
+            val repairPriority = 1
+
+            val requestEquipmentRepairPost = RepairPost(
+                equipmentId = equipmentId,
+                name = equipmentName,
+                departmentId = departmentId,
+                department = departmentName,
+                reportingPersonId = userId,
+                brokenReportDate = repairDate,
+                reportStatus = statusId,
+                code = code,
+                reason = reason,
+                repairPriority = repairPriority
+            )
+            if (isSendRepairRequest == false) {
+                UserPreferences(requireContext()).accessTokenString()?.let { viewModel.brokenReport(it, requestEquipmentRepairPost) }
                 binding.paginationProgressBar.visibility = View.VISIBLE
+            } else {
+                Toast.makeText(requireContext(),"Đã Báo Hỏng Thiết Bị", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Toast.makeText(requireContext(),"Đã Báo Hỏng Thiết Bị", Toast.LENGTH_SHORT).show()
         }
         //lắng nghe livedate response
         viewModel.brokenReportResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when (it) {
                     is Resource.Success -> {
-                        if (it.data?.status == "200"){
+                        binding.paginationProgressBar.visibility = View.GONE
+                        if (it.data?.success == true){
                             Toast.makeText(requireContext(),"Báo Hỏng Thành Công", Toast.LENGTH_SHORT).show()
                             binding.apply {
                                 equipDetailStatus.text = "Đang Báo Hỏng"
                                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.red)
                             }
-                            reportBroken =  true
+                            isSendRepairRequest =  true
                             binding.tvBrokenReportError.visibility = View.GONE
                         } else {
                             Toast.makeText(requireContext(),"Báo Hỏng Thất Bại", Toast.LENGTH_SHORT).show()
                         }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvBrokenReportError.visibility = View.VISIBLE
                         binding.tvBrokenReportError.setText("ERROR\n${it.message}")
                         Log.e("BROKENREPORT_OBSERVER_ERROR", it.data.toString())
+                        Toast.makeText(requireContext(),"Báo Hỏng Thất Bại", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -153,7 +168,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
     override fun onAuthenticationSuccess() {
         Log.d("BrokenReportFragment","onAuthenticationSuccess")
         val reason = binding.editTextReason.text.toString().trim()
-        args.equipment.id?.let { requestBroken(it, reason) }
+        args.equipment.let { requestBroken(args.equipment, reason) }
     }
 
     override fun onAuthenticationError(errorCode: Int, errorMessage: String) {

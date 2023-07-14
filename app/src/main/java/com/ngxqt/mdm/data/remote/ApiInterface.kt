@@ -49,6 +49,20 @@ interface ApiInterface {
         @Query("page") page: Int? = null
     ): Response<HostResponse>
 
+    @POST("v1/api/equipment_inventory/create_inventory_notes")
+    suspend fun requestInventoryEquipment(
+        @Header("Authorization") authorization: String,
+        @Body post: List<InventoryPost>
+    ): Response<HostResponse>
+
+    @POST("v1/api/equipment_repair/report")
+    suspend fun requestRepairEquipment(
+        @Header("Authorization") authorization: String,
+        @Body post: RepairPost
+    ): Response<HostResponse>
+
+
+
     @GET("api/v1/users")
     suspend fun getAllUsers(@Header("Authorization") authorization: String): Response<GetAllUsersResponse>
 

@@ -20,13 +20,16 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.RequestEquipmentInventoryPost
+import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.InventoryPost
 import com.ngxqt.mdm.databinding.FragmentInventoryNoteBinding
 import com.ngxqt.mdm.ui.viewmodels.InventoryNoteViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
+import com.ngxqt.mdm.util.EquipmentStatusEnum
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,7 +40,8 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
     private var _binding: FragmentInventoryNoteBinding? = null
     private val binding get() = _binding!!
     private val args by navArgs<InventoryNoteFragmentArgs>()
-    private var inventoryNote = false
+    private var isSendInventoryRequest = false
+    private var isTurnOnBiometric = false
     private lateinit var biometricPrompt: BiometricPrompt
 
     override fun onCreateView(
@@ -64,6 +68,9 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
 
     private fun setEquipmentDetail(){
         val equipment = args.equipment
+        UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
+            isTurnOnBiometric = isTurnedOn == true
+        })
         binding.apply {
             Glide.with(root)
                 .load(equipment.image)
@@ -71,64 +78,77 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .error(R.drawable.logo)
                 .into(equipDetailImage)
-            equipDetailTitle.text = equipment.name
-            equipDetailStatus.text = equipment.equipmentStatus?.name?.trim()
-            equipDetailModel.text = equipment.model
-            equipDetailSerial.text = equipment.serial
-            equipDetailYearManufacture.text = equipment.yearOfManufacture.toString()
-            equipDetailYearUse.text = equipment.yearInUse.toString()
-            equipDetailManufacturer.text = equipment.manufacturerId
-            equipDetailOrigin.text = equipment.manufacturingCountryId
-            if (equipment.equipmentStatus?.name == "active"){
+            equipDetailTitle.text = "${equipment.name?: "Không có dữ liệu"}"
+            equipDetailStatus.text = "${equipment.equipmentStatus?.name?.trim()?: "Không có dữ liệu"}"
+            equipDetailModel.text = "${equipment.model?: "Không có dữ liệu"}"
+            equipDetailSerial.text = "${equipment.serial?: "Không có dữ liệu"}"
+            equipDetailYearManufacture.text = "${equipment.yearOfManufacture?: "Không có dữ liệu"}"
+            equipDetailYearUse.text = "${equipment.yearInUse?: "Không có dữ liệu"}"
+            equipDetailManufacturer.text = "${equipment.manufacturerId?: "Không có dữ liệu"}"
+            equipDetailOrigin.text = "${equipment.manufacturingCountryId?: "Không có dữ liệu"}"
+            if (equipment.equipmentStatus?.id == EquipmentStatusEnum.ACTIVE.id){
                 equipDetailStatusCardview.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.green)
             }
             btnInventory.setOnClickListener {
                 val note = binding.editTextNote.text.toString().trim()
                 if (note.isNotEmpty()){
-                    UserPreferences(requireContext()).accessSettingBiometric.asLiveData().observe(viewLifecycleOwner, Observer { isTurnedOn ->
-                        if (isTurnedOn == true) BiometricHelper.authenticate(biometricPrompt)
-                        else equipment.id?.let { requestInventory(it, note) }
-                    })
+                    if (isTurnOnBiometric == true) BiometricHelper.authenticate(biometricPrompt)
+                    else requestInventory(equipment, note)
                 } else{
                     Toast.makeText(requireContext(), "Vui Lòng Nhập Ghi Chú Kiểm Kê", Toast.LENGTH_SHORT).show()
                 }
             }
-
         }
-
     }
 
-    private fun requestInventory(id: Int, note: String) {
+    private fun requestInventory(equipment: Equipment, note: String) {
         //call api
-        val calendar = Calendar.getInstance()
-        val date = SimpleDateFormat("yyyy-MM-dd").format(calendar.time)
-        val requestEquipmentInventoryPost = RequestEquipmentInventoryPost(date, note)
-        val userPreferences = UserPreferences(requireContext())
-        if (inventoryNote == false) {
-            lifecycleScope.launch {
-                userPreferences.accessTokenString()?.let { viewModel.inventoryNote(it,id, requestEquipmentInventoryPost) }
+        lifecycleScope.launch {
+            val deferredUserId = async { UserPreferences(requireContext()).accessUserInfo()?.id }
+            val equipmentId = equipment.id
+            val equipmentName = equipment.name
+            val departmentName = equipment.department?.name
+            val userId = deferredUserId.await()
+            val inventoryDate = SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().time)
+            val statusId = equipment.statusId
+            val times = 1
+
+            val requestEquipmentInventoryPost = InventoryPost(
+                equipmentId = equipmentId,
+                name = equipmentName,
+                department = departmentName,
+                inventoryCreateUserId = userId,
+                inventoryDate = inventoryDate,
+                status = statusId,
+                times = times,
+                note = note
+            )
+            if (isSendInventoryRequest == false) {
+                UserPreferences(requireContext()).accessTokenString()?.let { viewModel.inventoryNote(it, requestEquipmentInventoryPost) }
                 binding.paginationProgressBar.visibility = View.VISIBLE
+            } else {
+                Toast.makeText(requireContext(),"Đã Kiểm Kê Thiết Bị", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Toast.makeText(requireContext(),"Đã Kiểm Kê Thiết Bị", Toast.LENGTH_SHORT).show()
         }
         //lắng nghe livedate response
         viewModel.inventoryNoteResponseLiveData.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
                 when (it) {
                     is Resource.Success -> {
-                        if (it.data?.status == 200){
+                        binding.paginationProgressBar.visibility = View.GONE
+                        if (it.data?.success == true){
                             Toast.makeText(requireContext(),"Kiểm Kê Thành Công", Toast.LENGTH_SHORT).show()
-                            inventoryNote =  true
+                            isSendInventoryRequest = true
                             binding.tvInventoryNoteError.visibility = View.GONE
                         } else {
                             Toast.makeText(requireContext(),"Kiểm Kê Thất Bại", Toast.LENGTH_SHORT).show()
                         }
                     }
                     is Resource.Error -> {
+                        binding.paginationProgressBar.visibility = View.GONE
                         binding.tvInventoryNoteError.visibility = View.VISIBLE
                         binding.tvInventoryNoteError.setText("ERROR\n${it.message}")
+                        Toast.makeText(requireContext(),"Kiểm Kê Thất Bại", Toast.LENGTH_SHORT).show()
                         Log.e("INVENTORYNOTE_OBSERVER_ERROR", it.data.toString())
                     }
                 }
@@ -139,7 +159,7 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
     override fun onAuthenticationSuccess() {
         Log.d("InventoryNoteFragment","onAuthenticationSuccess")
         val note = binding.editTextNote.text.toString().trim()
-        args.equipment.id?.let { requestInventory(it, note) }
+        requestInventory(args.equipment, note)
     }
 
     override fun onAuthenticationError(errorCode: Int, errorMessage: String) {

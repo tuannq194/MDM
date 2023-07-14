@@ -6,10 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.RequestEquipmentBrokenPost
-import com.ngxqt.mdm.data.model.RequestEquipmentBrokenResponse
-import com.ngxqt.mdm.util.CoroutineDispatcherProvider
+import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.RepairPost
 import com.ngxqt.mdm.repository.MDMRepository
+import com.ngxqt.mdm.util.CoroutineDispatcherProvider
 import com.ngxqt.mdm.util.Event
 import com.ngxqt.mdm.util.NetworkUtil
 import com.ngxqt.mdm.util.Resource
@@ -25,20 +25,20 @@ class BrokenReportViewModel @Inject constructor(
     private val dispatcherProvider: CoroutineDispatcherProvider,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-    private val _brokenReportResponseLiveData: MutableLiveData<Event<Resource<RequestEquipmentBrokenResponse>>> = MutableLiveData()
-    val brokenReportResponseLiveData: LiveData<Event<Resource<RequestEquipmentBrokenResponse>>>
+    private val _brokenReportResponseLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
+    val brokenReportResponseLiveData: LiveData<Event<Resource<HostResponse>>>
         get() = _brokenReportResponseLiveData
 
-    private var brokenReportResponse: RequestEquipmentBrokenResponse? = null
+    private var brokenReportResponse: HostResponse? = null
 
-    fun brokenReport(authorization: String, equipmentId: Int, post: RequestEquipmentBrokenPost) = viewModelScope.launch() {
-        safeBrokenReport(authorization, equipmentId, post)
+    fun brokenReport(authorization: String, post: RepairPost) = viewModelScope.launch() {
+        safeBrokenReport(authorization, post)
     }
 
-    private suspend fun safeBrokenReport(authorization: String, equipmentId: Int, post: RequestEquipmentBrokenPost) {
+    private suspend fun safeBrokenReport(authorization: String, post: RepairPost) {
         try {
             if(NetworkUtil.hasInternetConnection(context)){
-                val response = mdmRepository.requestEquipmentBroken(authorization, equipmentId, post)
+                val response = mdmRepository.requestRepairEquipment(authorization, post)
                 _brokenReportResponseLiveData.postValue(Event(handleLoginResponse(response)))
             } else {
                 _brokenReportResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
@@ -50,7 +50,7 @@ class BrokenReportViewModel @Inject constructor(
 
     }
 
-    private fun handleLoginResponse(response: Response<RequestEquipmentBrokenResponse>): Resource<RequestEquipmentBrokenResponse> {
+    private fun handleLoginResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
             Log.d("LOGIN_RETROFIT_SUCCESS", "OK")
             response.body()?.let { resultResponse ->
