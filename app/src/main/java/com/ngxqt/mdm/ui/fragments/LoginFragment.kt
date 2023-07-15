@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.databinding.FragmentLoginBinding
 import com.ngxqt.mdm.ui.viewmodels.LoginViewModel

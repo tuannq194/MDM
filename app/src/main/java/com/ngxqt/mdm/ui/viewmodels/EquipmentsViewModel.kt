@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.*
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
+import com.ngxqt.mdm.data.model.responsemodel.GetAllDepartmentsResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection

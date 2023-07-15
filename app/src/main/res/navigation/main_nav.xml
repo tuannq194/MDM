@@ -193,7 +193,7 @@
         tools:layout="@layout/fragment_inventory_note" >
         <argument
             android:name="equipment"
-            app:argType="com.ngxqt.mdm.data.model.Equipment" />
+            app:argType="com.ngxqt.mdm.data.model.objectmodel.Equipment" />
     </fragment>
     <fragment
         android:id="@+id/brokenFragment"
@@ -222,7 +222,7 @@
         tools:layout="@layout/fragment_broken_report">
         <argument
             android:name="equipment"
-            app:argType="com.ngxqt.mdm.data.model.Equipment" />
+            app:argType="com.ngxqt.mdm.data.model.objectmodel.Equipment" />
     </fragment>
     <fragment
         android:id="@+id/departmentFragment"
@@ -244,7 +244,7 @@
         tools:layout="@layout/fragment_department_equipment">
         <argument
             android:name="department"
-            app:argType="com.ngxqt.mdm.data.model.Department" />
+            app:argType="com.ngxqt.mdm.data.model.objectmodel.Department" />
         <action
             android:id="@+id/action_departmentEquipmentFragment_to_equipmentDetailFragment"
             app:destination="@id/equipmentDetailFragment"

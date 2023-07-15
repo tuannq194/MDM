@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.databinding.ItemEquipmentBinding
 
 class EquipmentsPagingAdapter(private val listener: OnItemClickListener) :

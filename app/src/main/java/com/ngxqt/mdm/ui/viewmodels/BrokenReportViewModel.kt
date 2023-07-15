@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.CoroutineDispatcherProvider
@@ -44,7 +44,7 @@ class BrokenReportViewModel @Inject constructor(
                 _brokenReportResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception){
-            Log.e("LOGIN_API_ERROR", e.toString())
+            Log.e("REPAIR_API_ERROR", e.toString())
             _brokenReportResponseLiveData.postValue(Event(Resource.Error(e.toString())))
         }
 
@@ -52,12 +52,12 @@ class BrokenReportViewModel @Inject constructor(
 
     private fun handleLoginResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
-            Log.d("LOGIN_RETROFIT_SUCCESS", "OK")
+            Log.d("REPAIR_RETROFIT_SUCCESS", response.body().toString())
             response.body()?.let { resultResponse ->
                 return Resource.Success(brokenReportResponse ?: resultResponse)
             }
         } else {
-            Log.e("LOGIN_RETROFIT_ERROR", response.toString())
+            Log.e("REPAIR_RETROFIT_ERROR", response.toString())
         }
         return Resource.Error((brokenReportResponse ?: response.message()).toString())
     }

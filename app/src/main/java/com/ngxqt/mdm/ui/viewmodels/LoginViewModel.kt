@@ -6,9 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
-import com.ngxqt.mdm.data.model.User
+import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection

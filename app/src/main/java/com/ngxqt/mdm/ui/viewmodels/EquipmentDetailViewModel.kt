@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.HostResponse
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
@@ -60,7 +60,7 @@ class EquipmentDetailViewModel @Inject constructor(
         return Resource.Error((getEquipmentByIdResponse ?: response.message()).toString())
     }
 
-    /** HISROTY REPAIR*/
+    /** HISROTY REPAIR*//*
     private val _getRepairHisResLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
     val getRepairHisResLiveData: LiveData<Event<Resource<HostResponse>>>
         get() = _getRepairHisResLiveData
@@ -97,7 +97,7 @@ class EquipmentDetailViewModel @Inject constructor(
         return Resource.Error((getRepairHisResponse ?: response.message()).toString())
     }
 
-    /** HISROTY INVENTORY*/
+    *//** HISROTY INVENTORY*//*
     private val _getInventoryHisResLiveData: MutableLiveData<Event<Resource<HostResponse>>> = MutableLiveData()
     val getInventoryHisResponseLiveData: LiveData<Event<Resource<HostResponse>>>
         get() = _getInventoryHisResLiveData
@@ -132,5 +132,5 @@ class EquipmentDetailViewModel @Inject constructor(
             Log.e("GET_INVENTORY_HIS_API_ERROR", response.toString())
         }
         return Resource.Error((getInventoryHisResponse ?: response.message()).toString())
-    }
+    }*/
 }

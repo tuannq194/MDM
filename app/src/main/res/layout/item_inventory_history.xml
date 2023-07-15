@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_white_border_20"
+
+    android:layout_margin="5dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/inventory_created_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:breakStrategy="balanced"
+            android:fontFamily="@font/averta_std_cy_regular_3"
+            android:maxLines="2"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            tools:text="Ngày kiểm kê:" />
+
+        <TextView
+            android:id="@+id/inventory_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/averta_std_cy_regular_3"
+            android:maxLines="2"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            tools:text="Ghi chú: khá dài như nàyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy" />
+
+        <TextView
+            android:id="@+id/inventory_created_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/averta_std_cy_regular_3"
+            android:maxLines="2"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            tools:text="Người kiểm kê: Tuấn" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

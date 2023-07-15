@@ -18,8 +18,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.databinding.FragmentEquipmentDetailBinding
+import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.EquipmentDetailViewModel
 import com.ngxqt.mdm.util.EquipmentStatusEnum
 import com.ngxqt.mdm.util.Resource
@@ -50,8 +51,6 @@ class EquipmentDetailFragment : Fragment() {
 
         setButton()
         getEquipmentById(equipmentId)
-        getRepairHistory(equipmentId)
-        getInventoryHistory(equipmentId)
     }
 
     private fun setToolbar(){
@@ -76,14 +75,12 @@ class EquipmentDetailFragment : Fragment() {
             }
             btnEquipDetailRepairHistory.setOnClickListener {
                 equipment?.let {
-                    val action = EquipmentDetailFragmentDirections.actionEquipmentDetailFragmentToBrokenReportFragment(equipment!!)
-                    findNavController().navigate(action)
+                    showDialogRepairHistory(equipment!!)
                 }
             }
             btnEquipDetailInventoryHistory.setOnClickListener {
                 equipment?.let {
-                    val action = EquipmentDetailFragmentDirections.actionEquipmentDetailFragmentToInventoryNoteFragment(equipment!!)
-                    findNavController().navigate(action)
+                    showDialogInventoryHistory(equipment!!)
                 }
             }
         }
@@ -155,78 +152,13 @@ class EquipmentDetailFragment : Fragment() {
         }
     }
 
-    private fun getRepairHistory(equipmentId: Int){
-        // Call API
-        val userPreferences = UserPreferences(requireContext())
-        lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.getRepairHistory(it,equipmentId) }
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        }
-        //Get LiveData
-        viewModel.getRepairHisResLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                when(it) {
-                    is Resource.Success -> {
-                        binding.paginationProgressBar.visibility = View.GONE
-                        val repairInfo = it.data?.data?.repairInfo
-                        if (repairInfo.isNullOrEmpty()) {
-                            binding.equipDetailRepair.visibility = View.VISIBLE
-                            binding.equipDetailRepairCardview.visibility = View.GONE
-                        } else {
-                            binding.tvEquipmentDetailError.visibility = View.GONE
-                            binding.equipDetailRepair.visibility = View.GONE
-                            binding.equipDetailRepairCardview.visibility = View.VISIBLE
-                        }
-                    }
-                    is Resource.Error -> {
-                        binding.paginationProgressBar.visibility = View.GONE
-                        binding.tvEquipmentDetailError.visibility = View.VISIBLE
-                        binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
-                        Log.e("GET_REPAIR_HIS_OBSERVER_ERROR", it.data.toString())
-                    }
-                    is Resource.Loading -> {
-                        binding.paginationProgressBar.visibility = View.VISIBLE
-                    }
-                }
-            }
-        })
+    private fun showDialogInventoryHistory(equipment: Equipment){
+        val dialog = MyDialog(equipment,"Lịch Sử Kiểm Kê Thiết Bị")
+        dialog.show(parentFragmentManager, MyDialog.INVENTORY_HISTORY_DIALOG)
     }
 
-    private fun getInventoryHistory(equipmentId: Int){
-        // Call API
-        val userPreferences = UserPreferences(requireContext())
-        lifecycleScope.launch {
-            userPreferences.accessTokenString()?.let { viewModel.getInventoryHistory(it,equipmentId,null) }
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        }
-        //Get LiveData
-        viewModel.getInventoryHisResponseLiveData.observe(viewLifecycleOwner, Observer {
-            it.getContentIfNotHandled()?.let {
-                binding.paginationProgressBar.visibility = View.INVISIBLE
-                when(it) {
-                    is Resource.Success -> {
-                        val count = it.data?.data?.equipments?.count
-                        if (count != null) {
-                            if (count > 0){
-                                binding.tvEquipmentDetailError.visibility = View.GONE
-                                binding.equipDetailInventory.visibility = View.GONE
-                                binding.equipDetailInventoryCardview.visibility = View.VISIBLE
-                            } else {
-                                binding.equipDetailInventory.visibility = View.VISIBLE
-                                binding.equipDetailInventoryCardview.visibility = View.GONE
-                            }
-                        }
-                    }
-                    is Resource.Error -> {
-                        binding.tvEquipmentDetailError.visibility = View.VISIBLE
-                        binding.tvEquipmentDetailError.setText("ERROR\n${it.message}")
-                        Log.e("GET_INVENTORY_HIS_OBSERVER_ERROR", it.data.toString())
-                    }
-                    is Resource.Loading -> {
-                        binding.paginationProgressBar.visibility = View.VISIBLE
-                    }
-                }
-            }
-        })
+    private fun showDialogRepairHistory(equipment: Equipment){
+        val dialog = MyDialog(equipment,"Lịch Sử Báo Hỏng Thiết Bị")
+        dialog.show(parentFragmentManager, MyDialog.REPAIR_HISTORY_DIALOG)
     }
 }

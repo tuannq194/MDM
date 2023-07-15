@@ -4,17 +4,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.liveData
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.GetAllDepartmentsResponse
-import com.ngxqt.mdm.data.model.HostResponse
-import com.ngxqt.mdm.data.model.User
+import com.ngxqt.mdm.data.model.responsemodel.GetAllDepartmentsResponse
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
+import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.data.remote.ApiInterface
-import com.ngxqt.mdm.ui.paging.DepartmentsPagingSource
-import com.ngxqt.mdm.ui.paging.EquipmentsPagingSource
-import com.ngxqt.mdm.ui.paging.NotificationPagingSource
-import com.ngxqt.mdm.ui.paging.UserPagingSource
+import com.ngxqt.mdm.ui.paging.*
 import dagger.hilt.android.scopes.ViewModelScoped
 import retrofit2.Response
 import javax.inject.Inject
@@ -88,13 +85,45 @@ class MDMRepository @Inject constructor(
         }
     ).liveData
 
-    suspend fun getRepairHistory(authorization: String, equipmentId: Int?): Response<HostResponse> {
+    /*suspend fun getRepairHistory(authorization: String, equipmentId: Int?): Response<HostResponse> {
         return mdmApi.getRepairHistory(authorization, equipmentId)
-    }
+    }*/
 
-    suspend fun getInventoryHistory(authorization: String, equipmentId: Int?, page: Int?): Response<HostResponse> {
+    /*suspend fun getInventoryHistory(authorization: String, equipmentId: Int?, page: Int?): Response<HostResponse> {
         return mdmApi.getInventoryHistory(authorization, equipmentId, page)
-    }
+    }*/
+
+    fun getRepairHistory(
+        authorization: String,
+        equipmentId: Int?
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            maxSize = 100,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            RepairHistoryPagingSource(
+                mdmApi, authorization, equipmentId
+            )
+        }
+    ).liveData
+
+    fun getInventoryHistory(
+        authorization: String,
+        equipmentId: Int?
+    ) = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            maxSize = 100,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            InventoryHistoryPagingSource(
+                mdmApi, authorization, equipmentId
+            )
+        }
+    ).liveData
 
     suspend fun requestInventoryEquipment(authorization: String, post: InventoryPost): Response<HostResponse> {
         val list: MutableList<InventoryPost> = mutableListOf()
@@ -120,14 +149,6 @@ class MDMRepository @Inject constructor(
             )
         }
     ).liveData
-
-
-    /**
-     * Old function
-     */
-    /*suspend fun getNotification(authorization: String): Response<GetNotificationResponse> {
-        return mdmApi.getNotification(authorization)
-    }*/
 
     suspend fun saveToken(accessToken: String) {
         preferences.saveToken(accessToken)

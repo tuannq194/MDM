@@ -1,4 +1,4 @@
-package com.ngxqt.mdm.data.model
+package com.ngxqt.mdm.data.model.objectmodel
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName

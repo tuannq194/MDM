@@ -10,7 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.ngxqt.mdm.data.model.User
+import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.util.KeyStoreManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow

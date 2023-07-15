@@ -20,7 +20,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.databinding.FragmentInventoryNoteBinding
 import com.ngxqt.mdm.ui.viewmodels.InventoryNoteViewModel
@@ -109,7 +109,7 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
             val equipmentName = equipment.name
             val departmentName = equipment.department?.name
             val userId = deferredUserId.await()
-            val inventoryDate = SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().time)
+            val inventoryDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'").format(Calendar.getInstance().time)
             val statusId = equipment.statusId
             val times = 1
 

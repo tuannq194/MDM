@@ -1,6 +1,7 @@
-package com.ngxqt.mdm.data.model
+package com.ngxqt.mdm.data.model.responsemodel
 
 import com.google.gson.annotations.SerializedName
+import com.ngxqt.mdm.data.model.objectmodel.Department
 
 data class GetAllDepartmentsResponse(
     @SerializedName("success") val success: Boolean?,

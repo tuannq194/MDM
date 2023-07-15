@@ -20,7 +20,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.databinding.FragmentBrokenReportBinding
 import com.ngxqt.mdm.ui.viewmodels.BrokenReportViewModel

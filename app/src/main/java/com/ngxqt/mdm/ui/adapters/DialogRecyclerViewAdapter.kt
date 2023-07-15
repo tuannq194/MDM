@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.databinding.ItemEquipmentBinding
 
 class DialogRecyclerViewAdapter(private val listener: OnItemClickListener):

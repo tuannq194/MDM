@@ -2,37 +2,30 @@ package com.ngxqt.mdm.ui.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.ngxqt.mdm.data.model.objectmodel.Department
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.data.remote.ApiInterface
 import retrofit2.HttpException
 import java.io.IOException
 
-class DepartmentsPagingSource(
+class RepairHistoryPagingSource(
     private val mdmApi: ApiInterface,
     private val authorization: String,
-    private val keyword: String?
-) : PagingSource<Int, Department>() {
-    companion object {
-        private const val STARTING_INDEX = 1
-    }
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Department> {
-        val page = params.key ?: STARTING_INDEX
-
+    private val equipmentId: Int?
+) : PagingSource<Int, Equipment>() {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Equipment> {
         return try {
-            val response = mdmApi.getDepartments(
+            val response = mdmApi.getRepairHistory(
                 authorization,
-                page,
-                keyword
+                equipmentId
             )
             if (response.body()?.success == true) {
                 response.body()?.let { body ->
-                    var data: MutableList<Department> = mutableListOf()
-                    body.data?.departments?.rows?.let { data = body.data.departments.rows }
+                    var data: MutableList<Equipment> = mutableListOf()
+                    body.data?.repairInfo?.let { data = body.data.repairInfo }
                     LoadResult.Page(
                         data = data,
-                        prevKey = if (page == STARTING_INDEX) null else page - 1,
-                        nextKey = if (data.isEmpty()) null else page + 1
+                        prevKey = null,
+                        nextKey = null
                     )
                 } ?: run {
                     LoadResult.Error(NullPointerException("Response body is null"))
@@ -47,7 +40,7 @@ class DepartmentsPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Department>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, Equipment>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)

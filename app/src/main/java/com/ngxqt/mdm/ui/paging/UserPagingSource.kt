@@ -1,9 +1,8 @@
 package com.ngxqt.mdm.ui.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.ngxqt.mdm.data.model.User
+import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.data.remote.ApiInterface
 import retrofit2.HttpException
 import java.io.IOException
@@ -14,7 +13,7 @@ class UserPagingSource(
     private val keyword: String?,
     private val roleId: Int?,
     private val departmentId: Int?
-) : PagingSource<Int,User>() {
+) : PagingSource<Int, User>() {
     companion object {
         private const val STARTING_INDEX = 1
     }

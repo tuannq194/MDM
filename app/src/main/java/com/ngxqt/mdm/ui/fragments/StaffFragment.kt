@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.User
+import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.databinding.FragmentStaffBinding
 import com.ngxqt.mdm.ui.adapters.UserPagingAdapter
 import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter

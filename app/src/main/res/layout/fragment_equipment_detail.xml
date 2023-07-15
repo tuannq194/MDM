@@ -337,7 +337,7 @@
                     android:text="Thiết bị chưa được báo hỏng"
                     android:textColor="@color/black"
                     android:textSize="14dp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -348,24 +348,30 @@
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
                     android:backgroundTint="@color/white"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:background="@android:color/transparent"
+                        android:text="Xem lịch sử báo hỏng thiết bị"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="14dp" />
                     <Button
                         android:id="@+id/btn_equip_detail_repair_history"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
-                        android:drawableRight="@drawable/ic_angle_right"
+                        android:drawableRight="@drawable/ic_down_arrow"
                         android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Xem lịch sử báo hỏng thiết bị"
-                        android:textAllCaps="false"
-                        android:textColor="@color/black"
-                        android:textSize="14dp" />
+                        android:paddingRight="10dp" />
                 </androidx.cardview.widget.CardView>
             </FrameLayout>
 
@@ -400,7 +406,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="20dp"
                     android:text="Thiết bị chưa được kiểm kê"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:textColor="@color/black"
                     android:textSize="14dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -413,24 +419,30 @@
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
                     android:backgroundTint="@color/white"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:background="@android:color/transparent"
+                        android:text="Xem lịch sử kiểm kê thiết bị"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="14dp" />
                     <Button
                         android:id="@+id/btn_equip_detail_inventory_history"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
-                        android:drawableRight="@drawable/ic_angle_right"
+                        android:drawableRight="@drawable/ic_down_arrow"
                         android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Xem lịch sử kiểm kê thiết bị"
-                        android:textAllCaps="false"
-                        android:textColor="@color/black"
-                        android:textSize="14dp" />
+                        android:paddingRight="10dp" />
                 </androidx.cardview.widget.CardView>
             </FrameLayout>
 

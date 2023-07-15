@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.ngxqt.mdm.data.model.Department
+import com.ngxqt.mdm.data.model.objectmodel.Department
 import com.ngxqt.mdm.repository.MDMRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

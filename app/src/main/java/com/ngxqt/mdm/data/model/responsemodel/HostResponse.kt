@@ -1,6 +1,9 @@
-package com.ngxqt.mdm.data.model
+package com.ngxqt.mdm.data.model.responsemodel
 
 import com.google.gson.annotations.SerializedName
+import com.ngxqt.mdm.data.model.objectmodel.Department
+import com.ngxqt.mdm.data.model.objectmodel.User
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.data.model.objectmodel.Notification
 
 data class HostResponse(
@@ -20,7 +23,7 @@ data class Data(
     @SerializedName("departments") val departments: Departments?,
     @SerializedName("department") val department: Department?,
     @SerializedName("notifications") val notifications: Notifications?,
-    @SerializedName("repair_info") val repairInfo: MutableList<RepairInfo>?,
+    @SerializedName("repair_info") val repairInfo: MutableList<Equipment>?,
     @SerializedName("count") val count: Int?
 )
 

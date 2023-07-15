@@ -2,7 +2,7 @@ package com.ngxqt.mdm.ui.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.data.remote.ApiInterface
 import retrofit2.HttpException
 import java.io.IOException
@@ -17,7 +17,7 @@ class EquipmentsPagingSource(
     private val riskLevel: Int?,
     private val yearInUse: Int?,
     private val yearOfManufacture: Int?
-) : PagingSource<Int,Equipment>() {
+) : PagingSource<Int, Equipment>() {
     companion object {
         private const val STARTING_INDEX = 1
     }

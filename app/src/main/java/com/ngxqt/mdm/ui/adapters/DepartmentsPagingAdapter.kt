@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.ngxqt.mdm.data.model.Department
+import com.ngxqt.mdm.data.model.objectmodel.Department
 import com.ngxqt.mdm.databinding.ItemDepartmentBinding
 
 class DepartmentsPagingAdapter(private val listener: OnItemClickListener) :

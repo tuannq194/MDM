@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
-import com.ngxqt.mdm.data.model.Department
-import com.ngxqt.mdm.data.model.Equipment
+import com.ngxqt.mdm.data.model.objectmodel.Department
+import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.databinding.FragmentEquipmentsBinding
 import com.ngxqt.mdm.ui.adapters.EquipmentsPagingAdapter
 import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter
