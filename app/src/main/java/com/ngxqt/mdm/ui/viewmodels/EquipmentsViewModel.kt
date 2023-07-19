@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +11,7 @@ import com.ngxqt.mdm.data.model.objectmodel.Equipment
 import com.ngxqt.mdm.data.model.responsemodel.GetAllDepartmentsResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,19 +61,19 @@ class EquipmentsViewModel @Inject constructor(
                 _getAllDepartmentsResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception) {
-            Log.e("GETALLDEPARTMENT_API_ERROR", e.toString())
+            LogUtils.d("GETALLDEPARTMENT_API_ERROR: $e")
             _getAllDepartmentsResponseLiveData.postValue(Event(Resource.Error(e.toString())))
         }
     }
 
     private fun handleGetAllDepartmentsResponse(response: Response<GetAllDepartmentsResponse>): Resource<GetAllDepartmentsResponse> {
         if (response.isSuccessful) {
-            Log.d("GETALLDEPARTMENT_RETROFIT_SUCCESS", response.body()?.message.toString())
+            LogUtils.d("GETALLDEPARTMENT_RETROFIT_SUCCESS: ${response.body()?.message}")
             response.body()?.let { resultResponse ->
                 return Resource.Success(getAllDepartmentsResponse ?: resultResponse)
             }
         } else {
-            Log.e("GETALLDEPARTMENT_RETROFIT_ERROR", response.toString())
+            LogUtils.d("GETALLDEPARTMENT_RETROFIT_ERROR: $response")
         }
         return Resource.Error((getAllDepartmentsResponse ?: response.message()).toString())
     }

@@ -1,15 +1,15 @@
 package com.ngxqt.mdm.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.data.model.postmodel.InventoryPost
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,7 +41,7 @@ class InventoryNoteViewModel @Inject constructor(
                 _inventoryNoteResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception){
-            Log.e("INVENTORY_API_ERROR", e.toString())
+            LogUtils.d("INVENTORY_API_ERROR: $e")
             _inventoryNoteResponseLiveData.postValue(Event(Resource.Error(e.toString())))
         }
 
@@ -49,12 +49,12 @@ class InventoryNoteViewModel @Inject constructor(
 
     private fun handleInventoryNoteResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
-            Log.d("INVENTORY_RETROFIT_SUCCESS", "OK")
+            LogUtils.d("INVENTORY_RETROFIT_SUCCESS: OK")
             response.body()?.let { resultResponse ->
                 return Resource.Success(inventoryNoteResponse ?: resultResponse)
             }
         } else {
-            Log.e("INVENTORY_RETROFIT_ERROR", response.toString())
+            LogUtils.d("INVENTORY_RETROFIT_ERROR: $response")
         }
         return Resource.Error((inventoryNoteResponse ?: response.message()).toString())
     }

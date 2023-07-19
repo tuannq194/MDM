@@ -1,12 +1,12 @@
 package com.ngxqt.mdm.di
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.remote.ApiInterface
+import com.ngxqt.mdm.util.LogUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -63,11 +63,10 @@ object ApiModule {
     ): Retrofit {
         val baseUrlFlow = userPreferencesProvider.getBaseUrl()
         var baseUrl = runBlocking { baseUrlFlow.first() }
-        Log.d("provideRetrofit", "RUN HERE ${baseUrl}")
+        LogUtils.d("RUN HERE ${baseUrl}")
         if (baseUrl == null) baseUrl = "http://bvdemo.qltbyt.com"
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            //.addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

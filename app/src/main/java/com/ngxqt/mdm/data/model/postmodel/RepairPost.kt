@@ -10,7 +10,6 @@ data class RepairPost(
     @SerializedName("reporting_person_id") val reportingPersonId: Int?,
     @SerializedName("broken_report_date") val brokenReportDate: String?,
     @SerializedName("report_status") val reportStatus: Int?,
-    @SerializedName("code") val code: String?,
     @SerializedName("reason") val reason: String?,
     @SerializedName("repair_priority") val repairPriority: Int?
 )

@@ -4,7 +4,6 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import java.security.*
 import javax.crypto.Cipher
@@ -31,7 +30,7 @@ class KeyStoreManager(private val context: Context) {
             keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
         } catch (e: Exception) {
-            Log.d(TAG, e.message.toString())
+            LogUtils.d("$TAG: ${e.message}")
         }
     }
 
@@ -50,7 +49,7 @@ class KeyStoreManager(private val context: Context) {
                 keyPair = keyPairGenerator.genKeyPair()
             } else Toast.makeText(context, "Alias exist!!", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Log.d(TAG, e.message.toString())
+            LogUtils.d("$TAG: ${e.message}")
         }
     }
 
@@ -82,7 +81,7 @@ class KeyStoreManager(private val context: Context) {
     }
 
     fun decryptLongString(encryptedText: String?, alias: String?): String {
-        Log.d("decryptTokenString","encryptedText = ${encryptedText}, alias = ${alias}")
+        LogUtils.d("encryptedText = ${encryptedText}, alias = ${alias}")
         val privateKey = keyStore.getKey(alias, null) as PrivateKey
         val combined = Base64.decode(encryptedText, Base64.NO_WRAP)
         val encryptedSymmetricKey = combined.copyOfRange(0, 256)
@@ -123,30 +122,6 @@ class KeyStoreManager(private val context: Context) {
         val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
         cipher.init(Cipher.DECRYPT_MODE, symmetricKey)
         return cipher.doFinal(encryptedData)
-    }
-
-    /** Mã hóa và giải mã với dữ liệu ngắn gọn*/
-    fun encryptString(clearText: String, alias: String): String {
-        val publicKey = keyStore.getCertificate(alias).publicKey
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey)
-        val cipherText = cipher.doFinal(clearText.toByteArray(Charsets.UTF_8))
-
-        //textEncrypt.text = Base64.encodeToString(cipherText, Base64.DEFAULT)
-        return Base64.encodeToString(cipherText, Base64.NO_WRAP)
-    }
-
-    fun decryptString(cipherText: String?, alias: String?): String? {
-        Log.d("decryptString","cipherText = ${cipherText}, alias = ${alias}")
-        if (cipherText.isNullOrEmpty() || alias.isNullOrEmpty()) return null
-        val privateKeyEntry = keyStore.getEntry(alias, null) as KeyStore.PrivateKeyEntry
-        val privateKey = privateKeyEntry.privateKey
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.DECRYPT_MODE, privateKey)
-        val decryptText = cipher.doFinal(Base64.decode(cipherText, Base64.DEFAULT))
-
-        //textDecrypt.text = String(decryptText)
-        return String(decryptText)
     }
 
     fun getAliases(): String {

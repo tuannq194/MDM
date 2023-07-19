@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +24,7 @@ import com.ngxqt.mdm.ui.adapters.ItemLoadStateAdapter
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.EquipmentStatusEnum
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -229,7 +229,7 @@ class EquipmentsFragment : Fragment(),
                     is Resource.Error -> {
                         binding.paginationProgressBar.visibility = View.GONE
                         Toast.makeText(requireContext(),"${it.data?.message}",Toast.LENGTH_SHORT).show()
-                        Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data?.message.toString())
+                        LogUtils.d("GETALLDEPARTMENT_OBSERVER_ERROR: ${it.data?.message}")
                     }
                     is Resource.Loading -> {
                         binding.paginationProgressBar.visibility = View.VISIBLE

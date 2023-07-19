@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId "com.ngxqt.mdm"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -36,14 +36,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        release {
-            keyAlias 'key0'
-            keyPassword '19042000'
-            storeFile file('D:/AndroidStudio/keystore/keystore-MDM-release-040523.jks')
-            storePassword '19042000'
-        }
-    }
     buildTypes {
         release {
             minifyEnabled true

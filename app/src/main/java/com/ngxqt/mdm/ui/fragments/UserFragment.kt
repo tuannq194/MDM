@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +22,7 @@ import com.ngxqt.mdm.ui.viewmodels.UserViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -109,7 +109,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
                     is Resource.Error -> {
                         binding.paginationProgressBar.visibility = View.GONE
                         Toast.makeText(requireContext(), it.message.toString(), Toast.LENGTH_SHORT).show()
-                        Log.e("GETALLDEPARTMENT_OBSERVER_ERROR", it.data.toString())
+                        LogUtils.d("GETALLDEPARTMENT_OBSERVER_ERROR: ${it.data}")
                     }
                     is Resource.Loading -> {
                         binding.paginationProgressBar.visibility = View.VISIBLE
@@ -128,7 +128,7 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     override fun onAuthenticationSuccess() {
-        Log.d("UserFragment","onAuthenticationSuccess")
+        LogUtils.d("UserFragment: onAuthenticationSuccess")
         findNavController().navigate(R.id.action_userFragment_to_settingFragment)
     }
 

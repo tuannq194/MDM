@@ -1,16 +1,16 @@
 package com.ngxqt.mdm.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.responsemodel.HostResponse
-import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.objectmodel.User
+import com.ngxqt.mdm.data.model.postmodel.LoginPost
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.repository.MDMRepository
 import com.ngxqt.mdm.util.Event
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.NetworkUtil.Companion.hasInternetConnection
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,19 +43,19 @@ class LoginViewModel @Inject constructor(
                 _loginResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception) {
-            Log.d("LOGIN_API_ERROR", e.message.toString())
+            LogUtils.d("LOGIN_API_ERROR: ${e.message}")
             _loginResponseLiveData.postValue(Event(Resource.Error("${e.message.toString()}")))
         }
     }
 
     private fun handleLoginResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
-            Log.d("LOGIN_RETROFIT_SUCCESS", "OK")
+            LogUtils.d("LOGIN_RETROFIT_SUCCESS: OK")
             response.body()?.let { resultResponse ->
                 return Resource.Success(loginResponse ?: resultResponse)
             }
         } else {
-            Log.d("LOGIN_RETROFIT_ERROR", response.toString())
+            LogUtils.d("LOGIN_RETROFIT_ERROR: $response")
             var res = response.body()?.message.toString()
             if (response.code()==401) res = "Email Hoặc Mật Khẩu Không Đúng"
             else if (response.code()==400) res = "Invalid request body"

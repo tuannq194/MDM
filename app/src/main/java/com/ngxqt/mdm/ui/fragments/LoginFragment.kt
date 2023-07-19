@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
-import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.databinding.FragmentLoginBinding
 import com.ngxqt.mdm.ui.viewmodels.LoginViewModel
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.Resource
 import com.ngxqt.mdm.util.isEmailValid
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,7 +59,7 @@ class LoginFragment : Fragment() {
                         binding.paginationProgressBar.visibility = View.GONE
                         binding.tvError.visibility = View.GONE
                         Toast.makeText(requireContext(), "Đăng nhập thất bại\nLỗi: ${it.message.toString()}", Toast.LENGTH_SHORT).show()
-                        Log.e("LOGIN_OBSERVER_ERROR", it.message.toString())
+                        LogUtils.d("LOGIN_OBSERVER_ERROR: ${it.message}")
                     }
                     is Resource.Loading -> {
                         binding.paginationProgressBar.visibility = View.VISIBLE

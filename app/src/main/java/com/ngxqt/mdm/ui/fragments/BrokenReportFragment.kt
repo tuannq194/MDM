@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +27,7 @@ import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.EquipmentStatusEnum
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.async
@@ -112,8 +112,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
             val departmentName = equipment.department?.name
             val userId = deferredUserId.await()
             val repairDate = SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().time)
-            val statusId = equipment.statusId
-            val code = "ok"
+            val reportStatus = 0
             val repairPriority = 1
 
             val requestEquipmentRepairPost = RepairPost(
@@ -123,8 +122,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
                 department = departmentName,
                 reportingPersonId = userId,
                 brokenReportDate = repairDate,
-                reportStatus = statusId,
-                code = code,
+                reportStatus = reportStatus,
                 reason = reason,
                 repairPriority = repairPriority
             )
@@ -157,7 +155,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
                         binding.paginationProgressBar.visibility = View.GONE
                         binding.tvBrokenReportError.visibility = View.VISIBLE
                         binding.tvBrokenReportError.setText("ERROR\n${it.message}")
-                        Log.e("BROKENREPORT_OBSERVER_ERROR", it.data.toString())
+                        LogUtils.d(it.data.toString())
                         Toast.makeText(requireContext(),"Báo Hỏng Thất Bại", Toast.LENGTH_SHORT).show()
                     }
                     is Resource.Loading -> {
@@ -169,7 +167,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     override fun onAuthenticationSuccess() {
-        Log.d("BrokenReportFragment","onAuthenticationSuccess")
+        LogUtils.d("onAuthenticationSuccess")
         val reason = binding.editTextReason.text.toString().trim()
         args.equipment.let { requestBroken(args.equipment, reason) }
     }

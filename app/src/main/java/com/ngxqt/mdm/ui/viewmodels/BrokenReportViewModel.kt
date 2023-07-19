@@ -1,18 +1,14 @@
 package com.ngxqt.mdm.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
+import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import com.ngxqt.mdm.repository.MDMRepository
-import com.ngxqt.mdm.util.CoroutineDispatcherProvider
-import com.ngxqt.mdm.util.Event
-import com.ngxqt.mdm.util.NetworkUtil
-import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -44,7 +40,7 @@ class BrokenReportViewModel @Inject constructor(
                 _brokenReportResponseLiveData.postValue(Event(Resource.Error("Mất Kết Nối Internet")))
             }
         } catch (e: Exception){
-            Log.e("REPAIR_API_ERROR", e.toString())
+            LogUtils.d("REPAIR_API_ERROR: $e")
             _brokenReportResponseLiveData.postValue(Event(Resource.Error(e.toString())))
         }
 
@@ -52,12 +48,12 @@ class BrokenReportViewModel @Inject constructor(
 
     private fun handleLoginResponse(response: Response<HostResponse>): Resource<HostResponse> {
         if (response.isSuccessful) {
-            Log.d("REPAIR_RETROFIT_SUCCESS", response.body().toString())
+            LogUtils.d("REPAIR_RETROFIT_SUCCESS: ${response.body()}")
             response.body()?.let { resultResponse ->
                 return Resource.Success(brokenReportResponse ?: resultResponse)
             }
         } else {
-            Log.e("REPAIR_RETROFIT_ERROR", response.toString())
+            LogUtils.d("REPAIR_RETROFIT_ERROR: $response")
         }
         return Resource.Error((brokenReportResponse ?: response.message()).toString())
     }

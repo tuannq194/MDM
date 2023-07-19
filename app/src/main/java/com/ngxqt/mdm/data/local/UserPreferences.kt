@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.data.local
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -12,6 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.util.KeyStoreManager
+import com.ngxqt.mdm.util.LogUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -45,7 +45,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
 
     /**Base URl*/
     suspend fun accessBaseUrlString(): String? {
-        Log.d("accessBaseUrlString","${appContext.dataStore.data.first()[BASE_URL]}")
+        LogUtils.d("${appContext.dataStore.data.first()[BASE_URL]}")
         return appContext.dataStore.data.first()[BASE_URL]
     }
 
@@ -57,7 +57,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     suspend fun saveBaseUrl(baseUrl: String) {
         appContext.dataStore.edit { preferences ->
             preferences[BASE_URL] = baseUrl
-            Log.d("saveBaseUrl","${baseUrl}")
+            LogUtils.d("saveBaseUrl: ${baseUrl}")
         }
     }
 

@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import com.ngxqt.mdm.ui.viewmodels.SettingViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.checkDeviceHasBiometric
+import com.ngxqt.mdm.util.LogUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -65,7 +65,7 @@ class SettingFragment : Fragment(), BiometricHelper.BiometricCallback {
                             viewModel.saveSettingBiometric(isBiometricTurnedOn)
                             if (!isBiometricTurnedOn) Toast.makeText(requireContext(), "Đã tắt xác thực vân tay", Toast.LENGTH_SHORT).show()
                         } else {
-                            Log.d("SettingFragment","isBiometricIsTurnedOn $isBiometricTurnedOn")
+                            LogUtils.d("SettingFragment: isBiometricIsTurnedOn $isBiometricTurnedOn")
                             authenticate(biometricPrompt)
                         }
                     }
@@ -92,20 +92,20 @@ class SettingFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     override fun onAuthenticationSuccess() {
-        Log.d("SettingFragment","onAuthenticationSuccess $isBiometricTurnedOn")
+        LogUtils.d("SettingFragment: onAuthenticationSuccess $isBiometricTurnedOn")
         viewModel.saveSettingBiometric(isBiometricTurnedOn)
         if (isBiometricTurnedOn) Toast.makeText(requireContext(), "Xác thực thành công\nĐã bật xác thực vân tay", Toast.LENGTH_SHORT).show()
         else Toast.makeText(requireContext(), "Xác thực thành công\nĐã tắt xác thực vân tay", Toast.LENGTH_SHORT).show()
     }
 
     override fun onAuthenticationError(errorCode: Int, errorMessage: String) {
-        Log.d("SettingFragment","onAuthenticationError $errorMessage ${!isBiometricTurnedOn}")
+        LogUtils.d("SettingFragment: onAuthenticationError $errorMessage ${!isBiometricTurnedOn}")
         binding.settingBiometric.isChecked = !isBiometricTurnedOn
         Toast.makeText(requireContext(), "$errorMessage", Toast.LENGTH_SHORT).show()
     }
 
     override fun onAuthenticationFailed() {
-        Log.d("SettingFragment","onAuthenticationFailed")
+        LogUtils.d("SettingFragment: onAuthenticationFailed")
         binding.settingBiometric.isChecked = !isBiometricTurnedOn
         Toast.makeText(requireContext(), "Xác thực thất bại", Toast.LENGTH_SHORT).show()
     }

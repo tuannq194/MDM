@@ -3,13 +3,11 @@ package com.ngxqt.mdm.ui.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.biometric.BiometricPrompt
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
@@ -19,6 +17,7 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
+import com.ngxqt.mdm.util.LogUtils
 
 class SplashFragment : Fragment(), BiometricHelper.BiometricCallback {
     override fun onCreateView(
@@ -45,7 +44,7 @@ class SplashFragment : Fragment(), BiometricHelper.BiometricCallback {
 
     override fun onAuthenticationSuccess() {
         Toast.makeText(requireContext(), "Xác thực thành công", Toast.LENGTH_SHORT).show()
-        Log.d("SplashFragment","onAuthenticationSuccess")
+        LogUtils.d("SplashFragment: onAuthenticationSuccess")
         findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
     }
 

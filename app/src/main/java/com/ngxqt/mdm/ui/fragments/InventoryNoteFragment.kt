@@ -1,7 +1,6 @@
 package com.ngxqt.mdm.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +26,7 @@ import com.ngxqt.mdm.ui.viewmodels.InventoryNoteViewModel
 import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
 import com.ngxqt.mdm.util.EquipmentStatusEnum
+import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.async
@@ -149,7 +149,7 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
                         binding.tvInventoryNoteError.visibility = View.VISIBLE
                         binding.tvInventoryNoteError.setText("ERROR\n${it.message}")
                         Toast.makeText(requireContext(),"Kiểm Kê Thất Bại", Toast.LENGTH_SHORT).show()
-                        Log.e("INVENTORYNOTE_OBSERVER_ERROR", it.data.toString())
+                        LogUtils.d("INVENTORYNOTE_OBSERVER_ERROR: ${it.data}")
                     }
                     is Resource.Loading -> {
                         binding.paginationProgressBar.visibility = View.VISIBLE
@@ -160,7 +160,7 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
     }
 
     override fun onAuthenticationSuccess() {
-        Log.d("InventoryNoteFragment","onAuthenticationSuccess")
+        LogUtils.d("InventoryNoteFragment: onAuthenticationSuccess")
         val note = binding.editTextNote.text.toString().trim()
         requestInventory(args.equipment, note)
     }
