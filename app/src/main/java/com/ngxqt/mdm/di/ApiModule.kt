@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.ngxqt.mdm.BuildConfig
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.util.LogUtils
@@ -28,8 +29,13 @@ object ApiModule {
     @Provides
     @ViewModelScoped
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        String
-        return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        val loggingInterceptor = HttpLoggingInterceptor()
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        } else {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE)
+        }
+        return loggingInterceptor
     }
 
     @Provides
