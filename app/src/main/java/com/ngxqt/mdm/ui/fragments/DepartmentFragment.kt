@@ -56,6 +56,22 @@ class DepartmentFragment : Fragment(), DepartmentsPagingAdapter.OnItemClickListe
             getDepartments(null)
             isFirstRendered = true
         }
+
+        binding.btnDepartmentSearch.setOnClickListener {
+            val keyword = binding.editTextDepartmentSearch.text.toString().trim()
+            if (keyword.isNotEmpty()){
+                getDepartments(keyword)
+                binding.btnClearFilter.visibility = View.VISIBLE
+            } else{
+                Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnClearFilter.setOnClickListener {
+            binding.editTextDepartmentSearch.text.clear()
+            getDepartments(null)
+            binding.btnClearFilter.visibility = View.GONE
+        }
     }
     private fun setToolbar(){
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigationView).visibility = View.GONE

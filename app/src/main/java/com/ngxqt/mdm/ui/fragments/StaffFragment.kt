@@ -62,9 +62,16 @@ class StaffFragment : Fragment(),UserPagingAdapter.OnItemClickListener {
             val keyword = binding.editTextStaffSearch.text.toString().trim()
             if (keyword.isNotEmpty()){
                 getUsers(keyword)
+                binding.btnClearFilter.visibility = View.VISIBLE
             } else{
                 Toast.makeText(requireContext(), "Vui Lòng Nhập Thông Tin Để Tìm Kiếm", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        binding.btnClearFilter.setOnClickListener {
+            binding.editTextStaffSearch.text.clear()
+            getUsers(null)
+            binding.btnClearFilter.visibility = View.GONE
         }
     }
     private fun setToolbar(){

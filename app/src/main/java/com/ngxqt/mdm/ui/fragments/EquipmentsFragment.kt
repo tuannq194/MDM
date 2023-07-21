@@ -105,7 +105,7 @@ class EquipmentsFragment : Fragment(),
             textButtonDepartment = getString(R.string.tat_ca)
             binding.btnEquipmentsFilterDepartment.setText(textButtonDepartment)
             getEquipments(filterStatus, filterKeyword, filterDepartment)
-            binding.btnClearFilter.visibility = View.INVISIBLE
+            binding.btnClearFilter.visibility = View.GONE
         }
     }
 
@@ -158,7 +158,7 @@ class EquipmentsFragment : Fragment(),
         if ( filterKeyword != null || filterStatus != null || filterDepartment != null){
             binding.btnClearFilter.visibility = View.VISIBLE
         } else {
-            binding.btnClearFilter.visibility = View.INVISIBLE
+            binding.btnClearFilter.visibility = View.GONE
         }
     }
 
