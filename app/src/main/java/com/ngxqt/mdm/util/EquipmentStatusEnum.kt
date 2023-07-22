@@ -5,6 +5,6 @@ enum class EquipmentStatusEnum(val id:Int) {
     ACTIVE(3),
     WAS_BROKEN(4),
     REPAIRED(5),
-    LIQUIDATED(6),
-    INACTIVE(7)
+    INACTIVE(6),
+    LIQUIDATED(7)
 }

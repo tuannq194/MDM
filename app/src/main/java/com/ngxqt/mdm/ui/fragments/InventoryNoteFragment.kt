@@ -146,9 +146,7 @@ class InventoryNoteFragment : Fragment(), BiometricHelper.BiometricCallback {
                     }
                     is Resource.Error -> {
                         binding.paginationProgressBar.visibility = View.GONE
-                        binding.tvInventoryNoteError.visibility = View.VISIBLE
-                        binding.tvInventoryNoteError.setText("ERROR\n${it.message}")
-                        Toast.makeText(requireContext(),"Kiểm Kê Thất Bại", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),"Kiểm Kê Thất Bại\n Lỗi: ${it.message}", Toast.LENGTH_SHORT).show()
                         LogUtils.d("INVENTORYNOTE_OBSERVER_ERROR: ${it.data}")
                     }
                     is Resource.Loading -> {

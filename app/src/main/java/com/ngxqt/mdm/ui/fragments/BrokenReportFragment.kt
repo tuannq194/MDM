@@ -153,10 +153,8 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
                     }
                     is Resource.Error -> {
                         binding.paginationProgressBar.visibility = View.GONE
-                        binding.tvBrokenReportError.visibility = View.VISIBLE
-                        binding.tvBrokenReportError.setText("ERROR\n${it.message}")
-                        LogUtils.d(it.data.toString())
-                        Toast.makeText(requireContext(),"Báo Hỏng Thất Bại", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),"Báo Hỏng Thất Bại\nLỗi: ${it.message}", Toast.LENGTH_SHORT).show()
+                        LogUtils.d("BROKENREPORT_OBSERVER_ERROR: ${it.data}")
                     }
                     is Resource.Loading -> {
                         binding.paginationProgressBar.visibility = View.VISIBLE

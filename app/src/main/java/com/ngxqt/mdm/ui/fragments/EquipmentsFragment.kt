@@ -163,7 +163,7 @@ class EquipmentsFragment : Fragment(),
     }
 
     private fun showDialogStatus(){
-        val statusList = mutableListOf("Tất Cả", "Đang Sử Dụng", "Đang Báo Hỏng", "Đang Sửa Chữa", "Đã Thanh Lý", "Ngưng Sử Dụng", "Mới")
+        val statusList = mutableListOf("Tất Cả", "Mới", "Đang Sử Dụng", "Đang Báo Hỏng", "Đang Sửa Chữa", "Đã Thanh Lý", "Ngưng Sử Dụng")
         val dialog = MyDialog(statusList,"Lọc Trạng Thái", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
                 textButtonStatus = statusList.get(position)
