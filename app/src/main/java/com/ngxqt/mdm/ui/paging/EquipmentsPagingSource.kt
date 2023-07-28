@@ -20,6 +20,7 @@ class EquipmentsPagingSource(
 ) : PagingSource<Int, Equipment>() {
     companion object {
         private const val STARTING_INDEX = 1
+        private const val LIMIT_PER_PAGE = 10
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Equipment> {
@@ -29,6 +30,7 @@ class EquipmentsPagingSource(
             val response = mdmApi.getEquipments(
                 authorization,
                 page,
+                LIMIT_PER_PAGE,
                 name,
                 departmentId,
                 statusId,

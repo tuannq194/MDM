@@ -25,6 +25,7 @@ interface ApiInterface {
     suspend fun getEquipments(
         @Header("Authorization") authorization: String,
         @Query("page") page: Int? = null,
+        @Query("limit") limit: Int? = null,
         @Query("name") name: String? = null,
         @Query("department_id") departmentId: Int? = null,
         @Query("status_id") statusId: Int? = null,
