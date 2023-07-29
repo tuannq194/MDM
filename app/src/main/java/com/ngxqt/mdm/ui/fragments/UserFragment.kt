@@ -18,12 +18,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentUserBinding
+import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.UserViewModel
-import com.ngxqt.mdm.util.BiometricHelper
+import com.ngxqt.mdm.util.*
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
-import com.ngxqt.mdm.util.LogUtils
-import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.statusNameToStatusIdMapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -54,11 +54,24 @@ class UserFragment : Fragment(), BiometricHelper.BiometricCallback {
             })
         }
         binding.userLogout.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.clearData()
-                findNavController().navigate(R.id.action_userFragment_to_baseUrlFragment5)
-            }
+            showDialogConfirm()
         }
+    }
+
+    private fun showDialogConfirm() {
+        val dialog = MyDialog(
+            "Bạn thực sự muốn\nđăng xuất tài khoản?",
+            listener = object : MyDialog.OnConfirmClickListener {
+                override fun onConfirmClick(clicked: Boolean) {
+                    if (clicked) {
+                        lifecycleScope.launch {
+                            viewModel.clearData()
+                            findNavController().navigate(R.id.action_userFragment_to_baseUrlFragment5)
+                        }
+                    }
+                }
+            })
+        dialog.show(parentFragmentManager, MyDialog.CONFIRM_DIALOG)
     }
 
     private fun setUserInfo() {

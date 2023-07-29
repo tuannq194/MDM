@@ -28,8 +28,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MyDialog() : DialogFragment() {
     private val viewModel: DialogViewModel by viewModels()
-    private lateinit var listener: OnPickerItemSelectedListener
+    private lateinit var itemSelectedlistener: OnPickerItemSelectedListener
+    private lateinit var confirmClicklistener: OnConfirmClickListener
     private var title: String? = null
+    private var description: String? = null
     private var items: MutableList<String>? = null
     private var equipment: Equipment? = null
 
@@ -40,13 +42,20 @@ class MyDialog() : DialogFragment() {
     constructor(items: MutableList<String>, title: String, listener: OnPickerItemSelectedListener) : this() {
         this.items = items
         this.title = title
-        this.listener = listener
+        this.itemSelectedlistener = listener
+    }
+
+    constructor(title: String, description: String? = null, listener: OnConfirmClickListener) : this() {
+        this.title = title
+        this.description = description
+        this.confirmClicklistener = listener
     }
 
     companion object {
         const val FILTER_DIALOG = "filterEquipments"
         const val INVENTORY_HISTORY_DIALOG = "inventoryHistory"
         const val REPAIR_HISTORY_DIALOG = "repairHistory"
+        const val CONFIRM_DIALOG = "confirm"
     }
 
     private var _binding: DialogBottomBinding? = null
@@ -58,6 +67,7 @@ class MyDialog() : DialogFragment() {
         if (tag.equals(FILTER_DIALOG)) dialog = filterEquipmentsDialog()
         else if (tag.equals(INVENTORY_HISTORY_DIALOG)) dialog = inventoryHistoryDialog()
         else if (tag.equals(REPAIR_HISTORY_DIALOG)) dialog = repairHistoryDialog()
+        else if (tag.equals(CONFIRM_DIALOG)) dialog = confirmDialog()
         dialog?.apply {
             show()
             window!!.apply {
@@ -82,7 +92,7 @@ class MyDialog() : DialogFragment() {
             dialogPicker.displayedValues = items?.toTypedArray()
             dialogPicker.wrapSelectorWheel = false
             dialogOk.setOnClickListener {
-                listener?.onPickerItemSelected(binding.dialogPicker.value)
+                itemSelectedlistener?.onPickerItemSelected(binding.dialogPicker.value)
                 dialog?.dismiss()
             }
         }
@@ -146,6 +156,27 @@ class MyDialog() : DialogFragment() {
         return builder.create()
     }
 
+    private fun confirmDialog(): Dialog? {
+        val builder = AlertDialog.Builder(requireActivity(), R.style.MyDialogStyle)
+        builder.setView(binding.root)
+
+        binding.apply {
+            dialogTitle.setText("${title}")
+            dialogPicker.visibility = View.GONE
+            dialogRecyclerView.visibility = View.GONE
+            dialogCancel.visibility = View.VISIBLE
+            dialogCancel.setOnClickListener {
+                dialog?.dismiss()
+            }
+            dialogOk.setOnClickListener {
+                confirmClicklistener.onConfirmClick(true)
+                dialog?.dismiss()
+            }
+        }
+
+        return builder.create()
+    }
+
     private fun setupRecyclerView(historyPagingAdapter: HistoryPagingAdapter) {
         binding.dialogRecyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
@@ -183,5 +214,9 @@ class MyDialog() : DialogFragment() {
 
     interface OnPickerItemSelectedListener {
         fun onPickerItemSelected(position: Int)
+    }
+
+    interface OnConfirmClickListener {
+        fun onConfirmClick(clicked: Boolean)
     }
 }
