@@ -5,6 +5,7 @@ import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.data.model.responsemodel.GetAllDepartmentsResponse
+import com.ngxqt.mdm.data.model.responsemodel.GetAllEquipmentsResponse
 import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -34,6 +35,11 @@ interface ApiInterface {
         @Query("year_in_use") yearInUse: Int? = null,
         @Query("year_of_manufacture") yearOfManufacture: Int? = null
     ): Response<HostResponse>
+
+    @GET("v1/api/equipment/search")
+    suspend fun getAllEquipments(
+        @Header("Authorization") authorization: String
+    ): Response<GetAllEquipmentsResponse>
 
     @GET("v1/api/department/search")
     suspend fun getDepartments(

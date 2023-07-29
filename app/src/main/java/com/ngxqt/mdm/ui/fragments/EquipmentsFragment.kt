@@ -26,6 +26,7 @@ import com.ngxqt.mdm.ui.viewmodels.EquipmentsViewModel
 import com.ngxqt.mdm.util.EquipmentStatusEnum
 import com.ngxqt.mdm.util.LogUtils
 import com.ngxqt.mdm.util.Resource
+import com.ngxqt.mdm.util.statusNameToStatusIdMapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -163,21 +164,20 @@ class EquipmentsFragment : Fragment(),
     }
 
     private fun showDialogStatus(){
-        val statusList = mutableListOf("Tất Cả", "Mới", "Đang Sử Dụng", "Đang Báo Hỏng", "Đang Sửa Chữa", "Đã Thanh Lý", "Ngưng Sử Dụng")
+        val statusList = mutableListOf(
+            EquipmentStatusEnum.ALL.statusName,
+            EquipmentStatusEnum.ACTIVE.statusName,
+            EquipmentStatusEnum.WAS_BROKEN.statusName,
+            EquipmentStatusEnum.REPAIRED.statusName,
+            EquipmentStatusEnum.INACTIVE.statusName,
+            EquipmentStatusEnum.LIQUIDATED.statusName
+        )
         val dialog = MyDialog(statusList,"Lọc Trạng Thái", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
                 textButtonStatus = statusList.get(position)
                 binding.btnEquipmentsFilterStatus.setText(textButtonStatus)
-                filterStatus = when(textButtonStatus) {
-                    "Mới" -> EquipmentStatusEnum.NEW.id
-                    "Đang Sử Dụng" -> EquipmentStatusEnum.ACTIVE.id
-                    "Đang Báo Hỏng" -> EquipmentStatusEnum.WAS_BROKEN.id
-                    "Đang Sửa Chữa" -> EquipmentStatusEnum.REPAIRED.id
-                    "Đã Thanh Lý" -> EquipmentStatusEnum.LIQUIDATED.id
-                    "Ngưng Sử Dụng" -> EquipmentStatusEnum.INACTIVE.id
-                    "Tất Cả" -> null
-                    else -> null
-                }
+                filterStatus = statusNameToStatusIdMapper(textButtonStatus)
+                if (textButtonStatus == EquipmentStatusEnum.ALL.statusName) filterStatus = null
                 getEquipments(filterStatus, filterKeyword, filterDepartment)
                 setButtonClearFilter()
             }

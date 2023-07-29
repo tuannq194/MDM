@@ -12,6 +12,32 @@ internal fun isUrlValid(url: String): Boolean {
     return regex.matches(url)
 }
 
+internal fun statusNameToStatusIdMapper(statusName: String?): Int? {
+    return when (statusName) {
+        "Tất Cả" -> EquipmentStatusEnum.ALL.id
+        "Mới" -> EquipmentStatusEnum.NEW.id
+        "Đang Sử Dụng" -> EquipmentStatusEnum.ACTIVE.id
+        "Đang Báo Hỏng" -> EquipmentStatusEnum.WAS_BROKEN.id
+        "Đang Sửa Chữa" -> EquipmentStatusEnum.REPAIRED.id
+        "Đã Thanh Lý" -> EquipmentStatusEnum.LIQUIDATED.id
+        "Ngưng Sử Dụng" -> EquipmentStatusEnum.INACTIVE.id
+        else -> null
+    }
+}
+
+internal fun statusIdToStatusNameMapper(statusId: Int?): String {
+    return when (statusId) {
+        EquipmentStatusEnum.ALL.id ->"Tất Cả"
+        EquipmentStatusEnum.NEW.id -> "Mới"
+        EquipmentStatusEnum.ACTIVE.id -> "Đang Sử Dụng"
+        EquipmentStatusEnum.WAS_BROKEN.id -> "Đang Báo Hỏng"
+        EquipmentStatusEnum.REPAIRED.id -> "Đang Sửa Chữa"
+        EquipmentStatusEnum.LIQUIDATED.id -> "Đã Thanh Lý"
+        EquipmentStatusEnum.INACTIVE.id -> "Ngưng Sử Dụng"
+        else -> ""
+    }
+}
+
 internal fun Equipment.withDefaultValues(): Equipment {
     return this.copy(
         id = id ?: 0,

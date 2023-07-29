@@ -10,6 +10,7 @@ import com.ngxqt.mdm.data.model.objectmodel.User
 import com.ngxqt.mdm.data.model.postmodel.InventoryPost
 import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
+import com.ngxqt.mdm.data.model.responsemodel.GetAllEquipmentsResponse
 import com.ngxqt.mdm.data.remote.ApiInterface
 import com.ngxqt.mdm.ui.paging.*
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -45,6 +46,10 @@ class MDMRepository @Inject constructor(
             )
         }
     ).liveData
+
+    suspend fun getAllEquipments(authorization: String): Response<GetAllEquipmentsResponse> {
+        return mdmApi.getAllEquipments(authorization)
+    }
 
     fun getDepartments(
         authorization: String, keyword: String?
