@@ -6,6 +6,7 @@ import com.ngxqt.mdm.data.model.postmodel.LoginPost
 import com.ngxqt.mdm.data.model.postmodel.RepairPost
 import com.ngxqt.mdm.data.model.responsemodel.GetAllDepartmentsResponse
 import com.ngxqt.mdm.data.model.responsemodel.GetAllEquipmentsResponse
+import com.ngxqt.mdm.data.model.responsemodel.GetHistoryRepairResponse
 import com.ngxqt.mdm.data.model.responsemodel.HostResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -72,7 +73,7 @@ interface ApiInterface {
     suspend fun getRepairHistory(
         @Header("Authorization") authorization: String,
         @Query("id") equipmentId: Int? = null
-    ): Response<HostResponse>
+    ): Response<GetHistoryRepairResponse>
 
     @GET("v1/api/equipment_inventory/history_inventory_of_equipment")
     suspend fun getInventoryHistory(

@@ -21,7 +21,7 @@ class RepairHistoryPagingSource(
             if (response.body()?.success == true) {
                 response.body()?.let { body ->
                     var data: MutableList<Equipment> = mutableListOf()
-                    body.data?.repairInfo?.let { data = body.data.repairInfo }
+                    body.data?.equipment?.let { data = body.data.equipment }
                     LoadResult.Page(
                         data = data,
                         prevKey = null,
