@@ -21,9 +21,10 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <LinearLayout
-            android:id="@+id/linearLayout3"
+            android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:weightSum="2"
             app:layout_constraintEnd_toEndOf="parent"
@@ -39,10 +40,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginBottom="5dp"
-                    android:text="Trạng thái"
+                    android:text="Chọn loại dữ liệu"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -57,7 +57,7 @@
                     app:cardCornerRadius="20dp">
 
                     <Button
-                        android:id="@+id/btn_equipments_filter_status"
+                        android:id="@+id/btn_statistic_type"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
@@ -72,46 +72,98 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutButtonStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:weightSum="2"
+                android:visibility="visible"
+                tools:visibility="visible">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:text="Khoa phòng"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <androidx.cardview.widget.CardView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:backgroundTint="@color/white"
-                    app:cardCornerRadius="20dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                    <Button
-                        android:id="@+id/btn_equipments_filter_department"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginBottom="5dp"
+                        android:text="Trạng thái"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:drawableRight="@drawable/ic_down_arrow"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Nothing"
-                        android:textAllCaps="false"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:backgroundTint="@color/white"
+                        app:cardCornerRadius="20dp">
+
+                        <Button
+                            android:id="@+id/btn_statistic_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
+                            android:drawableRight="@drawable/ic_down_arrow"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:text="Nothing"
+                            android:textAllCaps="false"
+                            android:textColor="@color/black"
+                            android:textSize="14dp" />
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginBottom="5dp"
+                        android:text="Khoa phòng"
                         android:textColor="@color/black"
-                        android:textSize="14dp" />
-                </androidx.cardview.widget.CardView>
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:backgroundTint="@color/white"
+                        app:cardCornerRadius="20dp">
+
+                        <Button
+                            android:id="@+id/btn_equipments_filter_department"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
+                            android:drawableRight="@drawable/ic_down_arrow"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:text="Nothing"
+                            android:textAllCaps="false"
+                            android:textColor="@color/black"
+                            android:textSize="14dp" />
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -120,7 +172,7 @@
             android:orientation="vertical"
             android:weightSum="5"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
             tools:layout_editor_absoluteX="20dp">
 
             <com.github.mikephil.charting.charts.HorizontalBarChart
@@ -134,19 +186,19 @@
                 android:id="@+id/statisticPieChart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
                 android:layout_margin="20dp"
+                android:layout_weight="2"
                 android:visibility="visible" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/legendRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="3"
                 android:clipToPadding="false"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingBottom="16dp"
-                android:layout_weight="3"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
 

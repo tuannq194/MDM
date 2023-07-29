@@ -2,6 +2,7 @@ package com.ngxqt.mdm.ui.fragments
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
@@ -42,6 +42,7 @@ class StatisticFragment : Fragment() {
     private var isFirstRendered = false
     private var statusName: String? = null
     private var textButtonStatus: String? = null
+    private var statisticType: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,17 +57,47 @@ class StatisticFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!isFirstRendered){
+            statisticType = StatisticType.STATUS.typeName
             textButtonStatus = statusIdToStatusNameMapper(0)
             getAllEquipment()
             isFirstRendered = true
         }
-        binding.btnEquipmentsFilterStatus.apply {
+        binding.btnStatisticType.apply {
+            setText("Trạng Thái")
+            setOnClickListener {
+                showDialogSelectType()
+            }
+        }
+
+        binding.btnStatisticStatus.apply {
             setText(textButtonStatus)
             setOnClickListener {
                 if (buttonClickable && mutableListEquipment != null) showDialogStatus()
                 else Toast.makeText(requireContext(),"Đợi Tải Dữ Liệu", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun showDialogSelectType() {
+        val statusList = mutableListOf(
+            StatisticType.STATUS.typeName,
+            StatisticType.RISK.typeName
+        )
+        val dialog = MyDialog(statusList,"Chọn Loại Dữ Liệu Cần Thống Kê", object : MyDialog.OnPickerItemSelectedListener{
+            override fun onPickerItemSelected(position: Int) {
+                statisticType = statusList.get(position)
+                if (position == 0) {
+                    binding.layoutButtonStatus.visibility = View.VISIBLE
+                    setupPieChart(EquipmentStatusEnum.ALL.id)
+                }
+                else if (position == 1) {
+                    binding.layoutButtonStatus.visibility = View.GONE
+                    setupPieChart(null)
+                }
+                binding.btnStatisticType.setText(statisticType)
+            }
+        })
+        dialog.show(parentFragmentManager, MyDialog.FILTER_DIALOG)
     }
 
     private fun showDialogStatus(){
@@ -82,7 +113,7 @@ class StatisticFragment : Fragment() {
             override fun onPickerItemSelected(position: Int) {
                 statusName = statusList.get(position)
                 textButtonStatus = statusName
-                binding.btnEquipmentsFilterStatus.setText(textButtonStatus)
+                binding.btnStatisticStatus.setText(textButtonStatus)
                 setupPieChart(statusNameToStatusIdMapper(statusName))
             }
         })
@@ -90,24 +121,24 @@ class StatisticFragment : Fragment() {
     }
 
     private fun setupPieChart(statusId: Int?) {
-        binding.statisticBarChart.visibility = View.GONE
         pieChart = binding.statisticPieChart
         pieChart.apply {
             visibility = View.VISIBLE
             description.isEnabled = false // Miêu tả (description) của Pie Chart
+            legend.isEnabled = false
 
-            legend.isEnabled = false // Bật legend của Pie Chart
-            legend.textSize = 14f
-            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM // Hiển thị ở phía dưới biểu đồ
-            legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER // Căn giữa Legend
-            legend.orientation = Legend.LegendOrientation.VERTICAL // Hiển thị dọc
-            legend.setDrawInside(false)
-
-            centerText = if (statusId == EquipmentStatusEnum.ALL.id) { // Đặt text giữa
-                "Tất Cả\nTrạng Thái"
-            } else {
-                "Thiết Bị\n${statusIdToStatusNameMapper(statusId)}"
+            centerText = when(statisticType) {
+                StatisticType.STATUS.typeName -> {
+                    if (statusId == EquipmentStatusEnum.ALL.id) { // Đặt text giữa
+                        "Tất Cả\nTrạng Thái"
+                    } else {
+                        "Thiết Bị\n${statusIdToStatusNameMapper(statusId)}"
+                    }
+                }
+                StatisticType.RISK.typeName -> "Mức Độ\nRủi Ro"
+                else -> ""
             }
+
             setCenterTextSize(16f) // Cỡ chữ text giữa
 
             setHoleRadius(40f) // Độ rộng bán kinh của lỗ giữa, tính theo phần trăm so với cả bán kính biểu đồ
@@ -116,7 +147,13 @@ class StatisticFragment : Fragment() {
         }
 
         // Dữ liệu biểu đồ
-        val pieEntries = getPieEntries(statusId)
+        val pieEntries = when(statisticType) {
+            StatisticType.STATUS.typeName -> getStatusPieEntries(statusId)
+            StatisticType.RISK.typeName -> getRiskPieEntries()
+            else -> ArrayList<PieEntry>()
+        }
+
+
 
         // Khởi tạo PieDataSet với danh sách PieEntry và chuỗi mô tả "Colors"
         val pieDataSet = PieDataSet(pieEntries, "Colors")
@@ -146,7 +183,7 @@ class StatisticFragment : Fragment() {
         pieChart.invalidate()
     }
 
-    private fun getPieEntries(statusId: Int?): ArrayList<PieEntry> {
+    private fun getStatusPieEntries(statusId: Int?): ArrayList<PieEntry> {
         // Dữ liệu biểu đồ
         val pieEntries = ArrayList<PieEntry>()
 
@@ -165,6 +202,33 @@ class StatisticFragment : Fragment() {
         // Thêm dữ liệu vào danh sách PieEntry để tạo biểu đồ Pie Chart
         for ((departmentName, count) in equipmentCountByDepartmentName) {
             pieEntries.add(PieEntry(count.toFloat(), departmentName))
+        }
+        return pieEntries
+    }
+
+    private fun getRiskPieEntries(): ArrayList<PieEntry> {
+        // Dữ liệu biểu đồ
+        val pieEntries = ArrayList<PieEntry>()
+
+        // Tạo một HashMap để lưu trữ số lượng Equipment cho mỗi tên department
+        val equipmentCountByRiskLevel = mutableMapOf<String, Int>()
+
+        // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo tên department
+        for (equipment in mutableListEquipment!!) {
+            equipment.equipmentRiskLevel?.name?.let {
+                equipmentCountByRiskLevel[it] = equipmentCountByRiskLevel.getOrDefault(it, 0) + 1
+            }
+        }
+        for (equipment in mutableListEquipment!!) {
+            val riskLevel = equipment.equipmentRiskLevel?.name
+            if (riskLevel.isNullOrEmpty()) {
+                equipmentCountByRiskLevel["Không xác định"] = equipmentCountByRiskLevel.getOrDefault("Không xác định", 0) + 1
+            }
+        }
+
+        // Thêm dữ liệu vào danh sách PieEntry để tạo biểu đồ Pie Chart
+        for ((riskLevel, count) in equipmentCountByRiskLevel) {
+            pieEntries.add(PieEntry(count.toFloat(), riskLevel))
         }
         return pieEntries
     }
@@ -221,5 +285,10 @@ class StatisticFragment : Fragment() {
                 }
             }
         })
+    }
+
+    enum class StatisticType(val id: Int, val typeName: String) {
+        STATUS(0, "Trạng Thái"),
+        RISK(1,  "Mức Độ Rủi Ro")
     }
 }
