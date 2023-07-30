@@ -24,7 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/averta_std_cy_regular_3"
-            android:maxLines="2"
             android:textColor="@color/black"
             android:textSize="14dp"
             tools:text="Thời gian: 17/03/2023" />
@@ -36,17 +35,15 @@
             android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
             android:fontFamily="@font/averta_std_cy_regular_3"
-            android:maxLines="2"
             android:textColor="@color/black"
             android:textSize="14dp"
-            tools:text="Nội dung: Thiết bị abc đã được báo hỏng rất là nặngggggggggggggg" />
+            tools:text="Nội dung: Thiết bị Máy chụp X quang cao tần SHIMADZU của Khoa Chẩn đoán hình ảnh đã được báo hỏng" />
 
         <TextView
             android:id="@+id/noti_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/averta_std_cy_regular_3"
-            android:maxLines="2"
             android:textColor="@color/black"
             android:textSize="14dp"
             tools:text="Người gửi: Admin" />
