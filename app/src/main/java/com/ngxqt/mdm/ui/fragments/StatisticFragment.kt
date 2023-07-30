@@ -63,8 +63,14 @@ class StatisticFragment : Fragment() {
             statisticType = StatisticType.DEPARTMENT.typeName
             textButtonStatus = EquipmentStatusEnum.ALL.statusName
             getAllEquipment()
-            isFirstRendered = true
         }
+
+        binding.buttonRetry.setOnClickListener {
+            statisticType = StatisticType.DEPARTMENT.typeName
+            textButtonStatus = EquipmentStatusEnum.ALL.statusName
+            getAllEquipment()
+        }
+
         binding.btnStatisticType.apply {
             setText(StatisticType.DEPARTMENT.typeName)
             setOnClickListener {
@@ -305,6 +311,9 @@ class StatisticFragment : Fragment() {
         lifecycleScope.launch {
             userPreferences.accessTokenString()?.let { viewModel.getAllEquipments(it) }
             binding.paginationProgressBar.visibility = View.VISIBLE
+            binding.buttonRetry.visibility = View.GONE
+            binding.imageError.visibility = View.GONE
+            binding.textViewError.visibility = View.GONE
         }
         //Get LiveData
         viewModel.getAllEquipmentsResponseLiveData.observe(viewLifecycleOwner, Observer {
@@ -316,12 +325,16 @@ class StatisticFragment : Fragment() {
                             mutableListEquipment = it.data.data?.equipments
                             setupPieChart(EquipmentStatusEnum.ALL.statusName)
                             buttonClickable = true
+                            isFirstRendered = true
                         } else {
                             Toast.makeText(requireContext(),it.data?.message, Toast.LENGTH_SHORT).show()
                         }
                     }
                     is Resource.Error -> {
                         binding.paginationProgressBar.visibility = View.GONE
+                        binding.buttonRetry.visibility = View.VISIBLE
+                        binding.imageError.visibility = View.VISIBLE
+                        binding.textViewError.visibility = View.VISIBLE
                         Toast.makeText(requireContext(),"${it.message}", Toast.LENGTH_SHORT).show()
                         LogUtils.d("GETALLEQUIPMENT_OBSERVER_ERROR: ${it.message}")
                     }
