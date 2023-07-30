@@ -111,7 +111,7 @@ class BrokenReportFragment : Fragment(), BiometricHelper.BiometricCallback {
             val departmentId = equipment.department?.id
             val departmentName = equipment.department?.name
             val userId = deferredUserId.await()
-            val repairDate = SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().time)
+            val repairDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'").format(Calendar.getInstance().time)
             val reportStatus = 0
             val repairPriority = 1
 

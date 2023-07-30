@@ -58,9 +58,9 @@ class HistoryPagingAdapter(private val typeHistory: String?) :
                             "Ngày báo hỏng: ${outputFormat.format(date as Date)}"
                         } ?: "Ngày báo hỏng: Không có dữ liệu"
 
-                        inventoryNote.text = equipment.reason?.let {
-                            "Lí do sửa chữa: ${it.trim()}"
-                        } ?: "Lí do sửa chữa: Không có dữ liệu"
+                        inventoryNote.text = equipment.repairStatusObj?.name?.let {
+                            "Trạng thái sữa chữa: ${it.trim()}"
+                        } ?: "Trạng thái sữa chữa: Không có dữ liệu"
 
                         inventoryCreatedUser.visibility = View.GONE
                     }

@@ -80,7 +80,10 @@ data class Equipment(
     @SerializedName("schedule_approve_user_id") val scheduleApproveUserId: Int?,
     @SerializedName("test_user_id") val testUserId: Int?,
     @SerializedName("Provider") val provider: EquipmentSubField?,
-    @SerializedName("Repair_Status") val repairStatusObj: String?
+    @SerializedName("schedule_create_user") val scheduleCreateUser: EquipmentSubField?,
+    @SerializedName("test_user") val testUser: EquipmentSubField?,
+    @SerializedName("schedule_approve_user") val scheduleApproveUser: EquipmentSubField?,
+    @SerializedName("Repair_Status") val repairStatusObj: EquipmentSubField?
 ) : Parcelable
 
 @Parcelize
