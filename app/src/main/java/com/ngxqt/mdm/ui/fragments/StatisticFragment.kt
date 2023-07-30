@@ -38,13 +38,12 @@ class StatisticFragment : Fragment() {
     private val viewModel: StatisticViewModel by viewModels()
     private var _binding: FragmentStatisticBinding? = null
     private val binding get() = _binding!!
-    private lateinit var barChart: BarChart
     private lateinit var pieChart: PieChart
     private var mutableListEquipment: MutableList<Equipment>? = mutableListOf()
     private var buttonClickable = false
     private var isFirstRendered = false
     private var statusName: String? = null
-    private var departmentNmame: String? = null
+    private var departmentName: String? = null
     private var textButtonStatus: String? = null
     private var statisticType: String? = null
 
@@ -158,10 +157,10 @@ class StatisticFragment : Fragment() {
         departmentList.addAll(departmentSet)
         val dialog = MyDialog(departmentList,"Chọn Khoa Phòng", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
-                departmentNmame = departmentList.get(position)
-                textButtonStatus = departmentNmame
+                departmentName = departmentList.get(position)
+                textButtonStatus = departmentName
                 binding.btnStatisticDepartment.setText(textButtonStatus)
-                setupPieChart(departmentName = departmentNmame)
+                setupPieChart(departmentName = departmentName)
             }
         })
         dialog.show(parentFragmentManager, MyDialog.FILTER_DIALOG)
@@ -201,14 +200,7 @@ class StatisticFragment : Fragment() {
         }
 
         // Dữ liệu biểu đồ
-        val pieEntries = when(statisticType) {
-            StatisticType.DEPARTMENT.typeName -> getDepartmentPieEntries(statusName)
-            StatisticType.STATUS.typeName -> getStatusPieEntries(departmentName)
-            StatisticType.RISK.typeName -> getRiskPieEntries()
-            else -> ArrayList<PieEntry>()
-        }
-
-
+        val pieEntries = getPieEntries(statusName, departmentName)
 
         // Khởi tạo PieDataSet với danh sách PieEntry và chuỗi mô tả "Colors"
         val pieDataSet = PieDataSet(pieEntries, "Colors")
@@ -238,76 +230,51 @@ class StatisticFragment : Fragment() {
         pieChart.invalidate()
     }
 
-    private fun getDepartmentPieEntries(statusName: String?): ArrayList<PieEntry> {
+    private fun getPieEntries(statusName: String? = null, departmentName: String? = null): ArrayList<PieEntry> {
         // Dữ liệu biểu đồ
         val pieEntries = ArrayList<PieEntry>()
 
         // Tạo một HashMap để lưu trữ số lượng Equipment cho mỗi tên department
-        val equipmentCountByDepartmentName = mutableMapOf<String, Int>()
+        val equipmentCount = mutableMapOf<String, Int>()
 
-        // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo tên department
-        for (equipment in mutableListEquipment!!) {
-            if (statusName == EquipmentStatusEnum.ALL.statusName || statusName == equipment.equipmentStatus?.name) {
-                val departmentName = equipment.department?.name ?: "Khoa phòng khác"
-                // Kiểm tra nếu tên department đã có trong HashMap, nếu có thì tăng giá trị lên 1, nếu không thì thêm mới với giá trị 1
-                equipmentCountByDepartmentName[departmentName] = equipmentCountByDepartmentName.getOrDefault(departmentName, 0) + 1
+        // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo typeName
+        when (statisticType) {
+            StatisticType.DEPARTMENT.typeName -> {
+                for (equipment in mutableListEquipment!!) {
+                    if (statusName == EquipmentStatusEnum.ALL.statusName || statusName == equipment.equipmentStatus?.name) {
+                        val departmentName = equipment.department?.name ?: "Khoa phòng khác"
+                        // Kiểm tra nếu tên department đã có trong HashMap, nếu có thì tăng giá trị lên 1, nếu không thì thêm mới với giá trị 1
+                        equipmentCount[departmentName] = equipmentCount.getOrDefault(departmentName, 0) + 1
+                    }
+                }
+            }
+            StatisticType.STATUS.typeName -> {
+                for (equipment in mutableListEquipment!!) {
+                    if (departmentName == "Tất cả" || departmentName == equipment.department?.name) {
+                        val status = equipment.equipmentStatus?.name ?: "Không xác định"
+                        equipmentCount[status] = equipmentCount.getOrDefault(status, 0) + 1
+                    }
+                }
+
+            }
+            StatisticType.RISK.typeName -> {
+                for (equipment in mutableListEquipment!!) {
+                    equipment.equipmentRiskLevel?.name?.let {
+                        equipmentCount[it] = equipmentCount.getOrDefault(it, 0) + 1
+                    }
+                }
+                for (equipment in mutableListEquipment!!) {
+                    val riskLevel = equipment.equipmentRiskLevel?.name
+                    if (riskLevel.isNullOrEmpty()) {
+                        equipmentCount["Không xác định"] = equipmentCount.getOrDefault("Không xác định", 0) + 1
+                    }
+                }
             }
         }
 
         // Thêm dữ liệu vào danh sách PieEntry để tạo biểu đồ Pie Chart
-        for ((departmentName, count) in equipmentCountByDepartmentName) {
-            pieEntries.add(PieEntry(count.toFloat(), departmentName))
-        }
-        return pieEntries
-    }
-
-    private fun getStatusPieEntries(departmentName: String?): ArrayList<PieEntry> {
-        // Dữ liệu biểu đồ
-        val pieEntries = ArrayList<PieEntry>()
-
-        // Tạo một HashMap để lưu trữ số lượng Equipment cho mỗi tên department
-        val equipmentCountByStatus = mutableMapOf<String, Int>()
-
-        // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo tên department
-        for (equipment in mutableListEquipment!!) {
-            if (departmentName == "Tất cả" || departmentName == equipment.department?.name) {
-                val status = equipment.equipmentStatus?.name ?: "Không xác định"
-                // Kiểm tra nếu tên department đã có trong HashMap, nếu có thì tăng giá trị lên 1, nếu không thì thêm mới với giá trị 1
-                equipmentCountByStatus[status] = equipmentCountByStatus.getOrDefault(status, 0) + 1
-            }
-        }
-
-        // Thêm dữ liệu vào danh sách PieEntry để tạo biểu đồ Pie Chart
-        for ((status, count) in equipmentCountByStatus) {
-            pieEntries.add(PieEntry(count.toFloat(), status))
-        }
-        return pieEntries
-    }
-
-
-    private fun getRiskPieEntries(): ArrayList<PieEntry> {
-        // Dữ liệu biểu đồ
-        val pieEntries = ArrayList<PieEntry>()
-
-        // Tạo một HashMap để lưu trữ số lượng Equipment cho mỗi tên department
-        val equipmentCountByRiskLevel = mutableMapOf<String, Int>()
-
-        // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo tên department
-        for (equipment in mutableListEquipment!!) {
-            equipment.equipmentRiskLevel?.name?.let {
-                equipmentCountByRiskLevel[it] = equipmentCountByRiskLevel.getOrDefault(it, 0) + 1
-            }
-        }
-        for (equipment in mutableListEquipment!!) {
-            val riskLevel = equipment.equipmentRiskLevel?.name
-            if (riskLevel.isNullOrEmpty()) {
-                equipmentCountByRiskLevel["Không xác định"] = equipmentCountByRiskLevel.getOrDefault("Không xác định", 0) + 1
-            }
-        }
-
-        // Thêm dữ liệu vào danh sách PieEntry để tạo biểu đồ Pie Chart
-        for ((riskLevel, count) in equipmentCountByRiskLevel) {
-            pieEntries.add(PieEntry(count.toFloat(), riskLevel))
+        for ((typeName, count) in equipmentCount) {
+            pieEntries.add(PieEntry(count.toFloat(), typeName))
         }
         return pieEntries
     }
