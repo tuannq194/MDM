@@ -72,19 +72,20 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layoutButtonStatus"
+                android:id="@+id/layoutButtonStatusDepartment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:weightSum="2"
-                android:visibility="visible"
-                tools:visibility="visible">
+                android:visibility="visible">
 
                 <LinearLayout
+                    android:id="@+id/layoutButtonStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:visibility="visible"
                     android:orientation="vertical">
 
                     <TextView
@@ -122,6 +123,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/layoutButtonDepartment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -148,7 +150,7 @@
                         app:cardCornerRadius="20dp">
 
                         <Button
-                            android:id="@+id/btn_equipments_filter_department"
+                            android:id="@+id/btn_statistic_department"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@android:color/transparent"

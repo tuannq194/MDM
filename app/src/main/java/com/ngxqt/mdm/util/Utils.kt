@@ -14,26 +14,26 @@ internal fun isUrlValid(url: String): Boolean {
 
 internal fun statusNameToStatusIdMapper(statusName: String?): Int? {
     return when (statusName) {
-        "Tất Cả" -> EquipmentStatusEnum.ALL.id
-        "Mới" -> EquipmentStatusEnum.NEW.id
-        "Đang Sử Dụng" -> EquipmentStatusEnum.ACTIVE.id
-        "Đang Báo Hỏng" -> EquipmentStatusEnum.WAS_BROKEN.id
-        "Đang Sửa Chữa" -> EquipmentStatusEnum.REPAIRED.id
-        "Đã Thanh Lý" -> EquipmentStatusEnum.LIQUIDATED.id
-        "Ngưng Sử Dụng" -> EquipmentStatusEnum.INACTIVE.id
+        EquipmentStatusEnum.ALL.statusName-> EquipmentStatusEnum.ALL.id
+        EquipmentStatusEnum.NEW.statusName -> EquipmentStatusEnum.NEW.id
+        EquipmentStatusEnum.ACTIVE.statusName -> EquipmentStatusEnum.ACTIVE.id
+        EquipmentStatusEnum.WAS_BROKEN.statusName -> EquipmentStatusEnum.WAS_BROKEN.id
+        EquipmentStatusEnum.REPAIRED.statusName -> EquipmentStatusEnum.REPAIRED.id
+        EquipmentStatusEnum.INACTIVE.statusName -> EquipmentStatusEnum.INACTIVE.id
+        EquipmentStatusEnum.LIQUIDATED.statusName -> EquipmentStatusEnum.LIQUIDATED.id
         else -> null
     }
 }
 
 internal fun statusIdToStatusNameMapper(statusId: Int?): String {
     return when (statusId) {
-        EquipmentStatusEnum.ALL.id ->"Tất Cả"
-        EquipmentStatusEnum.NEW.id -> "Mới"
-        EquipmentStatusEnum.ACTIVE.id -> "Đang Sử Dụng"
-        EquipmentStatusEnum.WAS_BROKEN.id -> "Đang Báo Hỏng"
-        EquipmentStatusEnum.REPAIRED.id -> "Đang Sửa Chữa"
-        EquipmentStatusEnum.LIQUIDATED.id -> "Đã Thanh Lý"
-        EquipmentStatusEnum.INACTIVE.id -> "Ngưng Sử Dụng"
+        EquipmentStatusEnum.ALL.id-> EquipmentStatusEnum.ALL.statusName
+        EquipmentStatusEnum.NEW.id -> EquipmentStatusEnum.NEW.statusName
+        EquipmentStatusEnum.ACTIVE.id -> EquipmentStatusEnum.ACTIVE.statusName
+        EquipmentStatusEnum.WAS_BROKEN.id -> EquipmentStatusEnum.WAS_BROKEN.statusName
+        EquipmentStatusEnum.REPAIRED.id -> EquipmentStatusEnum.REPAIRED.statusName
+        EquipmentStatusEnum.INACTIVE.id -> EquipmentStatusEnum.INACTIVE.statusName
+        EquipmentStatusEnum.LIQUIDATED.id -> EquipmentStatusEnum.LIQUIDATED.statusName
         else -> ""
     }
 }

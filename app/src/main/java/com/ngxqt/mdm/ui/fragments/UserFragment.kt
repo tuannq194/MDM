@@ -20,10 +20,11 @@ import com.ngxqt.mdm.data.local.UserPreferences
 import com.ngxqt.mdm.databinding.FragmentUserBinding
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.viewmodels.UserViewModel
-import com.ngxqt.mdm.util.*
+import com.ngxqt.mdm.util.BiometricHelper
 import com.ngxqt.mdm.util.BiometricHelper.authenticate
 import com.ngxqt.mdm.util.BiometricHelper.initBiometric
-import com.ngxqt.mdm.util.statusNameToStatusIdMapper
+import com.ngxqt.mdm.util.LogUtils
+import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

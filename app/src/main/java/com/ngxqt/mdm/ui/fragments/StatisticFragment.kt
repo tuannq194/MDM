@@ -2,7 +2,6 @@ package com.ngxqt.mdm.ui.fragments
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -26,7 +27,9 @@ import com.ngxqt.mdm.ui.adapters.LegendAdapter
 import com.ngxqt.mdm.ui.dialog.MyDialog
 import com.ngxqt.mdm.ui.model.LegendItemModel
 import com.ngxqt.mdm.ui.viewmodels.StatisticViewModel
-import com.ngxqt.mdm.util.*
+import com.ngxqt.mdm.util.EquipmentStatusEnum
+import com.ngxqt.mdm.util.LogUtils
+import com.ngxqt.mdm.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -41,6 +44,7 @@ class StatisticFragment : Fragment() {
     private var buttonClickable = false
     private var isFirstRendered = false
     private var statusName: String? = null
+    private var departmentNmame: String? = null
     private var textButtonStatus: String? = null
     private var statisticType: String? = null
 
@@ -57,13 +61,13 @@ class StatisticFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!isFirstRendered){
-            statisticType = StatisticType.STATUS.typeName
-            textButtonStatus = statusIdToStatusNameMapper(0)
+            statisticType = StatisticType.DEPARTMENT.typeName
+            textButtonStatus = EquipmentStatusEnum.ALL.statusName
             getAllEquipment()
             isFirstRendered = true
         }
         binding.btnStatisticType.apply {
-            setText("Trạng Thái")
+            setText(StatisticType.DEPARTMENT.typeName)
             setOnClickListener {
                 showDialogSelectType()
             }
@@ -76,23 +80,44 @@ class StatisticFragment : Fragment() {
                 else Toast.makeText(requireContext(),"Đợi Tải Dữ Liệu", Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.btnStatisticDepartment.apply {
+            setText(textButtonStatus)
+            setOnClickListener {
+                if (buttonClickable && mutableListEquipment != null) showDialogDepartment()
+                else Toast.makeText(requireContext(),"Đợi Tải Dữ Liệu", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun showDialogSelectType() {
-        val statusList = mutableListOf(
+        val typeList = mutableListOf(
+            StatisticType.DEPARTMENT.typeName,
             StatisticType.STATUS.typeName,
             StatisticType.RISK.typeName
         )
-        val dialog = MyDialog(statusList,"Chọn Loại Dữ Liệu Cần Thống Kê", object : MyDialog.OnPickerItemSelectedListener{
+        val dialog = MyDialog(typeList,"Chọn Loại Dữ Liệu Cần Thống Kê", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
-                statisticType = statusList.get(position)
-                if (position == 0) {
-                    binding.layoutButtonStatus.visibility = View.VISIBLE
-                    setupPieChart(EquipmentStatusEnum.ALL.id)
-                }
-                else if (position == 1) {
-                    binding.layoutButtonStatus.visibility = View.GONE
-                    setupPieChart(null)
+                statisticType = typeList.get(position)
+                when(statisticType) {
+                    StatisticType.DEPARTMENT.typeName -> {
+                        binding.layoutButtonStatusDepartment.visibility = View.VISIBLE
+                        binding.layoutButtonStatus.visibility = View.VISIBLE
+                        binding.layoutButtonDepartment.visibility = View.GONE
+                        binding.btnStatisticStatus.text = EquipmentStatusEnum.ALL.statusName
+                        setupPieChart(statusName = EquipmentStatusEnum.ALL.statusName)
+                    }
+                    StatisticType.STATUS.typeName -> {
+                        binding.layoutButtonStatusDepartment.visibility = View.VISIBLE
+                        binding.layoutButtonStatus.visibility = View.GONE
+                        binding.layoutButtonDepartment.visibility = View.VISIBLE
+                        binding.btnStatisticDepartment.text = "Tất cả"
+                        setupPieChart(departmentName = "Tất cả")
+                    }
+                    StatisticType.RISK.typeName -> {
+                        binding.layoutButtonStatusDepartment.visibility = View.GONE
+                        setupPieChart()
+                    }
                 }
                 binding.btnStatisticType.setText(statisticType)
             }
@@ -109,18 +134,40 @@ class StatisticFragment : Fragment() {
             EquipmentStatusEnum.INACTIVE.statusName,
             EquipmentStatusEnum.LIQUIDATED.statusName
         )
-        val dialog = MyDialog(statusList,"Thống Kê Trạng Thái", object : MyDialog.OnPickerItemSelectedListener{
+        val dialog = MyDialog(statusList,"Chọn Trạng Thái", object : MyDialog.OnPickerItemSelectedListener{
             override fun onPickerItemSelected(position: Int) {
                 statusName = statusList.get(position)
                 textButtonStatus = statusName
                 binding.btnStatisticStatus.setText(textButtonStatus)
-                setupPieChart(statusNameToStatusIdMapper(statusName))
+                setupPieChart(statusName)
             }
         })
         dialog.show(parentFragmentManager, MyDialog.FILTER_DIALOG)
     }
 
-    private fun setupPieChart(statusId: Int?) {
+    private fun showDialogDepartment(){
+        val departmentSet = mutableSetOf<String>()
+        for (equipment in mutableListEquipment!!) {
+            equipment.department?.name?.let { departmentName ->
+                departmentSet.add(departmentName)
+            }
+        }
+
+        val departmentList = mutableListOf<String>()
+        departmentList.add("Tất cả")
+        departmentList.addAll(departmentSet)
+        val dialog = MyDialog(departmentList,"Chọn Khoa Phòng", object : MyDialog.OnPickerItemSelectedListener{
+            override fun onPickerItemSelected(position: Int) {
+                departmentNmame = departmentList.get(position)
+                textButtonStatus = departmentNmame
+                binding.btnStatisticDepartment.setText(textButtonStatus)
+                setupPieChart(departmentName = departmentNmame)
+            }
+        })
+        dialog.show(parentFragmentManager, MyDialog.FILTER_DIALOG)
+    }
+
+    private fun setupPieChart(statusName: String? = null, departmentName: String? = null) {
         pieChart = binding.statisticPieChart
         pieChart.apply {
             visibility = View.VISIBLE
@@ -128,14 +175,21 @@ class StatisticFragment : Fragment() {
             legend.isEnabled = false
 
             centerText = when(statisticType) {
-                StatisticType.STATUS.typeName -> {
-                    if (statusId == EquipmentStatusEnum.ALL.id) { // Đặt text giữa
-                        "Tất Cả\nTrạng Thái"
+                StatisticType.DEPARTMENT.typeName -> {
+                    if (statusName == EquipmentStatusEnum.ALL.statusName) { // Đặt text giữa
+                        "Tất cả\nTrạng thái"
                     } else {
-                        "Thiết Bị\n${statusIdToStatusNameMapper(statusId)}"
+                        "Thiết bị\n${statusName}"
                     }
                 }
-                StatisticType.RISK.typeName -> "Mức Độ\nRủi Ro"
+                StatisticType.STATUS.typeName -> {
+                    if (departmentName == "Tất cả") { // Đặt text giữa
+                        "Tất cả\nKhoa phòng"
+                    } else {
+                        "${departmentName}"
+                    }
+                }
+                StatisticType.RISK.typeName -> "Mức độ\nRủi ro"
                 else -> ""
             }
 
@@ -148,7 +202,8 @@ class StatisticFragment : Fragment() {
 
         // Dữ liệu biểu đồ
         val pieEntries = when(statisticType) {
-            StatisticType.STATUS.typeName -> getStatusPieEntries(statusId)
+            StatisticType.DEPARTMENT.typeName -> getDepartmentPieEntries(statusName)
+            StatisticType.STATUS.typeName -> getStatusPieEntries(departmentName)
             StatisticType.RISK.typeName -> getRiskPieEntries()
             else -> ArrayList<PieEntry>()
         }
@@ -183,7 +238,7 @@ class StatisticFragment : Fragment() {
         pieChart.invalidate()
     }
 
-    private fun getStatusPieEntries(statusId: Int?): ArrayList<PieEntry> {
+    private fun getDepartmentPieEntries(statusName: String?): ArrayList<PieEntry> {
         // Dữ liệu biểu đồ
         val pieEntries = ArrayList<PieEntry>()
 
@@ -192,8 +247,8 @@ class StatisticFragment : Fragment() {
 
         // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo tên department
         for (equipment in mutableListEquipment!!) {
-            if (statusId == 0 || equipment.statusId == statusId) {
-                val departmentName = equipment.department?.name ?: "Khoa Phòng Khác"
+            if (statusName == EquipmentStatusEnum.ALL.statusName || statusName == equipment.equipmentStatus?.name) {
+                val departmentName = equipment.department?.name ?: "Khoa phòng khác"
                 // Kiểm tra nếu tên department đã có trong HashMap, nếu có thì tăng giá trị lên 1, nếu không thì thêm mới với giá trị 1
                 equipmentCountByDepartmentName[departmentName] = equipmentCountByDepartmentName.getOrDefault(departmentName, 0) + 1
             }
@@ -205,6 +260,30 @@ class StatisticFragment : Fragment() {
         }
         return pieEntries
     }
+
+    private fun getStatusPieEntries(departmentName: String?): ArrayList<PieEntry> {
+        // Dữ liệu biểu đồ
+        val pieEntries = ArrayList<PieEntry>()
+
+        // Tạo một HashMap để lưu trữ số lượng Equipment cho mỗi tên department
+        val equipmentCountByStatus = mutableMapOf<String, Int>()
+
+        // Duyệt qua danh sách mutableListEquipment và đếm số lượng theo tên department
+        for (equipment in mutableListEquipment!!) {
+            if (departmentName == "Tất cả" || departmentName == equipment.department?.name) {
+                val status = equipment.equipmentStatus?.name ?: "Không xác định"
+                // Kiểm tra nếu tên department đã có trong HashMap, nếu có thì tăng giá trị lên 1, nếu không thì thêm mới với giá trị 1
+                equipmentCountByStatus[status] = equipmentCountByStatus.getOrDefault(status, 0) + 1
+            }
+        }
+
+        // Thêm dữ liệu vào danh sách PieEntry để tạo biểu đồ Pie Chart
+        for ((status, count) in equipmentCountByStatus) {
+            pieEntries.add(PieEntry(count.toFloat(), status))
+        }
+        return pieEntries
+    }
+
 
     private fun getRiskPieEntries(): ArrayList<PieEntry> {
         // Dữ liệu biểu đồ
@@ -268,7 +347,7 @@ class StatisticFragment : Fragment() {
                         binding.paginationProgressBar.visibility = View.GONE
                         if (it.data?.success == true) {
                             mutableListEquipment = it.data.data?.equipments
-                            setupPieChart(EquipmentStatusEnum.ALL.id)
+                            setupPieChart(EquipmentStatusEnum.ALL.statusName)
                             buttonClickable = true
                         } else {
                             Toast.makeText(requireContext(),it.data?.message, Toast.LENGTH_SHORT).show()
@@ -288,7 +367,8 @@ class StatisticFragment : Fragment() {
     }
 
     enum class StatisticType(val id: Int, val typeName: String) {
-        STATUS(0, "Trạng Thái"),
-        RISK(1,  "Mức Độ Rủi Ro")
+        DEPARTMENT(0, "Khoa phòng"),
+        STATUS(1, "Trạng thái"),
+        RISK(2,  "Mức độ rủi ro")
     }
 }

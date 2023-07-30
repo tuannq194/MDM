@@ -90,7 +90,7 @@ class MyDialog() : DialogFragment() {
             dialogPicker.visibility = View.VISIBLE
             dialogPicker.maxValue = items?.size?.minus(1) ?: 0
             dialogPicker.displayedValues = items?.toTypedArray()
-            dialogPicker.wrapSelectorWheel = false
+            dialogPicker.wrapSelectorWheel = true
             dialogOk.setOnClickListener {
                 itemSelectedlistener?.onPickerItemSelected(binding.dialogPicker.value)
                 dialog?.dismiss()
