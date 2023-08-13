@@ -12,8 +12,10 @@ import com.budiyev.android.codescanner.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ngxqt.mdm.R
 import com.ngxqt.mdm.databinding.FragmentScanBinding
+import com.ngxqt.mdm.util.LogUtils
 import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.disposables.Disposable
+import org.json.JSONObject
 
 class ScanFragment : Fragment() {
     private var _binding: FragmentScanBinding? = null
@@ -77,12 +79,18 @@ class ScanFragment : Fragment() {
             // Callbacks
             decodeCallback = DecodeCallback {
                 getActivity()?.runOnUiThread {
-                    val equipmentId = it.toString().toIntOrNull()
-                    if (equipmentId != null) {
-                        val action = ScanFragmentDirections.actionScanFragmentToEquipmentDetailFragment(equipmentId)
-                        findNavController().navigate(action)
-                    } else {
-                        Toast.makeText(requireContext(), "Mã QR Không Phải ID Của Thiết Bị", Toast.LENGTH_SHORT).show()
+                    try {
+                        val jsonObject = JSONObject(it.toString())
+                        val equipmentId = jsonObject.getInt("id")
+                        if (equipmentId != null) {
+                            val action = ScanFragmentDirections.actionScanFragmentToEquipmentDetailFragment(equipmentId)
+                            findNavController().navigate(action)
+                        } else {
+                            Toast.makeText(requireContext(), "Mã QR Không Phải ID Của Thiết Bị", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "Lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
+                        LogUtils.d("Error parsing JSON: ${e.message}")
                     }
                 }
             }
